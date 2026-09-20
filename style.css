@@ -130,6 +130,7 @@ h1 { font-size:clamp(32px,5vw,44px); font-weight:400; letter-spacing:.01em; line
 .reader-dialog { background:var(--white); }
 .preview-banner { background:var(--accent-soft); color:var(--ink); }
 html.pm-embed,html.pm-embed body,html.pm-embed .hero { background:transparent; }
+html.pm-embed,html.pm-embed body { overflow:hidden; }
 html.pm-embed .page { max-width:920px; padding:0 2px; }
 html.pm-embed .hero { padding-top:10px; border-bottom-color:transparent; }
 html.pm-embed .footer { padding-bottom:24px; }
