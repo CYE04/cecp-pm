@@ -94,12 +94,19 @@
         window.PMSongs.mount(songHost, data.songs, root.dataset);
       }
       if (key === 'reading') {
-        if (data.reading?.reference) {
-          const card = el('div', 'reading-card');
-          append(card, el('p', 'reading-ref', data.reading.reference));
-          if (data.reading.note) card.appendChild(el('p', 'muted', data.reading.note));
-          box.appendChild(card);
-          window.PMBible.mount(box, data.reading, root.dataset.bibleApi);
+        if (data.reading) {
+          // 支持缩写写法：reading: "诗 37" 或 reading: { ref: "林前 3:1-23", note: "..." }
+          const raw = data.reading;
+          const refStr = typeof raw === 'string' ? raw : raw.ref;
+          const reading = (refStr ? window.PMBible.parseRef(refStr) : null) || (typeof raw === 'object' ? raw : null);
+          const note = typeof raw === 'object' ? raw.note : undefined;
+          if (reading?.reference) {
+            const card = el('div', 'reading-card');
+            append(card, el('p', 'reading-ref', reading.reference));
+            if (note) card.appendChild(el('p', 'muted', note));
+            box.appendChild(card);
+            window.PMBible.mount(box, reading, root.dataset.bibleApi);
+          }
         }
         if (Array.isArray(data.offeringSongs) && data.offeringSongs.length) {
           const offeringHost = el('div', 'song-host'); box.appendChild(offeringHost);
@@ -108,7 +115,10 @@
         if (data.offering) box.appendChild(el('p', 'stage-description', data.offering));
       }
       if (key === 'sermon') {
-        const sermon = data.sermon || {};
+        const raw = data.sermon || {};
+        // 支持 ref 缩写：sermon: { ref: "gldqs 3 1 23", title: "...", ... }
+        const parsed = raw.ref ? window.PMBible.parseRef(raw.ref) : null;
+        const sermon = parsed ? { ...parsed, ...raw, reference: raw.reference || parsed.reference } : raw;
         if (sermon.title || sermon.speaker || sermon.reference || (Array.isArray(sermon.outline) && sermon.outline.length)) {
           const card = el('div', 'sermon-card');
           if (sermon.title) card.appendChild(el('h3', '', sermon.title));

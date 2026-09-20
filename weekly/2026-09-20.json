@@ -11,7 +11,7 @@
     { "start": "16:00", "end": "17:00", "title": "证道", "section": "sermon", "roles": ["note"] },
     { "start": "17:00", "title": "祝福祷告散会", "section": "dismissal" }
   ],
-  "reading": { "reference": "诗篇 37 篇", "book": 19, "chapter": 37 },
+  "reading": "sp 37",
   "songs": [
     { "title": "向主欢呼" },
     { "title": "你永远如此深爱着我" },
@@ -21,12 +21,8 @@
     { "title": "唱出耶稣的伟大" }
   ],
   "sermon": {
+    "ref": "gldqs 3 1 23",
     "title": "在基督根基上成长建造",
-    "reference": "哥林多前书 3:1–23",
-    "book": 46,
-    "chapter": 3,
-    "start": 1,
-    "end": 23,
     "outline": ["离开婴孩的阶段", "认清领袖是执事", "在基督里谨慎建造", "在圣灵里归属归位"]
   },
   "announcements": [
