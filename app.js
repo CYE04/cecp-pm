@@ -53,7 +53,6 @@
         await navigator.clipboard.writeText(url.href); shareStatus.textContent = '本周链接已复制';
       } catch (_) { shareStatus.textContent = '请复制浏览器地址栏中的链接'; }
     }));
-    actions.appendChild(window.PMFeatures.button('打印程序', () => window.print()));
     actions.appendChild(shareStatus); hero.appendChild(actions);
     page.appendChild(hero);
 

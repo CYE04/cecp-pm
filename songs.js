@@ -122,16 +122,26 @@
         try {
           await loadEngine(config.songEngine);
           scoreHost.replaceChildren(window.YouthEngine.renderSongObjects(scores));
-          scoreHost.querySelectorAll('.yt-btn').forEach(a => {
-            a.title = '观看诗歌视频'; a.setAttribute('aria-label', '观看诗歌视频');
-            if (a.getAttribute('href') === '#') a.remove();
+          // 把 YouTube 链接移到歌曲标题区旁边，移除其他工具栏按钮
+          scoreHost.querySelectorAll('.sw-wrap').forEach(wrap => {
+            const hd = wrap.querySelector('.sw-hd');
+            const toolsRow = wrap.querySelector('.sw-tools-row');
+            if (hd && toolsRow) {
+              const ytBtn = toolsRow.querySelector('.yt-btn');
+              if (ytBtn) {
+                if (ytBtn.getAttribute('href') === '#') {
+                  ytBtn.remove();
+                } else {
+                  ytBtn.title = '观看诗歌视频'; ytBtn.setAttribute('aria-label', '观看诗歌视频');
+                  ytBtn.style.cssText = 'flex-shrink:0;';
+                  hd.appendChild(ytBtn);
+                }
+              }
+            }
+            // 移除下载图片、荧光笔画笔等工具，整个工具栏一并清除
+            wrap.querySelectorAll('.sw-tools').forEach(t => t.remove());
           });
           scoreHost.querySelectorAll('audio').forEach(audio => { audio.preload = 'none'; });
-          const colors = { yellow:'黄色', green:'绿色', pink:'粉色', blue:'蓝色', orange:'橙色' };
-          scoreHost.querySelectorAll('[aria-label^="荧光笔颜色 "]').forEach(control => {
-            const color = control.getAttribute('aria-label').split(' ').pop();
-            if (colors[color]) control.setAttribute('aria-label', '荧光笔颜色 ' + colors[color]);
-          });
           // 和弦仍保留标准音名，性质说明只显示中文。
           document.querySelectorAll('chord-explorer').forEach(explorer => {
             if (explorer.dataset.pmLocalized) return;
