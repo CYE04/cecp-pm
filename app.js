@@ -1,0 +1,239 @@
+(function () {
+  'use strict';
+
+  const root = document.getElementById('app');
+  const el = (tag, className, content) => {
+    const node = document.createElement(tag);
+    if (className) node.className = className;
+    if (content != null) node.textContent = String(content);
+    return node;
+  };
+  const append = (parent, ...children) => {
+    children.filter(Boolean).forEach(child => parent.appendChild(child));
+    return parent;
+  };
+  const safeUrl = value => window.PMFeatures.safeUrl(value);
+  const link = (label, href) => {
+    const a = el('a', 'resource-link', label + ' ↗');
+    a.href = href;
+    a.target = '_blank';
+    a.rel = 'noopener noreferrer';
+    return a;
+  };
+  const section = (id, title) => {
+    const box = el('section', 'content-section');
+    box.id = id;
+    box.appendChild(el('h2', '', title));
+    return box;
+  };
+
+  function render(data) {
+    const date = data.date || '';
+    const dateLabel = /^\d{4}-\d{2}-\d{2}$/.test(date)
+      ? new Intl.DateTimeFormat('zh-CN', { year: 'numeric', month: 'long', day: 'numeric', timeZone: 'UTC' }).format(new Date(date + 'T12:00:00Z'))
+      : date;
+    document.title = `${dateLabel}｜主日下午聚会`;
+    root.replaceChildren();
+
+    const page = el('main', 'page');
+    if (data.preview) page.appendChild(el('p', 'preview-banner', '功能预览 · 此页用于查看功能，不代表本周聚会歌单与回放'));
+    const hero = el('header', 'hero');
+    append(hero,
+      el('p', 'eyebrow', data.venue || '主日相聚'),
+      el('h1', '', data.title || '主日下午聚会'),
+      el('p', 'hero-date', dateLabel),
+      el('p', 'hero-meta', [data.time, data.venue].filter(Boolean).join('　·　'))
+    );
+    if (data.sermon?.title) hero.appendChild(el('p', 'hero-topic', data.sermon.title));
+    const actions = el('div', 'page-actions');
+    const shareStatus = el('span', 'reader-feedback'); shareStatus.setAttribute('role', 'status');
+    actions.appendChild(window.PMFeatures.button('复制本周链接', async () => {
+      try {
+        const url = new URL(location.href); url.searchParams.set('date', data.date); url.hash = '';
+        await navigator.clipboard.writeText(url.href); shareStatus.textContent = '本周链接已复制';
+      } catch (_) { shareStatus.textContent = '请复制浏览器地址栏中的链接'; }
+    }));
+    actions.appendChild(window.PMFeatures.button('打印程序', () => window.print()));
+    actions.appendChild(shareStatus); hero.appendChild(actions);
+    page.appendChild(hero);
+
+    if (Array.isArray(data.schedule) && data.schedule.length) {
+      const box = section('flow', '聚会流程');
+      const list = el('ul', 'schedule');
+      data.schedule.forEach(item => {
+        const row = el('li', 'schedule-row');
+        const time = [item.start, item.end].filter(Boolean).join('–');
+        const title = el('span', 'schedule-title', item.title || '');
+        const jump = /^[a-z][a-z0-9-]*$/.test(item.section || '') ? el('a', 'schedule-jump') : null;
+        if (jump) { jump.href = '#' + item.section; jump.appendChild(title); }
+        append(row, el('time', 'schedule-time', time), jump || title);
+        if (Array.isArray(item.roles) && item.roles.length) {
+          const people = el('p', 'schedule-people'); people.dataset.roles = item.roles.join(','); people.hidden = true;
+          row.appendChild(people);
+        }
+        list.appendChild(row);
+      });
+      box.appendChild(list);
+      page.appendChild(box);
+      window.PMFeatures.mountSchedule(date, data.schedule, list, data.timeZone || 'Europe/Rome');
+    }
+
+    // 正文直接依照同一份 schedule 数组输出，时间表与内容不会出现不同顺序。
+    (data.schedule || []).forEach(item => {
+      const key = item.section;
+      if (!/^[a-z][a-z0-9-]*$/.test(key || '')) return;
+      const box = section(key, item.title || '聚会环节');
+      box.classList.add('stage-section');
+      box.insertBefore(el('p', 'stage-time', [item.start, item.end].filter(Boolean).join('–')), box.querySelector('h2'));
+      if (Array.isArray(item.roles) && item.roles.length) {
+        const people = el('p', 'stage-people'); people.dataset.roles = item.roles.join(','); people.hidden = true;
+        box.appendChild(people);
+      }
+      if (key === 'prayer' && data.prayerText) box.appendChild(el('p', 'stage-description', data.prayerText));
+      if (key === 'worship' && Array.isArray(data.songs) && data.songs.length) {
+        const songHost = el('div', 'song-host'); box.appendChild(songHost);
+        window.PMSongs.mount(songHost, data.songs, root.dataset);
+      }
+      if (key === 'reading') {
+        if (data.reading?.reference) {
+          const card = el('div', 'reading-card');
+          append(card, el('p', 'reading-ref', data.reading.reference));
+          if (data.reading.note) card.appendChild(el('p', 'muted', data.reading.note));
+          box.appendChild(card);
+          window.PMBible.mount(box, data.reading, root.dataset.bibleApi);
+        }
+        if (Array.isArray(data.offeringSongs) && data.offeringSongs.length) {
+          const offeringHost = el('div', 'song-host'); box.appendChild(offeringHost);
+          window.PMSongs.mount(offeringHost, data.offeringSongs, root.dataset);
+        }
+        if (data.offering) box.appendChild(el('p', 'stage-description', data.offering));
+      }
+      if (key === 'sermon') {
+        const sermon = data.sermon || {};
+        if (sermon.title || sermon.speaker || sermon.reference || (Array.isArray(sermon.outline) && sermon.outline.length)) {
+          const card = el('div', 'sermon-card');
+          if (sermon.title) card.appendChild(el('h3', '', sermon.title));
+          if (sermon.reference) card.appendChild(el('p', 'sermon-ref', sermon.reference));
+          const speaker = el('p', 'muted', sermon.speaker ? '讲员 · ' + sermon.speaker : '');
+          speaker.hidden = !sermon.speaker;
+          if (!sermon.speaker) speaker.dataset.rosterSpeaker = 'true';
+          card.appendChild(speaker);
+          if (Array.isArray(sermon.outline) && sermon.outline.length) {
+            const points = el('ul', 'outline');
+            sermon.outline.forEach(point => points.appendChild(el('li', '', point)));
+            card.appendChild(points);
+          }
+          box.appendChild(card);
+          window.PMBible.mount(box, sermon, root.dataset.bibleApi);
+        }
+      }
+      page.appendChild(box);
+    });
+
+    if (root.dataset.api) {
+      const box = section('roster', '本周服事安排');
+      const body = el('div', 'roster-body');
+      body.setAttribute('aria-live', 'polite');
+      body.setAttribute('aria-atomic', 'true');
+      box.appendChild(body);
+      page.appendChild(box);
+      loadRoster(body, date);
+    }
+
+    if (Array.isArray(data.announcements) && data.announcements.length) {
+      const box = section('announcements', '本周通知');
+      data.announcements.forEach(item => {
+        const card = el('div', 'notice');
+        append(card, el('h3', '', item.title || '通知'), el('p', '', item.detail || ''));
+        box.appendChild(card);
+      });
+      page.appendChild(box);
+    }
+
+    const replay = safeUrl(data.replayUrl);
+    const replayBox = section('replay', '直播回放');
+    if (replay) {
+      const embed = window.PMFeatures.videoEmbed(replay);
+      if (embed) {
+        const frame = el('iframe', 'replay-frame'); frame.src = embed; frame.title = '直播回放'; frame.loading = 'lazy'; frame.allowFullscreen = true;
+        frame.allow = 'encrypted-media; picture-in-picture; fullscreen'; frame.referrerPolicy = 'strict-origin-when-cross-origin';
+        replayBox.appendChild(frame);
+      } else if (/\.(mp4|webm)(?:\?|$)/i.test(replay)) {
+        const video = el('video', 'replay-frame'); video.controls = true; video.preload = 'none'; video.src = replay;
+        video.setAttribute('aria-label', '直播回放'); replayBox.appendChild(video);
+      }
+      replayBox.appendChild(link('打开回放', replay));
+    } else {
+      replayBox.appendChild(el('p', 'replay-empty', '本周暂无直播回放。'));
+    }
+    page.appendChild(replayBox);
+
+    if (data.invitation) {
+      const box = section('invitation', '一同相聚');
+      box.appendChild(el('p', 'invitation', data.invitation)); page.appendChild(box);
+    }
+
+    append(page, el('footer', 'footer', [data.venue, '主日下午聚会'].filter(Boolean).join(' · ')));
+    root.appendChild(page);
+  }
+
+  async function loadRoster(body, date) {
+    body.setAttribute('aria-busy', 'true');
+    body.replaceChildren(el('p', 'roster-status', '正在读取本周服事安排…'));
+    try {
+      const roster = await window.PMRoster.load(root.dataset.api, date);
+      body.replaceChildren();
+      if (!roster || !roster.duties.length) {
+        body.appendChild(el('p', 'roster-status', '这一天的下午服事安排尚未公布。'));
+        return;
+      }
+      body.appendChild(el('p', 'roster-caption', roster.label + ' · 主日下午'));
+      const list = el('dl', 'roster-grid');
+      roster.duties.forEach(duty => {
+        append(list, append(el('div', 'roster-duty'),
+          el('dt', '', duty.label), el('dd', '', duty.value)));
+      });
+      body.appendChild(list);
+      const duties = Object.fromEntries(roster.duties.map(duty => [duty.key, duty]));
+      root.querySelectorAll('[data-roles]').forEach(slot => {
+        slot.textContent = slot.dataset.roles.split(',').map(key => duties[key] ? duties[key].label + ' · ' + duties[key].value : '').filter(Boolean).join('　／　');
+        slot.hidden = !slot.textContent;
+      });
+      if (duties.note?.value) root.querySelectorAll('[data-roster-speaker]').forEach(slot => {
+        slot.textContent = '证道安排 · ' + duties.note.value; slot.hidden = false;
+      });
+    } catch (_) {
+      const retry = el('button', 'roster-retry', '重新加载');
+      retry.type = 'button';
+      retry.addEventListener('click', () => loadRoster(body, date));
+      body.replaceChildren(el('p', 'roster-status', '暂时无法读取服事安排，请稍后重试。'), retry);
+    } finally {
+      body.setAttribute('aria-busy', 'false');
+    }
+  }
+
+  async function loadJson(path) {
+    return window.PMFeatures.json(path);
+  }
+
+  async function start() {
+    try {
+      let date = new URLSearchParams(location.search).get('date');
+      if (!date) date = location.protocol === 'file:' ? window.PMWeeklyData?.latest?.date : (await loadJson('./weekly/latest.json')).date;
+      if (!/^\d{4}-\d{2}-\d{2}$/.test(date || '')) throw new Error('日期格式不正确，请使用例如 2026-09-20 的日期');
+      const data = location.protocol === 'file:'
+        ? (root.dataset.content ? window.PMPreviewData : window.PMWeeklyData?.weeks?.[date])
+        : await loadJson(root.dataset.content || './weekly/' + date + '.json');
+      if (!data) throw new Error('找不到这一周的聚会内容');
+      if (data.date !== date) throw new Error('内容日期与文件名不一致');
+      render(data);
+    } catch (error) {
+      const message = '聚会内容暂时无法打开，请检查日期或稍后重试。';
+      const box = el('div', 'error', message);
+      box.appendChild(window.PMFeatures.button('重新加载', start));
+      root.replaceChildren(box);
+    }
+  }
+
+  start();
+})();
