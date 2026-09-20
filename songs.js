@@ -122,23 +122,30 @@
         try {
           await loadEngine(config.songEngine);
           scoreHost.replaceChildren(window.YouthEngine.renderSongObjects(scores));
-          // 把 YouTube 链接移到歌曲标题区旁边，移除其他工具栏按钮
+          // 把 YouTube 链接嵌进 .sw-pills（调号/拍子/BPM 同一行），移除其他工具栏
           scoreHost.querySelectorAll('.sw-wrap').forEach(wrap => {
-            const hd = wrap.querySelector('.sw-hd');
+            const pills = wrap.querySelector('.sw-pills');
             const toolsRow = wrap.querySelector('.sw-tools-row');
-            if (hd && toolsRow) {
+            if (pills && toolsRow) {
               const ytBtn = toolsRow.querySelector('.yt-btn');
-              if (ytBtn) {
-                if (ytBtn.getAttribute('href') === '#') {
-                  ytBtn.remove();
-                } else {
-                  ytBtn.title = '观看诗歌视频'; ytBtn.setAttribute('aria-label', '观看诗歌视频');
-                  ytBtn.style.cssText = 'flex-shrink:0;';
-                  hd.appendChild(ytBtn);
-                }
+              if (ytBtn && ytBtn.getAttribute('href') !== '#') {
+                // 改成小 pill 样式，与调号 pill 一致
+                ytBtn.className = 'sw-pill';
+                ytBtn.style.cssText = 'display:inline-flex;align-items:center;gap:5px;text-decoration:none;';
+                ytBtn.setAttribute('aria-label', '观看诗歌视频');
+                ytBtn.title = '观看诗歌视频';
+                ytBtn.target = '_blank';
+                ytBtn.rel = 'noopener noreferrer';
+                // 保留 svg icon，加文字
+                const label = document.createElement('span');
+                label.textContent = 'YouTube';
+                ytBtn.appendChild(label);
+                pills.appendChild(ytBtn);
+              } else if (ytBtn) {
+                ytBtn.remove();
               }
             }
-            // 移除下载图片、荧光笔画笔等工具，整个工具栏一并清除
+            // 移除工具栏
             wrap.querySelectorAll('.sw-tools').forEach(t => t.remove());
           });
           scoreHost.querySelectorAll('audio').forEach(audio => { audio.preload = 'none'; });
