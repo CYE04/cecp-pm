@@ -129,9 +129,9 @@ h1 { font-size:clamp(32px,5vw,44px); font-weight:400; letter-spacing:.01em; line
 .bible-verse sup { color:var(--accent); }
 .reader-dialog { background:var(--white); }
 .preview-banner { background:var(--accent-soft); color:var(--ink); }
-html.pm-embed,html.pm-embed body { background:transparent; }
+html.pm-embed,html.pm-embed body,html.pm-embed .hero { background:transparent; }
 html.pm-embed .page { max-width:920px; padding:0 2px; }
-html.pm-embed .hero { padding-top:10px; }
+html.pm-embed .hero { padding-top:10px; border-bottom-color:transparent; }
 html.pm-embed .footer { padding-bottom:24px; }
 @media (max-width:620px) { .page { padding:0 14px; } .hero { min-height:auto; padding:42px 25px 28px; } .hero-meta { margin-bottom:28px; } .content-section { padding:27px 23px; margin:18px 0; } .schedule-row { grid-template-columns:1fr; gap:2px; padding:14px 0; } .schedule-people,.live-label { grid-column:1; } .schedule-title { font-size:18px; } .schedule-time { font-size:17px; } .reading-card,.sermon-card { padding:20px; } .roster-grid { grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; } .roster-duty { padding:15px 12px; } .roster-duty dd { font-size:18px; } .reader-dialog { padding:20px; } .bible-form { gap:8px; } }
 @media (max-width:620px) { .page { padding:0 18px; } .hero { padding:25px 0 24px; } .hero-meta { margin-bottom:12px; } .content-section { padding:26px 0; margin:0; } html.pm-embed .page { padding:0 2px; } html.pm-embed .hero { padding-top:8px; } }

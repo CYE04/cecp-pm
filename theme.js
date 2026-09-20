@@ -25,6 +25,8 @@
       const content = document.getElementById('app');
       if (content && 'ResizeObserver' in window) new ResizeObserver(sendHeight).observe(content);
       sendHeight();
+      // 歌谱图片等动态内容加载完后再上报，避免 iframe 留空白
+      [300, 800, 1800, 3500].forEach(ms => setTimeout(sendHeight, ms));
     });
   }
 })();
