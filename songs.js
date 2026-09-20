@@ -10,6 +10,16 @@
     const matches = catalog.filter(song => titleKey(song.title) === key && /^[a-zA-Z0-9_-]+$/.test(song.id || ''));
     return matches.length === 1 ? matches[0].id : '';
   }
+  function songLookup(entry, catalog = window.PMSongCatalog || []) {
+    if (typeof entry === 'string') return { id: entry, source: 'direct' };
+    if (entry?.id) return { id: entry.id, source: 'direct' };
+    if (!entry?.title || entry.sections) return { id: '', source: '' };
+    const matched = matchCatalog(entry.title, catalog);
+    if (matched) return { id: matched, source: 'catalog' };
+    // 允许直接把歌曲文件名填在 title 中，无需更新下午网站的曲库目录。
+    if (/^[a-zA-Z0-9_-]+$/.test(entry.title)) return { id: entry.title, source: 'title-id' };
+    return { id: '', source: '' };
+  }
   function loadEngine(url) {
     if (window.YouthEngine?.renderSongObjects) return Promise.resolve();
     if (!enginePromise) {
@@ -86,15 +96,16 @@
     container.replaceChildren(el('p', 'muted', '正在加载本周诗歌…'));
     const mediaBase = config.mediaBase || 'https://cecp.it/';
     const results = await Promise.allSettled(entries.map(async entry => {
-      const matchedId = typeof entry === 'object' && !entry?.id && !entry?.sections ? matchCatalog(entry?.title) : '';
-      const id = typeof entry === 'string' ? entry : entry?.id || matchedId;
+      const { id, source } = songLookup(entry);
       if (id) {
         if (!/^[a-zA-Z0-9_-]+$/.test(id)) throw new Error('诗歌编号不正确');
         try {
           const data = await json(new URL('songs/' + id + '.json', config.songBase).href);
-          return normalizeSong({ ...data, ...(typeof entry === 'object' ? entry : {}) }, mediaBase);
+          const extra = typeof entry === 'object' ? { ...entry } : {};
+          if (source === 'title-id') delete extra.title;
+          return normalizeSong({ ...data, ...extra }, mediaBase);
         } catch (error) {
-          if (matchedId) return normalizeSong(entry, mediaBase);
+          if (source !== 'direct') return normalizeSong(entry, mediaBase);
           throw error;
         }
       }
@@ -151,5 +162,5 @@
       });
     }
   }
-  window.PMSongs = { mount, matchCatalog };
+  window.PMSongs = { mount, matchCatalog, songLookup };
 })();

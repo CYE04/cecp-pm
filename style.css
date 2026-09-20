@@ -89,17 +89,51 @@ h1 { margin:0; font-family:"Songti SC","Noto Serif CJK SC","SimSun",serif; font-
 .replay-empty { margin:0; color:var(--muted); }
 .preview-banner { padding:12px 20px; margin:0; background:#ead5bd; color:#593c25; font-size:14px; }
 .invitation { white-space:pre-line; }
-/* 共享歌谱沿用青年页的功能，在此统一为下午聚会的暖色主题。 */
-html:root { color-scheme:light; --ym-bg-base:#f6f2ec; --ym-bg-elevated:#fffdfa; --ym-bg-elevated-2:#f5eee7; --ym-bg-sunken:#ece1d6; --ym-text-primary:#45372f; --ym-text-secondary:#786f68; --ym-text-tertiary:#786f68; --ym-separator:#ded6cd; --ym-separator-strong:#cabaad; --ym-accent:#886047; --ym-accent-hover:#654631; --ym-accent-pressed:#513521; --ym-accent-subtle:#88604715; --ym-accent-2:#ad896d; --ym-on-accent:#fffdfa; --ym-on-brand:#fffdfa; --ym-pl-bg:#ede3d8; --ym-pl-text:#45372f; --ym-pl-text2:#786f68; --ym-pl-fill:#765744; --ym-pl-lrc-dim:#786f68; }
 .shared-songs { min-width:0; }
 .shared-songs .ym-song-tab-num { display:none; }
-.shared-songs .ym-pl { background:#f1e8df; box-shadow:0 8px 24px #45372f0c; border:1px solid var(--line); backdrop-filter:none; -webkit-backdrop-filter:none; }
-.shared-songs .ym-pl::before,.shared-songs .ym-pl::after { display:none; }
-.shared-songs .ym-pl-info,.shared-songs .ym-pl-prog-wrap,.shared-songs .ym-pl-controls,.shared-songs .ym-pl-vol-wrap { background:#fffdfa; border-color:var(--line); backdrop-filter:none; -webkit-backdrop-filter:none; }
-.shared-songs .ym-pl-times { color:var(--muted); }
-.shared-songs .ym-pl-btn { color:var(--ink); }
-.shared-songs .ym-pl-lrc-line { color:#75665b; opacity:1; }
-.shared-songs .ym-pl-lrc-line.active { color:var(--ink); }
+
+/* 与青年页共用的编辑式排版和明暗配色。 */
+:root { color-scheme:light; --ink:#1b2333; --muted:#586173; --line:rgba(20,30,55,.12); --paper:#edeff3; --white:#fff; --raised:#f6f8fb; --accent:#1c5aa6; --accent-soft:rgba(28,90,166,.10); --rule:rgba(25,26,29,.8); }
+@media (prefers-color-scheme:dark) {
+  :root { color-scheme:dark; --ink:#eceef3; --muted:#a6aebd; --line:rgba(255,255,255,.12); --paper:#121418; --white:#1c1f26; --raised:#252932; --accent:#6ea3e6; --accent-soft:rgba(110,163,230,.16); --rule:rgba(236,238,241,.5); }
+}
+html[data-resolved-theme="dark"] { color-scheme:dark; --ink:#eceef3; --muted:#a6aebd; --line:rgba(255,255,255,.12); --paper:#121418; --white:#1c1f26; --raised:#252932; --accent:#6ea3e6; --accent-soft:rgba(110,163,230,.16); --rule:rgba(236,238,241,.5); --ym-bg-base:#121418; --ym-bg-elevated:#1c1f26; --ym-bg-elevated-2:#252932; --ym-bg-sunken:#0d0e12; --ym-text-primary:#eceef3; --ym-text-secondary:#a6aebd; --ym-text-tertiary:#828b9b; --ym-separator:rgba(255,255,255,.09); --ym-separator-strong:rgba(255,255,255,.15); --ym-accent:#6ea3e6; --ym-accent-hover:#84b2ec; --ym-accent-pressed:#5b93da; --ym-accent-subtle:rgba(110,163,230,.16); --ym-accent-2:#5b93da; --ym-on-accent:#0a1220; --ym-rule:rgba(236,238,241,.5); --ym-line-soft:rgba(255,255,255,.07); --ym-bg:#121418; --ym-card:rgba(255,255,255,.05); --ym-ink:#eceef3; --ym-ink2:#a6aebd; --ym-ink3:#828b9b; --ym-border:rgba(255,255,255,.09); --ym-border-md:rgba(255,255,255,.15); --ym-page:#121418; --ym-panel:#1c1f26; --ym-panel-2:#252932; --ym-glass:rgba(28,31,38,.78); --ym-chip:rgba(255,255,255,.05); --ym-chip-hover:rgba(255,255,255,.09); --ym-line:rgba(255,255,255,.09); --ym-brand:#6ea3e6; --ym-brand2:#5b93da; --ym-on-brand:#0a1220; }
+html[data-resolved-theme="light"] { color-scheme:light; --ink:#1b2333; --muted:#586173; --line:rgba(20,30,55,.12); --paper:#edeff3; --white:#fff; --raised:#f6f8fb; --accent:#1c5aa6; --accent-soft:rgba(28,90,166,.10); --rule:rgba(25,26,29,.8); --ym-bg-base:#edeff3; --ym-bg-elevated:#fff; --ym-bg-elevated-2:#f6f8fb; --ym-bg-sunken:#e6eaf0; --ym-text-primary:#1b2333; --ym-text-secondary:#586173; --ym-text-tertiary:#6d7686; --ym-separator:rgba(20,30,55,.10); --ym-separator-strong:rgba(20,30,55,.16); --ym-accent:#1c5aa6; --ym-accent-hover:#174c8c; --ym-accent-pressed:#123d71; --ym-accent-subtle:rgba(28,90,166,.10); --ym-accent-2:#3e7cc0; --ym-on-accent:#fff; --ym-rule:rgba(25,26,29,.8); --ym-line-soft:rgba(20,22,30,.07); --ym-bg:#edeff3; --ym-card:#fff; --ym-ink:#1b2333; --ym-ink2:#586173; --ym-ink3:#6d7686; --ym-border:rgba(20,30,55,.10); --ym-border-md:rgba(20,30,55,.16); --ym-page:#edeff3; --ym-panel:#fff; --ym-panel-2:#f6f8fb; --ym-glass:rgba(255,255,255,.72); --ym-chip:rgba(255,255,255,.66); --ym-chip-hover:#fff; --ym-line:rgba(20,30,55,.10); --ym-brand:#1c5aa6; --ym-brand2:#3e7cc0; --ym-on-brand:#fff; }
+body { background:var(--paper); color:var(--ink); }
+.page { max-width:920px; padding:0 34px; }
+.hero { padding:36px 0 32px; background:transparent; border-bottom:1px solid var(--rule); border-radius:0; box-shadow:none; }
+.hero::after { display:none; }
+.eyebrow { margin-bottom:13px; color:var(--muted); font-size:12px; letter-spacing:.18em; }
+h1 { font-size:clamp(32px,5vw,44px); font-weight:400; letter-spacing:.01em; line-height:1.18; }
+.hero-date { margin:16px 0 0; font-size:15px; font-weight:600; }
+.hero-meta { margin:5px 0 13px; color:var(--muted); font-size:14px; }
+.hero-topic { margin:0 0 10px; color:var(--ink); font-size:17px; font-weight:500; }
+.page-actions { margin-top:15px; }
+.content-section { margin:0; padding:32px 0; background:transparent; border:0; border-bottom:1px solid var(--line); border-radius:0; box-shadow:none; }
+.content-section h2 { margin:0 0 16px; padding-bottom:11px; border-bottom:1px solid var(--rule); font-size:clamp(23px,4vw,29px); font-weight:400; }
+.schedule-row { grid-template-columns:160px 1fr; padding:15px 2px; }
+.schedule-row.is-current { background:var(--accent-soft); }
+.schedule-time,.stage-time { color:var(--ink); font-family:'DM Mono','SF Mono',ui-monospace,monospace; font-size:17px; font-weight:600; }
+.schedule-title { font-family:Georgia,'Songti SC','Noto Serif SC',serif; font-size:20px; font-weight:400; }
+.stage-section { border-left:0; }
+.stage-time { margin:0 0 9px; color:var(--muted); font-size:13px; }
+.stage-people { color:var(--muted); }
+.live-label { color:var(--accent); }
+.reading-card,.sermon-card,.roster-duty { background:var(--raised); border:1px solid var(--line); border-radius:12px; }
+.reading-ref { font-size:23px; }
+.roster-duty dt,.notice p,.sermon-ref,.muted,.replay-empty { color:var(--muted); }
+.roster-duty dd { font-size:17px; }
+.resource-link,.roster-retry,.song-copy-button { background:var(--raised); border:1px solid var(--line); color:var(--ink); }
+.resource-link:hover,.resource-link:focus-visible,.roster-retry:hover,.song-copy-button:hover,.control-button:hover { background:var(--accent-soft); }
+.control-button { background:transparent; color:var(--ink); }
+.bible-verse sup { color:var(--accent); }
+.reader-dialog { background:var(--white); }
+.preview-banner { background:var(--accent-soft); color:var(--ink); }
+html.pm-embed,html.pm-embed body { background:transparent; }
+html.pm-embed .page { max-width:920px; padding:0 2px; }
+html.pm-embed .hero { padding-top:10px; }
+html.pm-embed .footer { padding-bottom:24px; }
 @media (max-width:620px) { .page { padding:0 14px; } .hero { min-height:auto; padding:42px 25px 28px; } .hero-meta { margin-bottom:28px; } .content-section { padding:27px 23px; margin:18px 0; } .schedule-row { grid-template-columns:1fr; gap:2px; padding:14px 0; } .schedule-people,.live-label { grid-column:1; } .schedule-title { font-size:18px; } .schedule-time { font-size:17px; } .reading-card,.sermon-card { padding:20px; } .roster-grid { grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; } .roster-duty { padding:15px 12px; } .roster-duty dd { font-size:18px; } .reader-dialog { padding:20px; } .bible-form { gap:8px; } }
+@media (max-width:620px) { .page { padding:0 18px; } .hero { padding:25px 0 24px; } .hero-meta { margin-bottom:12px; } .content-section { padding:26px 0; margin:0; } html.pm-embed .page { padding:0 2px; } html.pm-embed .hero { padding-top:8px; } }
 @media (prefers-reduced-motion:reduce) { html { scroll-behavior:auto; } }
 @media print { body { background:white; } .page { max-width:none; padding:0; } .hero { padding:20px; box-shadow:none; } .hero::after,.page-actions,.control-button,.song-copy-button,.song-copy-status,.bible-form,.reader-tools,.reader-feedback,.shared-songs,.replay-frame,.resource-link { display:none!important; } .content-section { box-shadow:none; margin:16px 0; padding:18px; break-inside:avoid; } .roster-duty { background:white; border:1px solid #ddd; } .hero-date,.hero-meta { margin:10px 0; } .hero-topic { margin:12px 0; } .hero h1 { font-size:32px; } }
