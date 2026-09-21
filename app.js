@@ -45,15 +45,6 @@
       el('p', 'hero-meta', [data.time, data.venue].filter(Boolean).join('　·　'))
     );
     if (data.sermon?.title) hero.appendChild(el('p', 'hero-topic', data.sermon.title));
-    const actions = el('div', 'page-actions');
-    const shareStatus = el('span', 'reader-feedback'); shareStatus.setAttribute('role', 'status');
-    actions.appendChild(window.PMFeatures.button('复制本周链接', async () => {
-      try {
-        const url = new URL(location.href); url.searchParams.set('date', data.date); url.hash = '';
-        await navigator.clipboard.writeText(url.href); shareStatus.textContent = '本周链接已复制';
-      } catch (_) { shareStatus.textContent = '请复制浏览器地址栏中的链接'; }
-    }));
-    actions.appendChild(shareStatus); hero.appendChild(actions);
     page.appendChild(hero);
 
     if (Array.isArray(data.schedule) && data.schedule.length) {
@@ -61,6 +52,7 @@
       const list = el('ul', 'schedule');
       data.schedule.forEach(item => {
         const row = el('li', 'schedule-row');
+        if (/^[a-z][a-z0-9-]*$/.test(item.section || '')) row.dataset.section = item.section;
         const time = [item.start, item.end].filter(Boolean).join('–');
         const title = el('span', 'schedule-title', item.title || '');
         const jump = /^[a-z][a-z0-9-]*$/.test(item.section || '') ? el('a', 'schedule-jump') : null;
@@ -231,7 +223,7 @@
       if (!date) date = location.protocol === 'file:' ? window.PMWeeklyData?.latest?.date : (await loadJson('./weekly/latest.json')).date;
       if (!/^\d{4}-\d{2}-\d{2}$/.test(date || '')) throw new Error('日期格式不正确，请使用例如 2026-09-20 的日期');
       const data = location.protocol === 'file:'
-        ? (root.dataset.content ? window.PMPreviewData : window.PMWeeklyData?.weeks?.[date])
+        ? (window.PMPreviewData || window.PMWeeklyData?.weeks?.[date])
         : await loadJson(root.dataset.content || './weekly/' + date + '.json');
       if (!data) throw new Error('找不到这一周的聚会内容');
       if (data.date !== date) throw new Error('内容日期与文件名不一致');

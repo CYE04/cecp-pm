@@ -23,6 +23,25 @@ try {
   const songs = await Promise.all(songFiles.map(file => readJson(join(songDir, file))));
   const catalog = songs.filter(song => song.id && song.title).map(song => ({ id: song.id, title: song.title }));
   await writeFile(join(root, 'song-catalog.js'), 'window.PMSongCatalog = ' + encode(catalog) + ';\n');
+  const normalizeTitle = value => String(value || '').normalize('NFKC').toLowerCase()
+    .replace(/祢/g, '你').replace(/[\s，,。.!！?？:：、（）()“”"'‘’·－—-]/g, '');
+  const titleIds = new Map();
+  catalog.forEach(song => {
+    const key = normalizeTitle(song.title);
+    if (!titleIds.has(key)) titleIds.set(key, []);
+    titleIds.get(key).push(song.id);
+  });
+  const previewEntries = [...Object.values(weeks), preview]
+    .flatMap(content => [...(content.songs || []), ...(content.offeringSongs || [])]);
+  const previewIds = new Set(previewEntries.flatMap(entry => {
+    if (typeof entry === 'string' && /^[a-zA-Z0-9_-]+$/.test(entry)) return [entry];
+    if (entry?.id && /^[a-zA-Z0-9_-]+$/.test(entry.id)) return [entry.id];
+    if (entry?.title && /^[a-zA-Z0-9_-]+$/.test(entry.title)) return [entry.title];
+    const matches = titleIds.get(normalizeTitle(entry?.title));
+    return matches?.length === 1 ? matches : [];
+  }));
+  const previewSongs = Object.fromEntries(songs.filter(song => previewIds.has(song.id)).map(song => [song.id, song]));
+  await writeFile(join(root, 'preview-songs.js'), 'window.PMPreviewSongs = ' + encode(previewSongs) + ';\n');
   songCount = catalog.length;
 } catch (error) {
   if (error.code !== 'ENOENT') throw error;

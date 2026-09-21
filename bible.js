@@ -5,11 +5,67 @@
   const chapters = [50,40,27,36,34,24,21,4,31,24,22,25,29,36,10,13,10,42,150,31,12,8,66,52,5,48,12,14,3,9,1,4,7,3,3,3,2,14,4,28,16,24,21,28,16,16,13,6,6,4,4,5,3,6,4,3,1,13,5,5,3,5,1,1,1,22];
   let serial = 0;
 
+  function setDrawerState(details, panel, open, options = {}) {
+    const toggle = details.querySelector('.bible-reader-toggle');
+    const label = toggle?.querySelector('.bible-reader-label');
+    const reduceMotion = options.reduceMotion ?? !!window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+    const token = String((Number(details.dataset.drawerToken) || 0) + 1);
+    details.dataset.drawerToken = token;
+    details.dataset.open = String(open);
+    toggle?.setAttribute('aria-expanded', String(open));
+    if (label) label.textContent = open ? '收起经文' : '展开经文';
+
+    if (reduceMotion) {
+      details.open = open;
+      panel.hidden = !open;
+      panel.style.height = open ? 'auto' : '0px';
+      panel.style.opacity = open ? '1' : '0';
+      return;
+    }
+
+    const frame = window.requestAnimationFrame || (callback => setTimeout(callback, 0));
+    const finish = callback => setTimeout(() => {
+      if (details.dataset.drawerToken === token) callback();
+    }, 380);
+    if (open) {
+      details.open = true;
+      panel.hidden = false;
+      panel.style.height = '0px';
+      panel.style.opacity = '0';
+      frame(() => frame(() => {
+        if (details.dataset.drawerToken !== token) return;
+        panel.style.height = panel.scrollHeight + 'px';
+        panel.style.opacity = '1';
+        finish(() => { panel.style.height = 'auto'; });
+      }));
+    } else {
+      if (!details.open) {
+        panel.hidden = true;
+        panel.style.height = '0px';
+        return;
+      }
+      panel.hidden = false;
+      panel.style.height = panel.scrollHeight + 'px';
+      panel.style.opacity = '1';
+      void panel.offsetHeight;
+      frame(() => {
+        if (details.dataset.drawerToken !== token) return;
+        panel.style.height = '0px';
+        panel.style.opacity = '0';
+        finish(() => { details.open = false; panel.hidden = true; });
+      });
+    }
+  }
+
   function mount(host, passage, endpoint) {
     if (!Number.isInteger(passage.book) || !names[passage.book - 1] || !Number.isInteger(passage.chapter) || passage.chapter < 1 || passage.chapter > chapters[passage.book - 1]) return;
     const id = 'pm-bible-' + ++serial;
     const details = el('details', 'bible-reader');
-    const summary = el('summary', '', '展开经文');
+    const summary = el('summary', 'bible-reader-toggle');
+    summary.setAttribute('aria-expanded', 'false');
+    const summaryText = el('span', 'bible-reader-copy');
+    summaryText.append(el('span', 'bible-reader-label', '展开经文'), el('span', 'bible-reader-reference', passage.reference || `${names[passage.book - 1]} ${passage.chapter} 章`));
+    summary.append(el('span', 'bible-reader-icon', '经'), summaryText, el('span', 'bible-reader-arrow', '⌄'));
     details.appendChild(summary);
     const form = el('form', 'bible-form');
     const bookLabel = el('label', '', '经卷');
@@ -84,13 +140,22 @@
     const next = button('下一章', () => load(currentBook, currentChapter + 1));
     const original = button('回到本周经文', () => load(passage.book, passage.chapter, passage));
     pager.append(previous, next, original);
-    details.append(form, title, tools, feedback, content, pager);
+    const panel = el('div', 'bible-reader-panel'); panel.hidden = true;
+    const panelInner = el('div', 'bible-reader-panel-inner');
+    panelInner.append(form, title, tools, feedback, content, pager);
+    panel.appendChild(panelInner);
+    details.appendChild(panel);
     books.addEventListener('change', () => { chapter.max = chapters[+books.value - 1]; chapter.value = 1; });
     form.addEventListener('submit', event => { event.preventDefault(); if (form.reportValidity()) load(+books.value, +chapter.value); });
-    details.addEventListener('toggle', () => {
-      summary.textContent = details.open ? '收起经文' : '展开经文';
-      if (details.open && !started) { started = true; load(passage.book, passage.chapter, passage); }
+    summary.addEventListener('click', event => {
+      event.preventDefault();
+      const open = details.dataset.open !== 'true';
+      setDrawerState(details, panel, open);
+      if (open && !started) { started = true; load(passage.book, passage.chapter, passage); }
     });
+    if ('ResizeObserver' in window) new ResizeObserver(() => {
+      if (details.dataset.open === 'true' && panel.style.height && panel.style.height !== 'auto') panel.style.height = panel.scrollHeight + 'px';
+    }).observe(panelInner);
     host.appendChild(details);
   }
   // 书卷缩写对照表（index = 书卷号 - 1，值是可接受的缩写数组）
@@ -191,5 +256,5 @@
     return { book, chapter, start, end, reference };
   }
 
-  window.PMBible = { mount, parseRef };
+  window.PMBible = { mount, parseRef, setDrawerState };
 })();

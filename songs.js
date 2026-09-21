@@ -2,6 +2,8 @@
   'use strict';
   const { el, safeUrl, json, retry } = window.PMFeatures;
   let enginePromise;
+  let lyricsDialog;
+  let lyricsObserver;
   const titleKey = value => String(value || '').normalize('NFKC').toLowerCase()
     .replace(/祢/g, '你').replace(/[\s，,。.!！?？:：、（）()“”"'‘’·－—-]/g, '');
   function matchCatalog(title, catalog = window.PMSongCatalog || []) {
@@ -19,6 +21,9 @@
     // 允许直接把歌曲文件名填在 title 中，无需更新下午网站的曲库目录。
     if (/^[a-zA-Z0-9_-]+$/.test(entry.title)) return { id: entry.title, source: 'title-id' };
     return { id: '', source: '' };
+  }
+  function hasLyrics(lines) {
+    return Array.from(lines || []).some(line => String(line.textContent || '').trim());
   }
   function loadEngine(url) {
     if (window.YouthEngine?.renderSongObjects) return Promise.resolve();
@@ -92,6 +97,87 @@
     return card;
   }
 
+  function ensureLyricsDialog() {
+    if (lyricsDialog) return lyricsDialog;
+    lyricsDialog = el('dialog', 'pm-lyrics-dialog');
+    const frame = el('div', 'pm-lyrics-dialog-frame');
+    const header = el('header', 'pm-lyrics-dialog-header');
+    const title = el('h2', 'pm-lyrics-dialog-title', '完整歌词');
+    const close = window.PMFeatures.button('关闭', () => lyricsDialog.close());
+    close.classList.add('pm-lyrics-dialog-close');
+    header.append(title, close);
+    const lines = el('div', 'pm-lyrics-dialog-lines');
+    lines.tabIndex = -1;
+    frame.append(header, lines);
+    lyricsDialog.appendChild(frame);
+    lyricsDialog.addEventListener('click', event => { if (event.target === lyricsDialog) lyricsDialog.close(); });
+    lyricsDialog.addEventListener('close', () => {
+      lyricsObserver?.disconnect();
+      lyricsObserver = null;
+    });
+    document.body.appendChild(lyricsDialog);
+    return lyricsDialog;
+  }
+
+  function openLyricsReader(player) {
+    const source = player?.querySelector('.ym-pl-lrc-inner');
+    const sourceLines = source?.querySelectorAll('.ym-pl-lrc-line');
+    if (!hasLyrics(sourceLines)) return;
+    const dialog = ensureLyricsDialog();
+    const title = dialog.querySelector('.pm-lyrics-dialog-title');
+    const target = dialog.querySelector('.pm-lyrics-dialog-lines');
+    title.textContent = player.querySelector('.ym-pl-title')?.textContent || '完整歌词';
+    let activeIndex = -1;
+    const sync = rebuild => {
+      const lines = Array.from(source.querySelectorAll('.ym-pl-lrc-line'));
+      if (rebuild || target.children.length !== lines.length) {
+        target.replaceChildren(...lines.map((line, index) => {
+          const copy = el('p', 'pm-lyrics-dialog-line', line.textContent);
+          copy.dataset.index = index;
+          return copy;
+        }));
+      }
+      const next = lines.findIndex(line => line.classList.contains('active'));
+      Array.from(target.children).forEach((line, index) => line.classList.toggle('active', index === next));
+      if (next >= 0 && next !== activeIndex) {
+        activeIndex = next;
+        target.children[next]?.scrollIntoView({ block:'center', behavior:'smooth' });
+      }
+    };
+    lyricsObserver?.disconnect();
+    sync(true);
+    lyricsObserver = new MutationObserver(records => sync(records.some(record => record.type === 'childList')));
+    lyricsObserver.observe(source, { childList:true, subtree:true, attributes:true, attributeFilter:['class'] });
+    if (!dialog.open) dialog.showModal();
+    dialog.querySelector('.pm-lyrics-dialog-close')?.focus();
+  }
+
+  function enhancePlayer(scoreHost) {
+    scoreHost.querySelectorAll('.ym-pl').forEach(player => {
+      if (player.dataset.pmEnhanced) return;
+      player.dataset.pmEnhanced = 'true';
+      player.classList.add('pm-compact-player');
+      const lyrics = player.querySelector('.ym-pl-lrc-panel');
+      if (!lyrics) return;
+      const actions = player.closest('.ym-song-panel')?.querySelector('.pm-song-actions');
+      const activate = () => {
+        const available = hasLyrics(lyrics.querySelectorAll('.ym-pl-lrc-line'));
+        let openButton = actions?.querySelector('.pm-lyrics-button');
+        if (available && actions && !openButton) {
+          openButton = window.PMFeatures.button('查看歌词', () => openLyricsReader(player));
+          openButton.classList.add('sw-tog', 'pm-lyrics-button');
+          openButton.setAttribute('aria-label', '打开完整歌词');
+          const transpose = actions.querySelector('.pm-transpose-button');
+          transpose ? transpose.after(openButton) : actions.prepend(openButton);
+        } else if (!available) {
+          openButton?.remove();
+        }
+      };
+      activate();
+      new MutationObserver(activate).observe(lyrics, { childList:true, subtree:true });
+    });
+  }
+
   async function mount(container, entries, config) {
     container.replaceChildren(el('p', 'muted', '正在加载本周诗歌…'));
     const mediaBase = config.mediaBase || 'https://cecp.it/';
@@ -100,7 +186,8 @@
       if (id) {
         if (!/^[a-zA-Z0-9_-]+$/.test(id)) throw new Error('诗歌编号不正确');
         try {
-          const data = await json(new URL('songs/' + id + '.json', config.songBase).href);
+          const localSong = location.protocol === 'file:' ? window.PMPreviewSongs?.[id] : null;
+          const data = localSong || await json(new URL('songs/' + id + '.json', config.songBase).href);
           const extra = typeof entry === 'object' ? { ...entry } : {};
           if (source === 'title-id') delete extra.title;
           return normalizeSong({ ...data, ...extra }, mediaBase);
@@ -120,34 +207,44 @@
       const renderScores = async () => {
         scoreHost.replaceChildren(el('p', 'muted', '正在准备歌谱…'));
         try {
-          await loadEngine(config.songEngine);
+          const engineUrl = location.protocol === 'file:' && config.songEngineLocal
+            ? config.songEngineLocal
+            : config.songEngine;
+          await loadEngine(engineUrl);
           scoreHost.replaceChildren(window.YouthEngine.renderSongObjects(scores));
-          // 把 YouTube 链接嵌进 .sw-pills（调号/拍子/BPM 同一行），移除其他工具栏
+          // 下午页只保留移调与视频入口；歌曲名称已在上方标签显示，不再重复一整块资料。
           scoreHost.querySelectorAll('.sw-wrap').forEach(wrap => {
-            const pills = wrap.querySelector('.sw-pills');
+            const header = wrap.querySelector('.sw-hd');
+            const transpose = header?.querySelector('.sw-tog');
             const toolsRow = wrap.querySelector('.sw-tools-row');
-            if (pills && toolsRow) {
+            if (header && transpose && toolsRow) {
               const ytBtn = toolsRow.querySelector('.yt-btn');
+              const actions = el('div', 'pm-song-actions');
+              transpose.classList.add('pm-transpose-button');
+              const transposeArrow = transpose.querySelector('svg');
+              if (transposeArrow) transpose.appendChild(transposeArrow);
+              transpose.before(actions);
+              actions.appendChild(transpose);
               if (ytBtn && ytBtn.getAttribute('href') !== '#') {
-                // 改成小 pill 样式，与调号 pill 一致
-                ytBtn.className = 'sw-pill';
-                ytBtn.style.cssText = 'display:inline-flex;align-items:center;gap:5px;text-decoration:none;';
+                ytBtn.classList.add('pm-video-button');
                 ytBtn.setAttribute('aria-label', '观看诗歌视频');
                 ytBtn.title = '观看诗歌视频';
                 ytBtn.target = '_blank';
                 ytBtn.rel = 'noopener noreferrer';
-                // 保留 svg icon，加文字
                 const label = document.createElement('span');
-                label.textContent = 'YouTube';
+                label.textContent = '观看视频';
                 ytBtn.appendChild(label);
-                pills.appendChild(ytBtn);
+                actions.appendChild(ytBtn);
               } else if (ytBtn) {
                 ytBtn.remove();
               }
+              Array.from(header.children).forEach(child => {
+                if (child !== actions) child.remove();
+              });
             }
-            // 移除工具栏
             wrap.querySelectorAll('.sw-tools').forEach(t => t.remove());
           });
+          enhancePlayer(scoreHost);
           scoreHost.querySelectorAll('audio').forEach(audio => { audio.preload = 'none'; });
           // 和弦仍保留标准音名，性质说明只显示中文。
           document.querySelectorAll('chord-explorer').forEach(explorer => {
@@ -179,5 +276,5 @@
       });
     }
   }
-  window.PMSongs = { mount, matchCatalog, songLookup };
+  window.PMSongs = { mount, matchCatalog, songLookup, hasLyrics, enhancePlayer, openLyricsReader };
 })();

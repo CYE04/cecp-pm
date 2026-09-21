@@ -17,11 +17,10 @@ h1 { margin:0; font-family:"Songti SC","Noto Serif CJK SC","SimSun",serif; font-
 .content-section { scroll-margin-top:24px; margin:34px 0; padding:36px 44px; background:var(--white); border:1px solid #e9e1d9; border-radius:22px; box-shadow:0 8px 30px #56473a08; }
 .content-section h2 { margin:0 0 24px; font-family:"Songti SC","Noto Serif CJK SC","SimSun",serif; font-size:clamp(27px,4vw,36px); font-weight:600; }
 .schedule,.simple-list { list-style:none; margin:0; padding:0; }
-.schedule-row { position:relative; display:grid; grid-template-columns:190px 1fr; column-gap:18px; row-gap:4px; align-items:baseline; padding:19px 0; border-top:1px solid var(--line); }
+.schedule-row { position:relative; display:grid; grid-template-columns:190px 1fr; column-gap:18px; row-gap:4px; align-items:baseline; padding:19px 0; }
 .schedule-people { grid-column:2; margin:0; color:var(--muted); font-size:13px; }
 .schedule-row.is-current { background:#f3ebe1; border-radius:10px; padding-left:12px; padding-right:12px; }
 .live-label { grid-column:2; color:#795433; font-size:12px; font-weight:700; }
-.schedule-row:last-child { border-bottom:1px solid var(--line); }
 .schedule-time { color:#806457; font:600 clamp(17px,2.7vw,23px) Georgia,serif; font-variant-numeric:tabular-nums; white-space:nowrap; }
 .schedule-title { font-size:20px; font-weight:620; }
 .schedule-jump { color:inherit; text-decoration:none; }
@@ -38,8 +37,8 @@ h1 { margin:0; font-family:"Songti SC","Noto Serif CJK SC","SimSun",serif; font-
 .sermon-card p { margin:6px 0; }
 .outline { margin:19px 0 0; padding-left:1.5em; }
 .outline li { margin:7px 0; }
-.list-row { display:flex; gap:14px; justify-content:space-between; align-items:center; padding:16px 0; border-top:1px solid var(--line); font-size:19px; }
-.notice { padding:18px 0; border-top:1px solid var(--line); }
+.list-row { display:flex; gap:14px; justify-content:space-between; align-items:center; padding:16px 0; font-size:19px; }
+.notice { padding:18px 0; }
 .notice h3 { margin:0 0 5px; font-size:19px; }
 .notice p { margin:0; color:var(--muted); white-space:pre-line; }
 .resource-link { display:inline-block; padding:11px 17px; border-radius:9px; background:#eadfd5; text-decoration:none; font-size:14px; font-weight:650; }
@@ -58,8 +57,20 @@ h1 { margin:0; font-family:"Songti SC","Noto Serif CJK SC","SimSun",serif; font-
 .control-button { padding:9px 14px; border:1px solid var(--line); border-radius:9px; background:var(--white); color:var(--ink); font:inherit; font-size:14px; cursor:pointer; }
 .control-button:hover { background:#eadfd5; }
 .control-button:disabled { opacity:.45; cursor:default; }
-.bible-reader { margin-top:22px; border-top:1px solid var(--line); padding-top:14px; }
-.bible-reader summary { cursor:pointer; font-weight:650; padding:10px 0; }
+.bible-reader { margin-top:22px; }
+.bible-reader summary::-webkit-details-marker { display:none; }
+.bible-reader-toggle { display:flex; align-items:center; gap:13px; width:100%; padding:14px 16px; list-style:none; cursor:pointer; border:1px solid var(--line); border-radius:13px; background:var(--raised); color:var(--ink); transition:background .2s ease,border-color .2s ease,transform .2s ease; }
+.bible-reader-toggle:hover { background:var(--accent-soft); border-color:color-mix(in srgb,var(--accent) 40%,var(--line)); }
+.bible-reader-toggle:active { transform:scale(.995); }
+.bible-reader-icon { display:grid; place-items:center; width:36px; height:36px; flex:0 0 auto; border-radius:10px; background:var(--accent-soft); color:var(--accent); font-family:"Songti SC","Noto Serif SC",serif; font-size:17px; font-weight:700; }
+.bible-reader-copy { display:flex; flex:1; min-width:0; flex-direction:column; line-height:1.35; }
+.bible-reader-label { font-size:16px; font-weight:700; }
+.bible-reader-reference { margin-top:3px; color:var(--muted); font-size:12px; font-weight:500; }
+.bible-reader-arrow { color:var(--muted); font-size:23px; line-height:1; transform:rotate(0deg); transition:transform .34s cubic-bezier(.2,.8,.2,1),color .2s ease; }
+.bible-reader[data-open="true"] .bible-reader-toggle { background:var(--accent-soft); border-color:color-mix(in srgb,var(--accent) 42%,var(--line)); }
+.bible-reader[data-open="true"] .bible-reader-arrow { color:var(--accent); transform:rotate(180deg); }
+.bible-reader-panel { height:0; opacity:0; overflow:clip; transition:height .36s cubic-bezier(.2,.8,.2,1),opacity .22s ease; }
+.bible-reader-panel-inner { padding:18px 4px 2px; }
 .bible-form { display:flex; flex-wrap:wrap; gap:12px; align-items:end; margin:16px 0 24px; }
 .bible-form label { display:flex; flex-direction:column; gap:5px; color:var(--muted); font-size:13px; }
 .bible-form select,.bible-form input { padding:10px; min-height:42px; border:1px solid var(--line); border-radius:8px; font:inherit; font-size:16px; color:var(--ink); background:var(--white); max-width:100%; }
@@ -74,7 +85,7 @@ h1 { margin:0; font-family:"Songti SC","Noto Serif CJK SC","SimSun",serif; font-
 .reader-dialog { max-width:850px; width:calc(100% - 24px); max-height:90dvh; padding:30px; border:1px solid var(--line); border-radius:20px; background:var(--white); color:var(--ink); }
 .reader-dialog::backdrop { background:#21160dc7; }
 .reader-dialog .reader-tools { position:sticky; top:-30px; background:var(--white); padding:14px 0; z-index:1; }
-.plain-song { padding:20px 0; border-top:1px solid var(--line); }
+.plain-song { padding:20px 0; }
 .plain-song-heading { display:flex; flex-wrap:wrap; align-items:center; gap:8px 14px; margin-bottom:16px; }
 .plain-song h3 { font-size:23px; margin:0; }
 .song-copy-button { border:1px solid var(--line); border-radius:8px; padding:6px 10px; background:#eadfd5; color:var(--ink); font:inherit; font-size:13px; cursor:pointer; }
@@ -91,6 +102,44 @@ h1 { margin:0; font-family:"Songti SC","Noto Serif CJK SC","SimSun",serif; font-
 .invitation { white-space:pre-line; }
 .shared-songs { min-width:0; }
 .shared-songs .ym-song-tab-num { display:none; }
+.shared-songs .ym-song-tabs { border-bottom:0; margin-bottom:1rem; }
+.shared-songs .sw-hd { justify-content:flex-end; min-height:0; margin:0 0 12px; padding:0; }
+.shared-songs .sw-score { border-top:0; border-bottom:0; }
+.shared-songs .sw-score-top { border-bottom:0; padding-left:0; padding-right:0; }
+.pm-song-actions { display:flex; flex-wrap:wrap; align-items:center; justify-content:flex-end; gap:8px; width:100%; }
+.shared-songs .pm-song-actions .sw-tog { min-height:36px; margin-top:0; padding:7px 12px; border-radius:10px; font-size:13px; font-weight:650; }
+.shared-songs .pm-transpose-button svg { display:none; }
+.shared-songs .pm-transpose-button::after { content:"⌄"; margin-left:2px; font-size:17px; font-weight:800; line-height:1; transform:translateY(-1px) rotate(0); transition:transform .22s ease; }
+.shared-songs .pm-transpose-button.on::after { transform:translateY(1px) rotate(180deg); }
+.shared-songs .pm-lyrics-button { background:transparent; }
+.shared-songs .pm-video-button { width:auto; min-width:112px; height:40px; padding:0 14px; gap:8px; border-radius:11px; font-size:14px; font-weight:700; }
+.shared-songs .pm-video-button svg { width:21px; height:21px; }
+.shared-songs .pm-compact-player { padding:7px; gap:5px; border-radius:16px; }
+.shared-songs .pm-compact-player .ym-pl-stage { grid-template-columns:82px minmax(0,1fr); gap:9px; }
+.shared-songs .pm-compact-player .ym-pl-cover-wrap,.shared-songs .pm-compact-player .ym-pl-stage.playing .ym-pl-cover-wrap { width:82px; }
+.shared-songs .pm-compact-player .ym-pl-cover,.shared-songs .pm-compact-player .ym-pl-cover img { border-radius:13px; }
+.shared-songs .pm-compact-player .ym-pl-lrc-panel,.shared-songs .pm-compact-player .ym-pl-stage.playing .ym-pl-lrc-panel { height:104px; }
+.shared-songs .pm-compact-player .ym-pl-lrc-inner { padding:40px 0 50px; }
+.shared-songs .pm-compact-player .ym-pl-lrc-line { font-size:13px; line-height:1.4; padding:2px 5px; }
+.shared-songs .pm-compact-player .ym-pl-lrc-line.active { font-size:16px; }
+.shared-songs .pm-compact-player .ym-pl-spectrum { height:8px; margin-top:-3px; }
+.shared-songs .pm-compact-player .ym-pl-info { padding:5px 9px; }
+.shared-songs .pm-compact-player .ym-pl-prog-wrap { padding:5px 7px; }
+.shared-songs .pm-compact-player .ym-pl-controls { padding:2px; }
+.shared-songs .pm-compact-player .ym-pl-btn { width:30px; height:30px; }
+.shared-songs .pm-compact-player .ym-pl-pp { width:36px!important; height:36px!important; }
+.shared-songs .pm-compact-player .ym-pl-vol-wrap { padding:5px 7px; }
+.pm-lyrics-dialog { position:fixed; inset:auto 0 0; width:min(760px,calc(100% - 28px)); max-height:88dvh; margin:0 auto; padding:0; border:0; border-radius:24px 24px 0 0; background:transparent; color:var(--ink); overflow:visible; }
+.pm-lyrics-dialog[open] { animation:pm-sheet-up .34s cubic-bezier(.2,.8,.2,1); }
+.pm-lyrics-dialog::backdrop { background:rgba(5,7,12,.72); backdrop-filter:blur(7px); }
+.pm-lyrics-dialog-frame { max-height:88dvh; overflow:hidden; border:1px solid var(--line); border-bottom:0; border-radius:24px 24px 0 0; background:var(--white); box-shadow:0 -20px 70px rgba(0,0,0,.32); }
+.pm-lyrics-dialog-frame::before { content:""; display:block; width:46px; height:5px; margin:10px auto 2px; border-radius:999px; background:var(--line); }
+.pm-lyrics-dialog-header { display:flex; align-items:center; justify-content:space-between; gap:18px; padding:17px 20px; border-bottom:1px solid var(--line); background:color-mix(in srgb,var(--white) 92%,transparent); }
+.pm-lyrics-dialog-title { margin:0; font-family:Georgia,"Songti SC","Noto Serif SC",serif; font-size:24px; font-weight:500; }
+.pm-lyrics-dialog-close { padding:8px 13px; border:1px solid var(--line); border-radius:9px; background:var(--raised); color:var(--ink); font:inherit; cursor:pointer; }
+.pm-lyrics-dialog-lines { max-height:calc(88dvh - 76px); overflow:auto; padding:34vh clamp(22px,7vw,70px); scroll-behavior:smooth; }
+.pm-lyrics-dialog-line { margin:0; padding:9px 14px; border-radius:11px; color:var(--muted); font-family:Georgia,"Songti SC","Noto Serif SC",serif; font-size:20px; line-height:1.65; text-align:center; transition:color .24s ease,background .24s ease,transform .24s ease; }
+.pm-lyrics-dialog-line.active { background:var(--accent-soft); color:var(--ink); font-size:25px; font-weight:650; transform:scale(1.02); }
 
 /* 与青年页共用的编辑式排版和明暗配色。 */
 :root { color-scheme:light; --ink:#1b2333; --muted:#586173; --line:rgba(20,30,55,.12); --paper:#edeff3; --white:#fff; --raised:#f6f8fb; --accent:#1c5aa6; --accent-soft:rgba(28,90,166,.10); --rule:rgba(25,26,29,.8); }
@@ -104,22 +153,39 @@ body { background:var(--paper); color:var(--ink); }
 .hero { padding:36px 0 32px; background:transparent; border-bottom:1px solid var(--rule); border-radius:0; box-shadow:none; }
 .hero::after { display:none; }
 .eyebrow { margin-bottom:13px; color:var(--muted); font-size:12px; letter-spacing:.18em; }
-h1 { font-size:clamp(32px,5vw,44px); font-weight:400; letter-spacing:.01em; line-height:1.18; }
-.hero-date { margin:16px 0 0; font-size:15px; font-weight:600; }
-.hero-meta { margin:5px 0 13px; color:var(--muted); font-size:14px; }
-.hero-topic { margin:0 0 10px; color:var(--ink); font-size:17px; font-weight:500; }
+h1 { font-size:clamp(42px,6vw,64px); font-weight:400; letter-spacing:.01em; line-height:1.18; }
+.hero-date { margin:18px 0 0; font-size:20px; font-weight:650; }
+.hero-meta { margin:6px 0 15px; color:var(--muted); font-size:17px; }
+.hero-topic { margin:0 0 10px; color:var(--ink); font-family:Georgia,"Songti SC","Noto Serif SC",serif; font-size:22px; font-weight:500; }
 .page-actions { margin-top:15px; }
-.content-section { margin:0; padding:32px 0; background:transparent; border:0; border-bottom:1px solid var(--line); border-radius:0; box-shadow:none; }
-.content-section h2 { margin:0 0 16px; padding-bottom:11px; border-bottom:1px solid var(--rule); font-size:clamp(23px,4vw,29px); font-weight:400; }
-.schedule-row { grid-template-columns:160px 1fr; padding:15px 2px; }
+.content-section { margin:0; padding:34px 0; background:transparent; border:0; border-radius:0; box-shadow:none; }
+.content-section { --section-accent:var(--accent); --section-soft:var(--accent-soft); }
+.content-section h2 { display:flex; align-items:center; gap:11px; margin:0 0 19px; padding:0; border:0; font-size:clamp(23px,4vw,29px); font-weight:400; }
+.content-section h2::before { content:""; width:7px; height:1.05em; flex:0 0 auto; border-radius:999px; background:var(--section-accent); }
+#prayer { --section-accent:#4f79b8; --section-soft:rgba(79,121,184,.11); }
+#worship { --section-accent:#b78335; --section-soft:rgba(183,131,53,.12); }
+#reading { --section-accent:#4d8a72; --section-soft:rgba(77,138,114,.12); }
+#sermon { --section-accent:#8166a5; --section-soft:rgba(129,102,165,.12); }
+#dismissal { --section-accent:#a36363; --section-soft:rgba(163,99,99,.11); }
+#roster { --section-accent:#367e89; --section-soft:rgba(54,126,137,.11); }
+#announcements { --section-accent:#a36f45; --section-soft:rgba(163,111,69,.11); }
+#replay { --section-accent:#64738b; --section-soft:rgba(100,115,139,.11); }
+.schedule-row { grid-template-columns:160px 1fr; margin:6px 0; padding:14px 16px; border:0; border-left:3px solid var(--row-accent,var(--accent)); border-radius:0 12px 12px 0; background:var(--row-soft,var(--accent-soft)); }
+.schedule-row[data-section="prayer"] { --row-accent:#4f79b8; --row-soft:rgba(79,121,184,.08); }
+.schedule-row[data-section="worship"] { --row-accent:#b78335; --row-soft:rgba(183,131,53,.08); }
+.schedule-row[data-section="reading"] { --row-accent:#4d8a72; --row-soft:rgba(77,138,114,.08); }
+.schedule-row[data-section="sermon"] { --row-accent:#8166a5; --row-soft:rgba(129,102,165,.08); }
+.schedule-row[data-section="dismissal"] { --row-accent:#a36363; --row-soft:rgba(163,99,99,.08); }
 .schedule-row.is-current { background:var(--accent-soft); }
 .schedule-time,.stage-time { color:var(--ink); font-family:'DM Mono','SF Mono',ui-monospace,monospace; font-size:17px; font-weight:600; }
 .schedule-title { font-family:Georgia,'Songti SC','Noto Serif SC',serif; font-size:20px; font-weight:400; }
 .stage-section { border-left:0; }
-.stage-time { margin:0 0 9px; color:var(--muted); font-size:13px; }
+.stage-time { margin:0 0 9px; color:var(--section-accent); font-size:13px; }
 .stage-people { color:var(--muted); }
 .live-label { color:var(--accent); }
-.reading-card,.sermon-card,.roster-duty { background:var(--raised); border:1px solid var(--line); border-radius:12px; }
+.reading-card,.sermon-card { background:var(--section-soft); border:0; border-left:4px solid var(--section-accent); border-radius:4px 12px 12px 4px; }
+.roster-duty { background:var(--raised); border:1px solid var(--line); border-radius:12px; }
+.notice,.plain-song { margin:10px 0; padding:17px 18px; border:0; border-left:3px solid var(--section-accent); border-radius:0 11px 11px 0; background:var(--section-soft); }
 .reading-ref { font-size:23px; }
 .roster-duty dt,.notice p,.sermon-ref,.muted,.replay-empty { color:var(--muted); }
 .roster-duty dd { font-size:17px; }
@@ -134,9 +200,12 @@ html.pm-embed,html.pm-embed body { overflow:hidden; }
 html.pm-embed .page { max-width:920px; padding:0 2px; }
 html.pm-embed .hero { padding-top:10px; border-bottom-color:transparent; }
 html.pm-embed .footer { padding-bottom:24px; }
-@media (max-width:620px) { .page { padding:0 14px; } .hero { min-height:auto; padding:42px 25px 28px; } .hero-meta { margin-bottom:28px; } .content-section { padding:27px 23px; margin:18px 0; } .schedule-row { grid-template-columns:1fr; gap:2px; padding:14px 0; } .schedule-people,.live-label { grid-column:1; } .schedule-title { font-size:18px; } .schedule-time { font-size:17px; } .reading-card,.sermon-card { padding:20px; } .roster-grid { grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; } .roster-duty { padding:15px 12px; } .roster-duty dd { font-size:18px; } .reader-dialog { padding:20px; } .bible-form { gap:8px; } }
+.content-section + .content-section { padding-top:28px; }
+@media (max-width:620px) { .page { padding:0 14px; } .hero { min-height:auto; padding:42px 25px 28px; } .hero-meta { margin-bottom:28px; } .content-section { padding:27px 23px; margin:18px 0; } .schedule-row { grid-template-columns:1fr; gap:2px; padding:14px 12px; } .schedule-people,.live-label { grid-column:1; } .schedule-title { font-size:18px; } .schedule-time { font-size:17px; } .reading-card,.sermon-card { padding:20px; } .roster-grid { grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; } .roster-duty { padding:15px 12px; } .roster-duty dd { font-size:18px; } .reader-dialog { padding:20px; } .bible-form { gap:8px; } }
 @media (max-width:620px) { .page { padding:0 18px; } .hero { padding:25px 0 24px; } .hero-meta { margin-bottom:12px; } .content-section { padding:26px 0; margin:0; } html.pm-embed .page { padding:0 2px; } html.pm-embed .hero { padding-top:8px; } }
-@media (prefers-reduced-motion:reduce) { html { scroll-behavior:auto; } }
+@media (max-width:620px) { .shared-songs .pm-compact-player { padding:7px; gap:5px; } .shared-songs .pm-compact-player .ym-pl-stage { grid-template-columns:72px minmax(0,1fr); gap:8px; } .shared-songs .pm-compact-player .ym-pl-cover-wrap,.shared-songs .pm-compact-player .ym-pl-stage.playing .ym-pl-cover-wrap { width:72px; } .shared-songs .pm-compact-player .ym-pl-lrc-panel,.shared-songs .pm-compact-player .ym-pl-stage.playing .ym-pl-lrc-panel { height:94px; } .shared-songs .pm-compact-player .ym-pl-lrc-inner { padding:36px 0 46px; } .shared-songs .pm-compact-player .ym-pl-lrc-line { font-size:12px; } .shared-songs .pm-compact-player .ym-pl-lrc-line.active { font-size:15px; } .shared-songs .pm-song-actions .sw-tog { min-height:36px; padding:7px 10px; } .shared-songs .pm-video-button { min-width:104px; height:36px; padding:0 11px; font-size:13px; } .pm-lyrics-dialog { width:calc(100% - 14px); max-height:92dvh; } .pm-lyrics-dialog-frame { max-height:92dvh; border-radius:20px 20px 0 0; } .pm-lyrics-dialog-header { padding:14px 15px; } .pm-lyrics-dialog-title { font-size:21px; } .pm-lyrics-dialog-lines { max-height:calc(92dvh - 67px); padding:36vh 12px; } .pm-lyrics-dialog-line { font-size:18px; padding:8px 9px; } .pm-lyrics-dialog-line.active { font-size:22px; } }
+@media (prefers-reduced-motion:reduce) { html { scroll-behavior:auto; } .bible-reader-panel,.bible-reader-arrow,.pm-lyrics-dialog-line { transition:none!important; } .pm-lyrics-dialog-lines { scroll-behavior:auto; } }
+@keyframes pm-sheet-up { from { opacity:0; transform:translateY(38px); } to { opacity:1; transform:translateY(0); } }
 @media print { body { background:white; } .page { max-width:none; padding:0; } .hero { padding:20px; box-shadow:none; } .hero::after,.page-actions,.control-button,.song-copy-button,.song-copy-status,.bible-form,.reader-tools,.reader-feedback,.shared-songs,.replay-frame,.resource-link { display:none!important; } .content-section { box-shadow:none; margin:16px 0; padding:18px; break-inside:avoid; } .roster-duty { background:white; border:1px solid #ddd; } .hero-date,.hero-meta { margin:10px 0; } .hero-topic { margin:12px 0; } .hero h1 { font-size:32px; } }
 
 /* ── FIX: 圣经表单控件高度统一 ───────────────────────────────────────────── */
