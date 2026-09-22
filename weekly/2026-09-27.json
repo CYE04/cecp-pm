@@ -12,7 +12,7 @@
     { "start": "17:00", "title": "祝福祷告散会", "section": "dismissal" }
   ],
   "reading": "sp 38",
-  "songs": [{ "title": "测试" }，"nengbunneg"],
+  "songs": [{ "title": "测试" },{ "title": "nengbuneng" }],
   "offeringSongs": ["yonghengweiyidepanwang"],
   "sermon": {
     "ref": "",
