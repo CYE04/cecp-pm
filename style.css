@@ -62,11 +62,12 @@ h1 { margin:0; font-family:"Songti SC","Noto Serif CJK SC","SimSun",serif; font-
 .bible-reader-toggle { display:flex; align-items:center; gap:13px; width:100%; padding:14px 16px; list-style:none; cursor:pointer; border:1px solid var(--line); border-radius:13px; background:var(--raised); color:var(--ink); transition:background .2s ease,border-color .2s ease,transform .2s ease; }
 .bible-reader-toggle:hover { background:var(--accent-soft); border-color:color-mix(in srgb,var(--accent) 40%,var(--line)); }
 .bible-reader-toggle:active { transform:scale(.995); }
-.bible-reader-icon { display:grid; place-items:center; width:36px; height:36px; flex:0 0 auto; border-radius:10px; background:var(--accent-soft); color:var(--accent); font-family:"Songti SC","Noto Serif SC",serif; font-size:17px; font-weight:700; }
+.bible-reader-icon { display:grid; place-items:center; width:36px; height:36px; flex:0 0 auto; border-radius:10px; background:var(--accent-soft); color:var(--accent); }
+.bible-reader-book { width:21px; height:21px; }
 .bible-reader-copy { display:flex; flex:1; min-width:0; flex-direction:column; line-height:1.35; }
 .bible-reader-label { font-size:16px; font-weight:700; }
 .bible-reader-reference { margin-top:3px; color:var(--muted); font-size:12px; font-weight:500; }
-.bible-reader-arrow { color:var(--muted); font-size:23px; line-height:1; transform:rotate(0deg); transition:transform .34s cubic-bezier(.2,.8,.2,1),color .2s ease; }
+.bible-reader-arrow { width:20px; height:20px; flex:0 0 auto; color:var(--muted); transform:rotate(0deg); transition:transform .34s cubic-bezier(.2,.8,.2,1),color .2s ease; }
 .bible-reader[data-open="true"] .bible-reader-toggle { background:var(--accent-soft); border-color:color-mix(in srgb,var(--accent) 42%,var(--line)); }
 .bible-reader[data-open="true"] .bible-reader-arrow { color:var(--accent); transform:rotate(180deg); }
 .bible-reader-panel { height:0; opacity:0; overflow:clip; transition:height .36s cubic-bezier(.2,.8,.2,1),opacity .22s ease; }
@@ -98,6 +99,7 @@ h1 { margin:0; font-family:"Songti SC","Noto Serif CJK SC","SimSun",serif; font-
 .song-error { margin-top:20px; }
 .replay-frame { display:block; width:100%; aspect-ratio:16 / 9; border:0; border-radius:12px; background:#241c17; margin-bottom:18px; }
 .replay-empty { margin:0; color:var(--muted); }
+.empty-state { margin:10px 0; padding:15px 17px; border-radius:11px; background:var(--section-soft,var(--accent-soft)); color:var(--muted); }
 .preview-banner { padding:12px 20px; margin:0; background:#ead5bd; color:#593c25; font-size:14px; }
 .invitation { white-space:pre-line; }
 .shared-songs { min-width:0; }
@@ -108,27 +110,31 @@ h1 { margin:0; font-family:"Songti SC","Noto Serif CJK SC","SimSun",serif; font-
 .shared-songs .sw-score-top { border-bottom:0; padding-left:0; padding-right:0; }
 .pm-song-actions { display:flex; flex-wrap:wrap; align-items:center; justify-content:flex-end; gap:8px; width:100%; }
 .shared-songs .pm-song-actions .sw-tog { min-height:36px; margin-top:0; padding:7px 12px; border-radius:10px; font-size:13px; font-weight:650; }
-.shared-songs .pm-transpose-button svg { display:none; }
-.shared-songs .pm-transpose-button::after { content:"⌄"; margin-left:2px; font-size:17px; font-weight:800; line-height:1; transform:translateY(-1px) rotate(0); transition:transform .22s ease; }
-.shared-songs .pm-transpose-button.on::after { transform:translateY(1px) rotate(180deg); }
+.shared-songs .pm-transpose-button svg:not(.pm-chevron-icon) { display:none; }
+.shared-songs .pm-transpose-button .pm-chevron-icon { width:17px; height:17px; margin-left:2px; transition:transform .22s ease; }
+.shared-songs .pm-transpose-button.on .pm-chevron-icon { transform:rotate(180deg); }
 .shared-songs .pm-lyrics-button { background:transparent; }
 .shared-songs .pm-video-button { width:auto; min-width:112px; height:40px; padding:0 14px; gap:8px; border-radius:11px; font-size:14px; font-weight:700; }
 .shared-songs .pm-video-button svg { width:21px; height:21px; }
-.shared-songs .pm-compact-player { padding:7px; gap:5px; border-radius:16px; }
-.shared-songs .pm-compact-player .ym-pl-stage { grid-template-columns:82px minmax(0,1fr); gap:9px; }
-.shared-songs .pm-compact-player .ym-pl-cover-wrap,.shared-songs .pm-compact-player .ym-pl-stage.playing .ym-pl-cover-wrap { width:82px; }
+.shared-songs .pm-compact-player { padding:6px; gap:4px; border-radius:15px; }
+.shared-songs .pm-compact-player .ym-pl-stage { grid-template-columns:72px minmax(0,1fr); gap:8px; }
+.shared-songs .pm-compact-player .ym-pl-cover-wrap,.shared-songs .pm-compact-player .ym-pl-stage.playing .ym-pl-cover-wrap { width:72px; }
 .shared-songs .pm-compact-player .ym-pl-cover,.shared-songs .pm-compact-player .ym-pl-cover img { border-radius:13px; }
-.shared-songs .pm-compact-player .ym-pl-lrc-panel,.shared-songs .pm-compact-player .ym-pl-stage.playing .ym-pl-lrc-panel { height:104px; }
-.shared-songs .pm-compact-player .ym-pl-lrc-inner { padding:40px 0 50px; }
+.shared-songs .pm-compact-player .ym-pl-lrc-panel,.shared-songs .pm-compact-player .ym-pl-stage.playing .ym-pl-lrc-panel { height:88px; }
+.shared-songs .pm-compact-player .ym-pl-lrc-inner { padding:34px 0 42px; }
 .shared-songs .pm-compact-player .ym-pl-lrc-line { font-size:13px; line-height:1.4; padding:2px 5px; }
 .shared-songs .pm-compact-player .ym-pl-lrc-line.active { font-size:16px; }
-.shared-songs .pm-compact-player .ym-pl-spectrum { height:8px; margin-top:-3px; }
-.shared-songs .pm-compact-player .ym-pl-info { padding:5px 9px; }
-.shared-songs .pm-compact-player .ym-pl-prog-wrap { padding:5px 7px; }
-.shared-songs .pm-compact-player .ym-pl-controls { padding:2px; }
-.shared-songs .pm-compact-player .ym-pl-btn { width:30px; height:30px; }
-.shared-songs .pm-compact-player .ym-pl-pp { width:36px!important; height:36px!important; }
-.shared-songs .pm-compact-player .ym-pl-vol-wrap { padding:5px 7px; }
+.shared-songs .pm-compact-player .ym-pl-spectrum { height:6px; margin-top:-4px; }
+.shared-songs .pm-compact-player .ym-pl-info { padding:4px 8px; }
+.shared-songs .pm-compact-player .ym-pl-title { font-size:13px; }
+.shared-songs .pm-compact-player .ym-pl-artist { font-size:11px; }
+.shared-songs .pm-compact-player .ym-pl-prog-wrap { padding:4px 6px; }
+.shared-songs .pm-compact-player .ym-pl-controls { display:grid; grid-template-columns:minmax(0,1fr) auto minmax(0,1fr); align-items:center; min-height:36px; padding:1px 6px; }
+.shared-songs .pm-compact-player .pm-playback-buttons { grid-column:2; display:flex; align-items:center; justify-content:center; gap:3px; }
+.shared-songs .pm-compact-player .ym-pl-btn { width:28px; height:28px; }
+.shared-songs .pm-compact-player .ym-pl-pp { width:34px!important; height:34px!important; }
+.shared-songs .pm-compact-player .pm-inline-volume { grid-column:3; justify-self:end; width:min(126px,100%); padding:0; border:0; background:transparent; backdrop-filter:none; -webkit-backdrop-filter:none; }
+.shared-songs .pm-compact-player .pm-inline-volume .ym-pl-vol { min-width:52px; }
 .pm-lyrics-dialog { position:fixed; inset:auto 0 0; width:min(760px,calc(100% - 28px)); max-height:88dvh; margin:0 auto; padding:0; border:0; border-radius:24px 24px 0 0; background:transparent; color:var(--ink); overflow:visible; }
 .pm-lyrics-dialog[open] { animation:pm-sheet-up .34s cubic-bezier(.2,.8,.2,1); }
 .pm-lyrics-dialog::backdrop { background:rgba(5,7,12,.72); backdrop-filter:blur(7px); }
@@ -203,7 +209,7 @@ html.pm-embed .footer { padding-bottom:24px; }
 .content-section + .content-section { padding-top:28px; }
 @media (max-width:620px) { .page { padding:0 14px; } .hero { min-height:auto; padding:42px 25px 28px; } .hero-meta { margin-bottom:28px; } .content-section { padding:27px 23px; margin:18px 0; } .schedule-row { grid-template-columns:1fr; gap:2px; padding:14px 12px; } .schedule-people,.live-label { grid-column:1; } .schedule-title { font-size:18px; } .schedule-time { font-size:17px; } .reading-card,.sermon-card { padding:20px; } .roster-grid { grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; } .roster-duty { padding:15px 12px; } .roster-duty dd { font-size:18px; } .reader-dialog { padding:20px; } .bible-form { gap:8px; } }
 @media (max-width:620px) { .page { padding:0 18px; } .hero { padding:25px 0 24px; } .hero-meta { margin-bottom:12px; } .content-section { padding:26px 0; margin:0; } html.pm-embed .page { padding:0 2px; } html.pm-embed .hero { padding-top:8px; } }
-@media (max-width:620px) { .shared-songs .pm-compact-player { padding:7px; gap:5px; } .shared-songs .pm-compact-player .ym-pl-stage { grid-template-columns:72px minmax(0,1fr); gap:8px; } .shared-songs .pm-compact-player .ym-pl-cover-wrap,.shared-songs .pm-compact-player .ym-pl-stage.playing .ym-pl-cover-wrap { width:72px; } .shared-songs .pm-compact-player .ym-pl-lrc-panel,.shared-songs .pm-compact-player .ym-pl-stage.playing .ym-pl-lrc-panel { height:94px; } .shared-songs .pm-compact-player .ym-pl-lrc-inner { padding:36px 0 46px; } .shared-songs .pm-compact-player .ym-pl-lrc-line { font-size:12px; } .shared-songs .pm-compact-player .ym-pl-lrc-line.active { font-size:15px; } .shared-songs .pm-song-actions .sw-tog { min-height:36px; padding:7px 10px; } .shared-songs .pm-video-button { min-width:104px; height:36px; padding:0 11px; font-size:13px; } .pm-lyrics-dialog { width:calc(100% - 14px); max-height:92dvh; } .pm-lyrics-dialog-frame { max-height:92dvh; border-radius:20px 20px 0 0; } .pm-lyrics-dialog-header { padding:14px 15px; } .pm-lyrics-dialog-title { font-size:21px; } .pm-lyrics-dialog-lines { max-height:calc(92dvh - 67px); padding:36vh 12px; } .pm-lyrics-dialog-line { font-size:18px; padding:8px 9px; } .pm-lyrics-dialog-line.active { font-size:22px; } }
+@media (max-width:620px) { .shared-songs .pm-compact-player { padding:6px; gap:4px; } .shared-songs .pm-compact-player .ym-pl-stage { grid-template-columns:64px minmax(0,1fr); gap:7px; } .shared-songs .pm-compact-player .ym-pl-cover-wrap,.shared-songs .pm-compact-player .ym-pl-stage.playing .ym-pl-cover-wrap { width:64px; } .shared-songs .pm-compact-player .ym-pl-lrc-panel,.shared-songs .pm-compact-player .ym-pl-stage.playing .ym-pl-lrc-panel { height:82px; } .shared-songs .pm-compact-player .ym-pl-lrc-inner { padding:32px 0 40px; } .shared-songs .pm-compact-player .ym-pl-lrc-line { font-size:12px; } .shared-songs .pm-compact-player .ym-pl-lrc-line.active { font-size:15px; } .shared-songs .pm-compact-player .pm-inline-volume { display:none!important; } .shared-songs .pm-song-actions .sw-tog { min-height:36px; padding:7px 10px; } .shared-songs .pm-video-button { min-width:104px; height:36px; padding:0 11px; font-size:13px; } .pm-lyrics-dialog { width:calc(100% - 14px); max-height:92dvh; } .pm-lyrics-dialog-frame { max-height:92dvh; border-radius:20px 20px 0 0; } .pm-lyrics-dialog-header { padding:14px 15px; } .pm-lyrics-dialog-title { font-size:21px; } .pm-lyrics-dialog-lines { max-height:calc(92dvh - 67px); padding:36vh 12px; } .pm-lyrics-dialog-line { font-size:18px; padding:8px 9px; } .pm-lyrics-dialog-line.active { font-size:22px; } }
 @media (prefers-reduced-motion:reduce) { html { scroll-behavior:auto; } .bible-reader-panel,.bible-reader-arrow,.pm-lyrics-dialog-line { transition:none!important; } .pm-lyrics-dialog-lines { scroll-behavior:auto; } }
 @keyframes pm-sheet-up { from { opacity:0; transform:translateY(38px); } to { opacity:1; transform:translateY(0); } }
 @media print { body { background:white; } .page { max-width:none; padding:0; } .hero { padding:20px; box-shadow:none; } .hero::after,.page-actions,.control-button,.song-copy-button,.song-copy-status,.bible-form,.reader-tools,.reader-feedback,.shared-songs,.replay-frame,.resource-link { display:none!important; } .content-section { box-shadow:none; margin:16px 0; padding:18px; break-inside:avoid; } .roster-duty { background:white; border:1px solid #ddd; } .hero-date,.hero-meta { margin:10px 0; } .hero-topic { margin:12px 0; } .hero h1 { font-size:32px; } }

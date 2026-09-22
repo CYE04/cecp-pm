@@ -16,6 +16,34 @@
     node.addEventListener('click', action);
     return node;
   }
+  const yesiconPaths = {
+    'book-2': [
+      'M19 4v16h-12a3 3 0 0 1 0 -6h12',
+      'M7 4h12',
+      'M7 4a3 3 0 0 0 -3 3v10'
+    ],
+    'chevron-down': ['M6 9l6 6l6 -6']
+  };
+  function yesicon(name, className) {
+    const paths = yesiconPaths[name];
+    if (!paths) throw new Error('未知图标：' + name);
+    const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    svg.setAttribute('viewBox', '0 0 24 24');
+    svg.setAttribute('fill', 'none');
+    svg.setAttribute('stroke', 'currentColor');
+    svg.setAttribute('stroke-width', '2');
+    svg.setAttribute('stroke-linecap', 'round');
+    svg.setAttribute('stroke-linejoin', 'round');
+    svg.setAttribute('aria-hidden', 'true');
+    svg.dataset.icon = 'tabler:' + name;
+    if (className) svg.setAttribute('class', className);
+    paths.forEach(value => {
+      const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+      path.setAttribute('d', value);
+      svg.appendChild(path);
+    });
+    return svg;
+  }
   async function copyText(value, clipboard = globalThis.navigator?.clipboard, doc = globalThis.document) {
     if (clipboard?.writeText) {
       try { await clipboard.writeText(value); return; } catch (_) { /* 改用页面内复制 */ }
@@ -54,6 +82,24 @@
   }
   function retry(container, message, action) {
     container.replaceChildren(el('p', 'muted', message), button('重新加载', action));
+  }
+  function filledSongs(value) {
+    if (!Array.isArray(value)) return [];
+    return value.filter(item => {
+      if (typeof item === 'string') return !!item.trim();
+      if (!item || typeof item !== 'object') return false;
+      if (Array.isArray(item.sections) && item.sections.length) return true;
+      return ['id', 'title', 'lyrics', 'mp3', 'scoreImg', 'url', 'youtube']
+        .some(key => typeof item[key] === 'string' && item[key].trim());
+    });
+  }
+  function announcementTexts(value) {
+    if (!Array.isArray(value)) return [];
+    return value.map(item => {
+      if (typeof item === 'string') return item.trim();
+      if (!item || typeof item !== 'object') return '';
+      return String(item.detail || item.title || '').trim();
+    }).filter(Boolean);
   }
   function videoEmbed(value) {
     const safe = safeUrl(value, 'https://cecp.it');
@@ -95,5 +141,5 @@
     const interval = setInterval(update, 30000);
     window.addEventListener('pagehide', () => clearInterval(interval), { once: true });
   }
-  return { el, button, copyText, safeUrl, json, retry, videoEmbed, activeSchedule, mountSchedule };
+  return { el, button, yesicon, copyText, safeUrl, json, retry, filledSongs, announcementTexts, videoEmbed, activeSchedule, mountSchedule };
 });

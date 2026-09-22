@@ -13,6 +13,7 @@
     return parent;
   };
   const safeUrl = value => window.PMFeatures.safeUrl(value);
+  const emptyState = message => el('p', 'empty-state', message);
   const link = (label, href) => {
     const a = el('a', 'resource-link', label + ' ↗');
     a.href = href;
@@ -81,11 +82,17 @@
         box.appendChild(people);
       }
       if (key === 'prayer' && data.prayerText) box.appendChild(el('p', 'stage-description', data.prayerText));
-      if (key === 'worship' && Array.isArray(data.songs) && data.songs.length) {
-        const songHost = el('div', 'song-host'); box.appendChild(songHost);
-        window.PMSongs.mount(songHost, data.songs, root.dataset);
+      if (key === 'worship') {
+        const songs = window.PMFeatures.filledSongs(data.songs);
+        if (songs.length) {
+          const songHost = el('div', 'song-host'); box.appendChild(songHost);
+          window.PMSongs.mount(songHost, songs, root.dataset);
+        } else {
+          box.appendChild(emptyState('本周敬拜诗歌尚未公布，同工正在准备中。'));
+        }
       }
       if (key === 'reading') {
+        let hasReading = false;
         if (data.reading) {
           // 支持缩写写法：reading: "诗 37" 或 reading: { ref: "林前 3:1-23", note: "..." }
           const raw = data.reading;
@@ -93,6 +100,7 @@
           const reading = (refStr ? window.PMBible.parseRef(refStr) : null) || (typeof raw === 'object' ? raw : null);
           const note = typeof raw === 'object' ? raw.note : undefined;
           if (reading?.reference) {
+            hasReading = true;
             const card = el('div', 'reading-card');
             append(card, el('p', 'reading-ref', reading.reference));
             if (note) card.appendChild(el('p', 'muted', note));
@@ -100,18 +108,25 @@
             window.PMBible.mount(box, reading, root.dataset.bibleApi);
           }
         }
-        if (Array.isArray(data.offeringSongs) && data.offeringSongs.length) {
+        if (!hasReading) box.appendChild(emptyState('本周读经经文尚未公布，同工正在准备中。'));
+        const offeringSongs = window.PMFeatures.filledSongs(data.offeringSongs);
+        if (offeringSongs.length) {
           const offeringHost = el('div', 'song-host'); box.appendChild(offeringHost);
-          window.PMSongs.mount(offeringHost, data.offeringSongs, root.dataset);
+          window.PMSongs.mount(offeringHost, offeringSongs, root.dataset);
+        } else if (data.offering) {
+          box.appendChild(el('p', 'stage-description', data.offering));
+        } else {
+          box.appendChild(emptyState('本周献诗尚未公布，同工正在准备中。'));
         }
-        if (data.offering) box.appendChild(el('p', 'stage-description', data.offering));
       }
       if (key === 'sermon') {
         const raw = data.sermon || {};
         // 支持 ref 缩写：sermon: { ref: "gldqs 3 1 23", title: "...", ... }
         const parsed = raw.ref ? window.PMBible.parseRef(raw.ref) : null;
-        const sermon = parsed ? { ...parsed, ...raw, reference: raw.reference || parsed.reference } : raw;
-        if (sermon.title || sermon.speaker || sermon.reference || (Array.isArray(sermon.outline) && sermon.outline.length)) {
+        const sermon = parsed ? { ...parsed, ...raw, reference: raw.reference || parsed.reference } : { ...raw };
+        sermon.outline = Array.isArray(sermon.outline) ? sermon.outline.filter(point => String(point || '').trim()) : [];
+        const hasSermon = sermon.title || sermon.speaker || sermon.reference || sermon.outline.length;
+        if (hasSermon) {
           const card = el('div', 'sermon-card');
           if (sermon.title) card.appendChild(el('h3', '', sermon.title));
           if (sermon.reference) card.appendChild(el('p', 'sermon-ref', sermon.reference));
@@ -126,6 +141,8 @@
           }
           box.appendChild(card);
           window.PMBible.mount(box, sermon, root.dataset.bibleApi);
+        } else {
+          box.appendChild(emptyState('本周证道信息尚未公布，同工正在准备中。'));
         }
       }
       page.appendChild(box);
@@ -141,13 +158,15 @@
       loadRoster(body, date);
     }
 
-    if (Array.isArray(data.announcements) && data.announcements.length) {
-      const box = section('announcements', '本周通知');
-      data.announcements.forEach(item => {
+    {
+      const box = section('announcements', '通知');
+      const announcements = window.PMFeatures.announcementTexts(data.announcements);
+      announcements.forEach(copy => {
         const card = el('div', 'notice');
-        append(card, el('h3', '', item.title || '通知'), el('p', '', item.detail || ''));
+        card.appendChild(el('p', '', copy));
         box.appendChild(card);
       });
+      if (!announcements.length) box.appendChild(emptyState('本周暂无通知。'));
       page.appendChild(box);
     }
 
