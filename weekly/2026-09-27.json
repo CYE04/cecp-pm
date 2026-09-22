@@ -1,0 +1,39 @@
+{
+  "_说明": {
+    "date": "聚会日期，必须与文件名一致，例如文件名为 2026-09-27.json",
+    "title": "页面大标题",
+    "time": "整场聚会时间",
+    "venue": "聚会地点",
+    "timeZone": "用于判断当前正在进行哪个环节",
+    "schedule": "聚会流程及对应服事岗位",
+    "reading": "本周读经，例如 sp 38 表示诗篇第 38 篇",
+    "songs": "敬拜诗歌；没有就写空数组 []",
+    "offeringSongs": "献诗；填写曲库文件名，不带 .json",
+    "sermon": "证道经文、主题和大纲",
+    "announcements": "通知；没有就写空数组 []",
+    "replayUrl": "直播回放地址；没有就留空"
+  },
+{
+  "date": "2026-09-27",
+  "title": "主日下午聚会",
+  "time": "14:00–17:00",
+  "venue": "帕多瓦教会",
+  "timeZone": "Europe/Rome",
+  "schedule": [
+    { "start": "14:00", "end": "14:50", "title": "祷告会", "section": "prayer", "roles": ["prayerLeader"] },
+    { "start": "15:00", "end": "15:40", "title": "敬拜、记念祷告", "section": "worship", "roles": ["worship", "praisePrayer", "memorialPrayer"] },
+    { "start": "15:40", "end": "16:00", "title": "读经、献诗", "section": "reading", "roles": ["reading"] },
+    { "start": "16:00", "end": "17:00", "title": "证道", "section": "sermon", "roles": ["note"] },
+    { "start": "17:00", "title": "祝福祷告散会", "section": "dismissal" }
+  ],
+  "reading": "sp 38",
+  "songs": [],
+  "offeringSongs": ["yonghengweiyidepanwang"],
+  "sermon": {
+    "ref": "",
+    "title": "",
+    "outline": []
+  },
+  "announcements": [],
+  "replayUrl": ""
+}
