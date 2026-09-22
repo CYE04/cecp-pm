@@ -66,7 +66,7 @@
     const summaryText = el('span', 'bible-reader-copy');
     summaryText.append(el('span', 'bible-reader-label', '展开经文'), el('span', 'bible-reader-reference', passage.reference || `${names[passage.book - 1]} ${passage.chapter} 章`));
     const scriptureIcon = el('span', 'bible-reader-icon');
-    scriptureIcon.appendChild(yesicon('book-2', 'yesicon bible-reader-book'));
+    scriptureIcon.appendChild(yesicon('bible', 'yesicon bible-reader-bible'));
     summary.append(scriptureIcon, summaryText, yesicon('chevron-down', 'yesicon bible-reader-arrow'));
     details.appendChild(summary);
     const form = el('form', 'bible-form');

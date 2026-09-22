@@ -92,6 +92,7 @@
         }
       }
       if (key === 'reading') {
+        box.appendChild(el('h3', 'stage-subheading', '读经'));
         let hasReading = false;
         if (data.reading) {
           // 支持缩写写法：reading: "诗 37" 或 reading: { ref: "林前 3:1-23", note: "..." }
@@ -109,6 +110,7 @@
           }
         }
         if (!hasReading) box.appendChild(emptyState('本周读经经文尚未公布，同工正在准备中。'));
+        box.appendChild(el('h3', 'stage-subheading stage-subheading-offering', '献诗'));
         const offeringSongs = window.PMFeatures.filledSongs(data.offeringSongs);
         if (offeringSongs.length) {
           const offeringHost = el('div', 'song-host'); box.appendChild(offeringHost);

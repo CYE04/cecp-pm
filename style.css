@@ -63,7 +63,7 @@ h1 { margin:0; font-family:"Songti SC","Noto Serif CJK SC","SimSun",serif; font-
 .bible-reader-toggle:hover { background:var(--accent-soft); border-color:color-mix(in srgb,var(--accent) 40%,var(--line)); }
 .bible-reader-toggle:active { transform:scale(.995); }
 .bible-reader-icon { display:grid; place-items:center; width:36px; height:36px; flex:0 0 auto; border-radius:10px; background:var(--accent-soft); color:var(--accent); }
-.bible-reader-book { width:21px; height:21px; }
+.bible-reader-bible { width:23px; height:23px; }
 .bible-reader-copy { display:flex; flex:1; min-width:0; flex-direction:column; line-height:1.35; }
 .bible-reader-label { font-size:16px; font-weight:700; }
 .bible-reader-reference { margin-top:3px; color:var(--muted); font-size:12px; font-weight:500; }
@@ -188,6 +188,9 @@ h1 { font-size:clamp(42px,6vw,64px); font-weight:400; letter-spacing:.01em; line
 .stage-section { border-left:0; }
 .stage-time { margin:0 0 9px; color:var(--section-accent); font-size:13px; }
 .stage-people { color:var(--muted); }
+.stage-subheading { display:flex; align-items:center; gap:9px; margin:22px 0 11px; color:var(--ink); font-size:18px; font-weight:700; letter-spacing:.06em; }
+.stage-subheading::before { content:""; width:18px; height:3px; flex:0 0 auto; border-radius:999px; background:var(--section-accent); }
+.stage-subheading-offering { margin-top:30px; }
 .live-label { color:var(--accent); }
 .reading-card,.sermon-card { background:var(--section-soft); border:0; border-left:4px solid var(--section-accent); border-radius:4px 12px 12px 4px; }
 .roster-duty { background:var(--raised); border:1px solid var(--line); border-radius:12px; }

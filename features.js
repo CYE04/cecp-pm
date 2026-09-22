@@ -17,6 +17,7 @@
     return node;
   }
   const yesiconPaths = {
+    bible: ['M19 2H6a2 2 0 0 0 -2 2v16a2 2 0 0 0 2 2h13a1 1 0 0 0 1 -1V3a1 1 0 0 0 -1 -1M15 12h-3v6h-2v-6H7v-2h3V6h2v4h3z'],
     'book-2': [
       'M19 4v16h-12a3 3 0 0 1 0 -6h12',
       'M7 4h12',
@@ -29,13 +30,16 @@
     if (!paths) throw new Error('未知图标：' + name);
     const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
     svg.setAttribute('viewBox', '0 0 24 24');
-    svg.setAttribute('fill', 'none');
-    svg.setAttribute('stroke', 'currentColor');
-    svg.setAttribute('stroke-width', '2');
-    svg.setAttribute('stroke-linecap', 'round');
-    svg.setAttribute('stroke-linejoin', 'round');
+    const filled = name === 'bible';
+    svg.setAttribute('fill', filled ? 'currentColor' : 'none');
+    svg.setAttribute('stroke', filled ? 'none' : 'currentColor');
+    if (!filled) {
+      svg.setAttribute('stroke-width', '2');
+      svg.setAttribute('stroke-linecap', 'round');
+      svg.setAttribute('stroke-linejoin', 'round');
+    }
     svg.setAttribute('aria-hidden', 'true');
-    svg.dataset.icon = 'tabler:' + name;
+    svg.dataset.icon = filled ? 'mdi:bible' : 'tabler:' + name;
     if (className) svg.setAttribute('class', className);
     paths.forEach(value => {
       const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
