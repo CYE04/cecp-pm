@@ -12,7 +12,11 @@
     { "start": "17:00", "title": "祝福祷告散会", "section": "dismissal" }
   ],
   "reading": "sp 38",
-  "songs": [],
+  "songs": [
+    { "title": "zhuzainilimian" },
+    { "title": "yehehuashenyizhangquan" },
+    { "title": "0583zhuaiyouduoshao" }
+  ],
   "offeringSongs": ["yonghengweiyidepanwang"],
   "sermon": {
     "ref": "",
