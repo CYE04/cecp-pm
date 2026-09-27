@@ -6,7 +6,7 @@
   "timeZone": "Europe/Rome",
   "schedule": [
     { "start": "14:00", "end": "14:50", "title": "祷告会", "section": "prayer", "roles": ["prayerLeader"] },
-    { "start": "15:00", "end": "15:40", "title": "敬拜、记念祷告", "section": "worship", "roles": ["worship", "praisePrayer", "memorialPrayer"] },
+    { "start": "15:00", "end": "15:40", "title": "诗歌敬拜、记念祷告", "section": "worship", "roles": ["worship", "praisePrayer", "memorialPrayer"] },
     { "start": "15:40", "end": "16:00", "title": "读经、献诗", "section": "reading", "roles": ["reading"] },
     { "start": "16:00", "end": "17:00", "title": "证道", "section": "sermon", "roles": ["note"] },
     { "start": "17:00", "title": "祝福祷告散会", "section": "dismissal" }
