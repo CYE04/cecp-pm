@@ -13,16 +13,13 @@
   ],
   "reading": "sp 39",
   "songs": [
-    { "title": "" },
-    { "title": "" },
-    { "title": "" }
   ],
-  "offeringSongs": [""],
+  "offeringSongs": [],
   "sermon": {
     "ref": "罗12 9 21",
     "title": "爱与逼迫到神的信实",
     "outline": []
   },
-  "announcements": [""],
+  "announcements": [],
   "replayUrl": ""
 }
