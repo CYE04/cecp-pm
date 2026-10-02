@@ -3,6 +3,12 @@
   const { el, button, yesicon, json, retry } = window.PMFeatures;
   const names = '创世记 出埃及记 利未记 民数记 申命记 约书亚记 士师记 路得记 撒母耳记上 撒母耳记下 列王纪上 列王纪下 历代志上 历代志下 以斯拉记 尼希米记 以斯帖记 约伯记 诗篇 箴言 传道书 雅歌 以赛亚书 耶利米书 耶利米哀歌 以西结书 但以理书 何西阿书 约珥书 阿摩司书 俄巴底亚书 约拿书 弥迦书 那鸿书 哈巴谷书 西番雅书 哈该书 撒迦利亚书 玛拉基书 马太福音 马可福音 路加福音 约翰福音 使徒行传 罗马书 哥林多前书 哥林多后书 加拉太书 以弗所书 腓立比书 歌罗西书 帖撒罗尼迦前书 帖撒罗尼迦后书 提摩太前书 提摩太后书 提多书 腓利门书 希伯来书 雅各书 彼得前书 彼得后书 约翰一书 约翰二书 约翰三书 犹大书 启示录'.split(' ');
   const chapters = [50,40,27,36,34,24,21,4,31,24,22,25,29,36,10,13,10,42,150,31,12,8,66,52,5,48,12,14,3,9,1,4,7,3,3,3,2,14,4,28,16,24,21,28,16,16,13,6,6,4,4,5,3,6,4,3,1,13,5,5,3,5,1,1,1,22];
+  const chapterUnit = book => book === 19 ? '篇' : '章';
+  const passageReference = passage => {
+    const fallback = `${names[passage.book - 1]} ${passage.chapter} ${chapterUnit(passage.book)}`;
+    if (!passage.reference) return fallback;
+    return passage.book === 19 ? passage.reference.replace(/(\d+)\s*章/, '$1 篇') : passage.reference;
+  };
   let serial = 0;
 
   function setDrawerState(details, panel, open, options = {}) {
@@ -64,7 +70,7 @@
     const summary = el('summary', 'bible-reader-toggle');
     summary.setAttribute('aria-expanded', 'false');
     const summaryText = el('span', 'bible-reader-copy');
-    summaryText.append(el('span', 'bible-reader-label', '展开经文'), el('span', 'bible-reader-reference', passage.reference || `${names[passage.book - 1]} ${passage.chapter} 章`));
+    summaryText.append(el('span', 'bible-reader-label', '展开经文'), el('span', 'bible-reader-reference', passageReference(passage)));
     const scriptureIcon = el('span', 'bible-reader-icon');
     scriptureIcon.appendChild(yesicon('bible', 'yesicon bible-reader-bible'));
     summary.append(scriptureIcon, summaryText, yesicon('chevron-down', 'yesicon bible-reader-arrow'));
@@ -75,9 +81,10 @@
     names.forEach((name, index) => { const option = el('option', '', name); option.value = index + 1; books.appendChild(option); });
     books.value = passage.book;
     bookLabel.appendChild(books);
-    const chapterLabel = el('label', '', '章');
+    const chapterLabel = el('label');
+    const chapterLabelText = el('span', '', chapterUnit(passage.book));
     const chapter = el('input'); chapter.type = 'number'; chapter.min = 1; chapter.max = chapters[passage.book - 1]; chapter.value = passage.chapter; chapter.required = true; chapter.setAttribute('aria-label', '章节');
-    chapterLabel.appendChild(chapter);
+    chapterLabel.append(chapterLabelText, chapter);
     const submit = el('button', 'control-button', '查阅'); submit.type = 'submit';
     form.append(bookLabel, chapterLabel, submit);
     const title = el('h3', 'bible-heading');
@@ -121,8 +128,12 @@
       const token = ++request;
       currentBook = book; currentChapter = number;
       books.value = book; chapter.value = number; chapter.max = chapters[book - 1];
+      chapterLabelText.textContent = chapterUnit(book);
+      chapter.setAttribute('aria-label', book === 19 ? '诗篇篇数' : '章节');
+      previous.textContent = book === 19 ? '上一篇' : '上一章';
+      next.textContent = book === 19 ? '下一篇' : '下一章';
       previous.disabled = number <= 1; next.disabled = number >= chapters[book - 1];
-      title.textContent = `${names[book - 1]} ${number} 章${range?.start ? ' ' + range.start + (range.end && range.end !== range.start ? '–' + range.end : '') + ' 节' : ''} · 和合本`;
+      title.textContent = `${names[book - 1]} ${number} ${chapterUnit(book)}${range?.start ? ' ' + range.start + (range.end && range.end !== range.start ? '–' + range.end : '') + ' 节' : ''} · 和合本`;
       verses = []; copyButton.disabled = fullButton.disabled = true; feedback.textContent = '';
       content.replaceChildren(el('p', 'muted', '正在读取经文…'));
       try {
@@ -147,7 +158,12 @@
     panelInner.append(form, title, tools, feedback, content, pager);
     panel.appendChild(panelInner);
     details.appendChild(panel);
-    books.addEventListener('change', () => { chapter.max = chapters[+books.value - 1]; chapter.value = 1; });
+    books.addEventListener('change', () => {
+      const book = +books.value;
+      chapter.max = chapters[book - 1]; chapter.value = 1;
+      chapterLabelText.textContent = chapterUnit(book);
+      chapter.setAttribute('aria-label', book === 19 ? '诗篇篇数' : '章节');
+    });
     form.addEventListener('submit', event => { event.preventDefault(); if (form.reportValidity()) load(+books.value, +chapter.value); });
     summary.addEventListener('click', event => {
       event.preventDefault();
@@ -253,10 +269,10 @@
     const start = m[3] ? parseInt(m[3], 10) : undefined;
     const end   = m[4] ? parseInt(m[4], 10) : start;
     const bookName = names[book - 1];
-    let reference = bookName + ' ' + chapter + ' 章';
+    let reference = bookName + ' ' + chapter + ' ' + chapterUnit(book);
     if (start) reference += ' ' + start + (end && end !== start ? '–' + end : '') + ' 节';
     return { book, chapter, start, end, reference };
   }
 
-  window.PMBible = { mount, parseRef, setDrawerState };
+  window.PMBible = { mount, parseRef, setDrawerState, chapterUnit, passageReference };
 })();
