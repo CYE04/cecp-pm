@@ -65,6 +65,55 @@
       if (!doc.execCommand('copy')) throw new Error('复制不可用');
     } finally { field.remove(); }
   }
+  function showManualCopy(value, options = {}) {
+    const doc = options.doc || globalThis.document;
+    if (!doc?.body) return null;
+    doc.querySelectorAll?.('.pm-manual-copy-panel').forEach(panel => panel.remove());
+    const panel = doc.createElement('section');
+    panel.className = 'pm-manual-copy-panel';
+    panel.setAttribute('role', 'region');
+    panel.setAttribute('aria-label', options.title || '手动复制');
+    const heading = doc.createElement('strong');
+    heading.textContent = options.title || '手动复制';
+    const help = doc.createElement('p');
+    help.textContent = '内容已全部选中。Mac 按 ⌘C，Windows 按 Ctrl+C；手机长按文字后点“复制”。';
+    const field = doc.createElement('textarea');
+    field.value = String(value || '');
+    field.readOnly = true;
+    field.rows = options.rows || 7;
+    field.setAttribute('aria-label', (options.title || '内容') + '，已全选');
+    const actions = doc.createElement('div');
+    actions.className = 'pm-manual-copy-actions';
+    const select = doc.createElement('button');
+    select.type = 'button';
+    select.textContent = '重新全选';
+    const close = doc.createElement('button');
+    close.type = 'button';
+    close.textContent = '关闭';
+    const selectAll = () => {
+      try { field.focus({ preventScroll:true }); } catch (_) { field.focus(); }
+      field.select();
+      field.setSelectionRange?.(0, field.value.length);
+    };
+    select.addEventListener('click', selectAll);
+    close.addEventListener('click', () => panel.remove());
+    actions.append(select, close);
+    panel.append(heading, help, field, actions);
+    const anchor = options.anchor;
+    if (anchor?.insertAdjacentElement) anchor.insertAdjacentElement('afterend', panel);
+    else doc.body.appendChild(panel);
+    (globalThis.requestAnimationFrame || globalThis.setTimeout)(selectAll);
+    return panel;
+  }
+  async function copyOrSelect(value, options = {}) {
+    try {
+      await copyText(value, options.clipboard, options.doc);
+      return true;
+    } catch (_) {
+      (options.showManual || showManualCopy)(value, options);
+      return false;
+    }
+  }
   function safeUrl(value, base) {
     if (typeof value !== 'string' || !value.trim()) return '';
     try {
@@ -145,5 +194,5 @@
     const interval = setInterval(update, 30000);
     window.addEventListener('pagehide', () => clearInterval(interval), { once: true });
   }
-  return { el, button, yesicon, copyText, safeUrl, json, retry, filledSongs, announcementTexts, videoEmbed, activeSchedule, mountSchedule };
+  return { el, button, yesicon, copyText, copyOrSelect, showManualCopy, safeUrl, json, retry, filledSongs, announcementTexts, videoEmbed, activeSchedule, mountSchedule };
 });

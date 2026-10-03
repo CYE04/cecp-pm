@@ -113,10 +113,8 @@
       const status = el('span', 'song-copy-status');
       status.setAttribute('role', 'status');
       const copy = window.PMFeatures.button('复制歌名', async () => {
-        try {
-          await window.PMFeatures.copyText(title);
-          status.textContent = '已复制歌名';
-        } catch (_) { status.textContent = '无法自动复制，请手动选择歌名'; }
+        const copied = await window.PMFeatures.copyOrSelect(title, { title:'复制歌名', anchor:heading, rows:2 });
+        status.textContent = copied ? '已复制歌名' : '下方歌名已全选';
       });
       copy.classList.add('song-copy-button');
       heading.appendChild(copy);
@@ -245,6 +243,36 @@
     });
   }
 
+  function enhanceSongCopy(scoreHost) {
+    scoreHost.querySelectorAll('.ym-song-tab-copy').forEach(copyIcon => {
+      if (copyIcon.dataset.pmCopyEnhanced) return;
+      copyIcon.dataset.pmCopyEnhanced = 'true';
+      copyIcon.setAttribute('role', 'button');
+      copyIcon.setAttribute('tabindex', '0');
+      copyIcon.setAttribute('aria-label', '复制歌名');
+      const perform = async event => {
+        event.preventDefault();
+        event.stopPropagation();
+        event.stopImmediatePropagation();
+        const tab = copyIcon.closest('.ym-song-tab');
+        const title = tab?.querySelector('.ym-song-tab-title')?.textContent?.trim();
+        if (!title) return;
+        const copied = await window.PMFeatures.copyOrSelect(title, {
+          title:'复制歌名', anchor:scoreHost.querySelector('.ym-song-tabs'), rows:2
+        });
+        if (!copied) return;
+        const old = copyIcon.innerHTML;
+        copyIcon.innerHTML = '&#10003;';
+        copyIcon.style.color = '#16a34a';
+        setTimeout(() => { copyIcon.innerHTML = old; copyIcon.style.color = ''; }, 1200);
+      };
+      copyIcon.addEventListener('click', perform, true);
+      copyIcon.addEventListener('keydown', event => {
+        if (event.key === 'Enter' || event.key === ' ') perform(event);
+      });
+    });
+  }
+
   async function mount(container, entries, config) {
     container.replaceChildren(el('p', 'muted', '正在加载本周诗歌…'));
     const mediaBase = config.mediaBase || 'https://cecp.it/';
@@ -310,6 +338,7 @@
             }
             wrap.querySelectorAll('.sw-tools').forEach(t => t.remove());
           });
+          enhanceSongCopy(scoreHost);
           enhancePlayer(scoreHost);
           scoreHost.querySelectorAll('audio').forEach(audio => { audio.preload = 'none'; });
           // 和弦仍保留标准音名，性质说明只显示中文。
@@ -342,5 +371,5 @@
       });
     }
   }
-  window.PMSongs = { mount, matchCatalog, songLookup, hasLyrics, centerLyric, lockPageScroll, shouldCloseLyricsDialog, enhancePlayer, openLyricsReader };
+  window.PMSongs = { mount, matchCatalog, songLookup, hasLyrics, centerLyric, lockPageScroll, shouldCloseLyricsDialog, enhanceSongCopy, enhancePlayer, openLyricsReader };
 })();

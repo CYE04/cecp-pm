@@ -30,6 +30,7 @@
   iframe.title = '主日下午聚会程序';
   iframe.src = url.href;
   iframe.loading = 'lazy';
+  iframe.allow = 'clipboard-write';
   iframe.style.cssText = 'display:block;width:100%;height:1100px;border:0;background:transparent';
   host.replaceChildren(iframe);
 
