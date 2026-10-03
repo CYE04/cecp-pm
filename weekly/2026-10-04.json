@@ -13,8 +13,11 @@
   ],
   "reading": "sp 39",
   "songs": [
+     { "title": "0013rongyaoguishen" },
+     { "title": "yonghengweiyidepanwang" },
+     { "title": "我心爱住" }
   ],
-  "offeringSongs": [],
+  "offeringSongs": ["0013rongyaoguishen"],
   "sermon": {
     "ref": "罗12 9 21",
     "title": "爱与逼迫到神的信实",
