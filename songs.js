@@ -4,6 +4,7 @@
   let enginePromise;
   let lyricsDialog;
   let lyricsObserver;
+  let releaseLyricsPage;
   const titleKey = value => String(value || '').normalize('NFKC').toLowerCase()
     .replace(/祢/g, '你').replace(/[\s，,。.!！?？:：、（）()“”"'‘’·－—-]/g, '');
   function matchCatalog(title, catalog = window.PMSongCatalog || []) {
@@ -24,6 +25,46 @@
   }
   function hasLyrics(lines) {
     return Array.from(lines || []).some(line => String(line.textContent || '').trim());
+  }
+  function centerLyric(container, line, behavior = 'smooth') {
+    if (!container || !line || typeof container.scrollTo !== 'function') return;
+    const top = Math.max(0, line.offsetTop - (container.clientHeight - line.offsetHeight) / 2);
+    container.scrollTo({ top, behavior });
+  }
+  function lockPageScroll(doc = document, view = window) {
+    const root = doc.documentElement;
+    const body = doc.body;
+    const x = view.scrollX || 0;
+    const y = view.scrollY || 0;
+    const previous = {
+      rootOverflow: root.style.overflow,
+      bodyPosition: body.style.position,
+      bodyTop: body.style.top,
+      bodyLeft: body.style.left,
+      bodyRight: body.style.right,
+      bodyWidth: body.style.width
+    };
+    root.style.overflow = 'hidden';
+    body.style.position = 'fixed';
+    body.style.top = `-${y}px`;
+    body.style.left = `-${x}px`;
+    body.style.right = '0';
+    body.style.width = '100%';
+    return () => {
+      root.style.overflow = previous.rootOverflow;
+      body.style.position = previous.bodyPosition;
+      body.style.top = previous.bodyTop;
+      body.style.left = previous.bodyLeft;
+      body.style.right = previous.bodyRight;
+      body.style.width = previous.bodyWidth;
+      const previousBehavior = root.style.scrollBehavior;
+      root.style.scrollBehavior = 'auto';
+      view.scrollTo(x, y);
+      root.style.scrollBehavior = previousBehavior;
+    };
+  }
+  function shouldCloseLyricsDialog(event, dialog) {
+    return event?.type === 'pointerdown' && event.target === dialog;
   }
   function loadEngine(url) {
     if (window.YouthEngine?.renderSongObjects) return Promise.resolve();
@@ -110,10 +151,14 @@
     lines.tabIndex = -1;
     frame.append(header, lines);
     lyricsDialog.appendChild(frame);
-    lyricsDialog.addEventListener('click', event => { if (event.target === lyricsDialog) lyricsDialog.close(); });
+    lyricsDialog.addEventListener('pointerdown', event => {
+      if (shouldCloseLyricsDialog(event, lyricsDialog)) lyricsDialog.close();
+    });
     lyricsDialog.addEventListener('close', () => {
       lyricsObserver?.disconnect();
       lyricsObserver = null;
+      releaseLyricsPage?.();
+      releaseLyricsPage = null;
     });
     document.body.appendChild(lyricsDialog);
     return lyricsDialog;
@@ -128,7 +173,7 @@
     const target = dialog.querySelector('.pm-lyrics-dialog-lines');
     title.textContent = player.querySelector('.ym-pl-title')?.textContent || '完整歌词';
     let activeIndex = -1;
-    const sync = rebuild => {
+    const sync = (rebuild, shouldScroll = true) => {
       const lines = Array.from(source.querySelectorAll('.ym-pl-lrc-line'));
       if (rebuild || target.children.length !== lines.length) {
         target.replaceChildren(...lines.map((line, index) => {
@@ -141,14 +186,25 @@
       Array.from(target.children).forEach((line, index) => line.classList.toggle('active', index === next));
       if (next >= 0 && next !== activeIndex) {
         activeIndex = next;
-        target.children[next]?.scrollIntoView({ block:'center', behavior:'smooth' });
+        if (shouldScroll) centerLyric(target, target.children[next]);
       }
     };
     lyricsObserver?.disconnect();
-    sync(true);
+    sync(true, false);
     lyricsObserver = new MutationObserver(records => sync(records.some(record => record.type === 'childList')));
     lyricsObserver.observe(source, { childList:true, subtree:true, attributes:true, attributeFilter:['class'] });
-    if (!dialog.open) dialog.showModal();
+    if (!dialog.open) {
+      releaseLyricsPage?.();
+      releaseLyricsPage = lockPageScroll();
+      try {
+        dialog.showModal();
+      } catch (error) {
+        releaseLyricsPage();
+        releaseLyricsPage = null;
+        throw error;
+      }
+    }
+    if (activeIndex >= 0) centerLyric(target, target.children[activeIndex], 'auto');
     dialog.querySelector('.pm-lyrics-dialog-close')?.focus();
   }
 
@@ -157,6 +213,17 @@
       if (player.dataset.pmEnhanced) return;
       player.dataset.pmEnhanced = 'true';
       player.classList.add('pm-compact-player');
+      const controls = player.querySelector('.ym-pl-controls');
+      const volume = player.querySelector('.ym-pl-vol-wrap');
+      if (controls) {
+        const playbackButtons = el('div', 'pm-playback-buttons');
+        Array.from(controls.children).forEach(control => playbackButtons.appendChild(control));
+        controls.appendChild(playbackButtons);
+        if (volume) {
+          volume.classList.add('pm-inline-volume');
+          controls.appendChild(volume);
+        }
+      }
       const lyrics = player.querySelector('.ym-pl-lrc-panel');
       if (!lyrics) return;
       const actions = player.closest('.ym-song-panel')?.querySelector('.pm-song-actions');
@@ -221,8 +288,7 @@
               const ytBtn = toolsRow.querySelector('.yt-btn');
               const actions = el('div', 'pm-song-actions');
               transpose.classList.add('pm-transpose-button');
-              const transposeArrow = transpose.querySelector('svg');
-              if (transposeArrow) transpose.appendChild(transposeArrow);
+              transpose.appendChild(window.PMFeatures.yesicon('chevron-down', 'yesicon pm-chevron-icon'));
               transpose.before(actions);
               actions.appendChild(transpose);
               if (ytBtn && ytBtn.getAttribute('href') !== '#') {
@@ -276,5 +342,5 @@
       });
     }
   }
-  window.PMSongs = { mount, matchCatalog, songLookup, hasLyrics, enhancePlayer, openLyricsReader };
+  window.PMSongs = { mount, matchCatalog, songLookup, hasLyrics, centerLyric, lockPageScroll, shouldCloseLyricsDialog, enhancePlayer, openLyricsReader };
 })();

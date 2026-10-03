@@ -72,7 +72,11 @@
     const summaryText = el('span', 'bible-reader-copy');
     summaryText.append(el('span', 'bible-reader-label', '展开经文'), el('span', 'bible-reader-reference', passageReference(passage)));
     const scriptureIcon = el('span', 'bible-reader-icon');
-    scriptureIcon.appendChild(yesicon('bible', 'yesicon bible-reader-bible'));
+    const scriptureBook = el('img', 'bible-reader-book');
+    scriptureBook.src = './assets/open-bible.png';
+    scriptureBook.alt = '';
+    scriptureBook.setAttribute('aria-hidden', 'true');
+    scriptureIcon.appendChild(scriptureBook);
     summary.append(scriptureIcon, summaryText, yesicon('chevron-down', 'yesicon bible-reader-arrow'));
     details.appendChild(summary);
     const form = el('form', 'bible-form');

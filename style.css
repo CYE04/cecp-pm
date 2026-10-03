@@ -62,8 +62,8 @@ h1 { margin:0; font-family:"Songti SC","Noto Serif CJK SC","SimSun",serif; font-
 .bible-reader-toggle { display:flex; align-items:center; gap:13px; width:100%; padding:14px 16px; list-style:none; cursor:pointer; border:1px solid var(--line); border-radius:13px; background:var(--raised); color:var(--ink); transition:background .2s ease,border-color .2s ease,transform .2s ease; }
 .bible-reader-toggle:hover { background:var(--accent-soft); border-color:color-mix(in srgb,var(--accent) 40%,var(--line)); }
 .bible-reader-toggle:active { transform:scale(.995); }
-.bible-reader-icon { display:grid; place-items:center; width:36px; height:36px; flex:0 0 auto; border-radius:10px; background:var(--accent-soft); color:var(--accent); }
-.bible-reader-bible { width:23px; height:23px; }
+.bible-reader-icon { display:grid; place-items:center; width:49px; height:39px; flex:0 0 auto; }
+.bible-reader-book { display:block; width:49px; height:39px; object-fit:contain; filter:drop-shadow(0 4px 4px rgba(30,18,10,.24)); }
 .bible-reader-copy { display:flex; flex:1; min-width:0; flex-direction:column; line-height:1.35; }
 .bible-reader-label { font-size:16px; font-weight:700; }
 .bible-reader-reference { margin-top:3px; color:var(--muted); font-size:12px; font-weight:500; }
