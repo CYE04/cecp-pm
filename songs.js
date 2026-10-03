@@ -2,9 +2,6 @@
   'use strict';
   const { el, safeUrl, json, retry } = window.PMFeatures;
   let enginePromise;
-  let lyricsDialog;
-  let lyricsObserver;
-  let releaseLyricsPage;
   const titleKey = value => String(value || '').normalize('NFKC').toLowerCase()
     .replace(/祢/g, '你').replace(/[\s，,。.!！?？:：、（）()“”"'‘’·－—-]/g, '');
   function matchCatalog(title, catalog = window.PMSongCatalog || []) {
@@ -30,41 +27,6 @@
     if (!container || !line || typeof container.scrollTo !== 'function') return;
     const top = Math.max(0, line.offsetTop - (container.clientHeight - line.offsetHeight) / 2);
     container.scrollTo({ top, behavior });
-  }
-  function lockPageScroll(doc = document, view = window) {
-    const root = doc.documentElement;
-    const body = doc.body;
-    const x = view.scrollX || 0;
-    const y = view.scrollY || 0;
-    const previous = {
-      rootOverflow: root.style.overflow,
-      bodyPosition: body.style.position,
-      bodyTop: body.style.top,
-      bodyLeft: body.style.left,
-      bodyRight: body.style.right,
-      bodyWidth: body.style.width
-    };
-    root.style.overflow = 'hidden';
-    body.style.position = 'fixed';
-    body.style.top = `-${y}px`;
-    body.style.left = `-${x}px`;
-    body.style.right = '0';
-    body.style.width = '100%';
-    return () => {
-      root.style.overflow = previous.rootOverflow;
-      body.style.position = previous.bodyPosition;
-      body.style.top = previous.bodyTop;
-      body.style.left = previous.bodyLeft;
-      body.style.right = previous.bodyRight;
-      body.style.width = previous.bodyWidth;
-      const previousBehavior = root.style.scrollBehavior;
-      root.style.scrollBehavior = 'auto';
-      view.scrollTo(x, y);
-      root.style.scrollBehavior = previousBehavior;
-    };
-  }
-  function shouldCloseLyricsDialog(event, dialog) {
-    return event?.type === 'pointerdown' && event.target === dialog;
   }
   function loadEngine(url) {
     if (window.YouthEngine?.renderSongObjects) return Promise.resolve();
@@ -136,46 +98,55 @@
     return card;
   }
 
-  function ensureLyricsDialog() {
-    if (lyricsDialog) return lyricsDialog;
-    lyricsDialog = el('dialog', 'pm-lyrics-dialog');
-    const frame = el('div', 'pm-lyrics-dialog-frame');
-    const header = el('header', 'pm-lyrics-dialog-header');
-    const title = el('h2', 'pm-lyrics-dialog-title', '完整歌词');
-    const close = window.PMFeatures.button('关闭', () => lyricsDialog.close());
-    close.classList.add('pm-lyrics-dialog-close');
-    header.append(title, close);
-    const lines = el('div', 'pm-lyrics-dialog-lines');
-    lines.tabIndex = -1;
-    frame.append(header, lines);
-    lyricsDialog.appendChild(frame);
-    lyricsDialog.addEventListener('pointerdown', event => {
-      if (shouldCloseLyricsDialog(event, lyricsDialog)) lyricsDialog.close();
-    });
-    lyricsDialog.addEventListener('close', () => {
-      lyricsObserver?.disconnect();
-      lyricsObserver = null;
-      releaseLyricsPage?.();
-      releaseLyricsPage = null;
-    });
-    document.body.appendChild(lyricsDialog);
-    return lyricsDialog;
+  function setLyricsPanelState(panel, trigger, open) {
+    panel.dataset.open = String(open);
+    panel.classList.toggle('is-open', open);
+    panel.inert = !open;
+    panel.setAttribute('aria-hidden', String(!open));
+    trigger.textContent = open ? '收起歌词' : '查看歌词';
+    trigger.setAttribute('aria-expanded', String(open));
+    trigger.setAttribute('aria-label', open ? '收起完整歌词' : '展开完整歌词');
+    if (!open) panel._lyricsObserver?.disconnect();
   }
 
-  function openLyricsReader(player) {
+  function ensureLyricsPanel(player, trigger) {
+    const songPanel = player.closest('.ym-song-panel');
+    let panel = songPanel?.querySelector('.pm-lyrics-inline');
+    if (panel) return panel;
+    panel = el('section', 'pm-lyrics-inline');
+    const frame = el('div', 'pm-lyrics-inline-frame');
+    const header = el('header', 'pm-lyrics-inline-header');
+    const title = el('h3', 'pm-lyrics-inline-title', '完整歌词');
+    const close = window.PMFeatures.button('收起', () => setLyricsPanelState(panel, trigger, false));
+    close.classList.add('pm-lyrics-inline-close');
+    header.append(title, close);
+    const lines = el('div', 'pm-lyrics-inline-lines');
+    frame.append(header, lines);
+    panel.appendChild(frame);
+    setLyricsPanelState(panel, trigger, false);
+    const anchor = trigger.closest('.sw-hd') || player;
+    anchor.insertAdjacentElement('afterend', panel);
+    return panel;
+  }
+
+  function openLyricsReader(player, trigger) {
     const source = player?.querySelector('.ym-pl-lrc-inner');
     const sourceLines = source?.querySelectorAll('.ym-pl-lrc-line');
     if (!hasLyrics(sourceLines)) return;
-    const dialog = ensureLyricsDialog();
-    const title = dialog.querySelector('.pm-lyrics-dialog-title');
-    const target = dialog.querySelector('.pm-lyrics-dialog-lines');
+    const panel = ensureLyricsPanel(player, trigger);
+    if (panel.dataset.open === 'true') {
+      setLyricsPanelState(panel, trigger, false);
+      return;
+    }
+    const title = panel.querySelector('.pm-lyrics-inline-title');
+    const target = panel.querySelector('.pm-lyrics-inline-lines');
     title.textContent = player.querySelector('.ym-pl-title')?.textContent || '完整歌词';
     let activeIndex = -1;
     const sync = (rebuild, shouldScroll = true) => {
       const lines = Array.from(source.querySelectorAll('.ym-pl-lrc-line'));
       if (rebuild || target.children.length !== lines.length) {
         target.replaceChildren(...lines.map((line, index) => {
-          const copy = el('p', 'pm-lyrics-dialog-line', line.textContent);
+          const copy = el('p', 'pm-lyrics-inline-line', line.textContent);
           copy.dataset.index = index;
           return copy;
         }));
@@ -187,23 +158,12 @@
         if (shouldScroll) centerLyric(target, target.children[next]);
       }
     };
-    lyricsObserver?.disconnect();
     sync(true, false);
-    lyricsObserver = new MutationObserver(records => sync(records.some(record => record.type === 'childList')));
-    lyricsObserver.observe(source, { childList:true, subtree:true, attributes:true, attributeFilter:['class'] });
-    if (!dialog.open) {
-      releaseLyricsPage?.();
-      releaseLyricsPage = lockPageScroll();
-      try {
-        dialog.showModal();
-      } catch (error) {
-        releaseLyricsPage();
-        releaseLyricsPage = null;
-        throw error;
-      }
-    }
+    panel._lyricsObserver?.disconnect();
+    panel._lyricsObserver = new MutationObserver(records => sync(records.some(record => record.type === 'childList')));
+    panel._lyricsObserver.observe(source, { childList:true, subtree:true, attributes:true, attributeFilter:['class'] });
+    setLyricsPanelState(panel, trigger, true);
     if (activeIndex >= 0) centerLyric(target, target.children[activeIndex], 'auto');
-    dialog.querySelector('.pm-lyrics-dialog-close')?.focus();
   }
 
   function enhancePlayer(scoreHost) {
@@ -229,12 +189,14 @@
         const available = hasLyrics(lyrics.querySelectorAll('.ym-pl-lrc-line'));
         let openButton = actions?.querySelector('.pm-lyrics-button');
         if (available && actions && !openButton) {
-          openButton = window.PMFeatures.button('查看歌词', () => openLyricsReader(player));
+          openButton = window.PMFeatures.button('查看歌词', () => openLyricsReader(player, openButton));
           openButton.classList.add('sw-tog', 'pm-lyrics-button');
-          openButton.setAttribute('aria-label', '打开完整歌词');
+          openButton.setAttribute('aria-expanded', 'false');
+          openButton.setAttribute('aria-label', '展开完整歌词');
           const transpose = actions.querySelector('.pm-transpose-button');
           transpose ? transpose.after(openButton) : actions.prepend(openButton);
         } else if (!available) {
+          player.closest('.ym-song-panel')?.querySelector('.pm-lyrics-inline')?.remove();
           openButton?.remove();
         }
       };
@@ -371,5 +333,5 @@
       });
     }
   }
-  window.PMSongs = { mount, matchCatalog, songLookup, hasLyrics, centerLyric, lockPageScroll, shouldCloseLyricsDialog, enhanceSongCopy, enhancePlayer, openLyricsReader };
+  window.PMSongs = { mount, matchCatalog, songLookup, hasLyrics, centerLyric, setLyricsPanelState, enhanceSongCopy, enhancePlayer, openLyricsReader };
 })();
