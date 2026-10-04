@@ -215,7 +215,9 @@
       box.appendChild(el('p', 'invitation', data.invitation)); page.appendChild(box);
     }
 
-    append(page, el('footer', 'footer', [data.venue, '主日下午聚会'].filter(Boolean).join(' · ')));
+    if (root?.id === 'app') {
+      append(page, el('footer', 'footer', [data.venue, '主日下午聚会'].filter(Boolean).join(' · ')));
+    }
     root.appendChild(page);
 
     const initialHash = location.hash.replace(/^#/, '');

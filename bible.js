@@ -69,9 +69,28 @@
     const details = el('details', 'bible-reader');
     const summary = el('summary', 'bible-reader-toggle');
     summary.setAttribute('aria-expanded', 'false');
-    const summaryText = el('span', 'bible-reader-copy');
-    summaryText.append(el('span', 'bible-reader-label', '展开经文'), el('span', 'bible-reader-reference', passageReference(passage)));
+    summary.style.display = 'flex';
+    summary.style.flexDirection = 'row';
+    summary.style.alignItems = 'center';
+    summary.style.justifyContent = 'flex-start';
+    summary.style.gap = '14px';
+    summary.style.width = '100%';
+    summary.style.boxSizing = 'border-box';
+    summary.style.cursor = 'pointer';
+
     const scriptureIcon = el('span', 'bible-reader-icon');
+    scriptureIcon.style.display = 'flex';
+    scriptureIcon.style.alignItems = 'center';
+    scriptureIcon.style.justifyContent = 'center';
+    scriptureIcon.style.flex = '0 0 auto';
+
+    const summaryText = el('span', 'bible-reader-copy');
+    summaryText.style.display = 'flex';
+    summaryText.style.flexDirection = 'column';
+    summaryText.style.flex = '1 1 auto';
+    summaryText.style.minWidth = '0';
+    summaryText.append(el('span', 'bible-reader-label', '展开经文'), el('span', 'bible-reader-reference', passageReference(passage)));
+
     const scriptureBook = el('img', 'bible-reader-book');
     const rootEl = host?.closest?.('#cecp-pm, #app') || document.getElementById('cecp-pm') || document.getElementById('app');
     const baseUrl = rootEl?.dataset?.baseUrl || window.PMEngine?.baseUrl || 'https://cye04.github.io/cecp-pm/';
@@ -82,7 +101,12 @@
       scriptureIcon.replaceChildren(yesicon('bible', 'yesicon bible-reader-svg-icon'));
     };
     scriptureIcon.appendChild(scriptureBook);
-    summary.append(scriptureIcon, summaryText, yesicon('chevron-down', 'yesicon bible-reader-arrow'));
+
+    const arrow = yesicon('chevron-down', 'yesicon bible-reader-arrow');
+    arrow.style.marginLeft = 'auto';
+    arrow.style.flex = '0 0 auto';
+
+    summary.append(scriptureIcon, summaryText, arrow);
     details.appendChild(summary);
     const form = el('form', 'bible-form');
     const bookLabel = el('label', '', '经卷');
