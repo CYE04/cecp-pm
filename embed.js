@@ -35,7 +35,32 @@
   host.replaceChildren(iframe);
 
   const syncTheme = () => iframe.contentWindow?.postMessage({ type:'cecp-pm-theme', theme:haloTheme() }, url.origin);
-  iframe.addEventListener('load', syncTheme);
+  const syncViewport = () => {
+    const rect = iframe.getBoundingClientRect();
+    const visual = window.visualViewport;
+    const viewportTop = visual?.offsetTop || 0;
+    const viewportBottom = viewportTop + (visual?.height || window.innerHeight);
+    const visibleTop = Math.max(rect.top, viewportTop);
+    const visibleBottom = Math.min(rect.bottom, viewportBottom);
+    const height = Math.max(0, visibleBottom - visibleTop);
+    iframe.contentWindow?.postMessage({
+      type:'cecp-pm-viewport',
+      top:Math.max(0, visibleTop - rect.top),
+      height,
+      width:rect.width
+    }, url.origin);
+  };
+  const syncFrame = () => { syncTheme(); syncViewport(); };
+  let viewportFrame = 0;
+  const scheduleViewport = () => {
+    if (viewportFrame) return;
+    viewportFrame = requestAnimationFrame(() => { viewportFrame = 0; syncViewport(); });
+  };
+  iframe.addEventListener('load', syncFrame);
+  window.addEventListener('scroll', scheduleViewport, { passive:true });
+  window.addEventListener('resize', scheduleViewport, { passive:true });
+  window.visualViewport?.addEventListener?.('scroll', scheduleViewport, { passive:true });
+  window.visualViewport?.addEventListener?.('resize', scheduleViewport, { passive:true });
   const observer = new MutationObserver(syncTheme);
   for (let node = host; node; node = node.parentElement) {
     observer.observe(node, { attributes:true, attributeFilter:['class','style','data-theme','data-color-mode','data-resolved-theme'] });
@@ -45,6 +70,9 @@
   window.addEventListener('message', event => {
     if (event.source !== iframe.contentWindow || event.origin !== url.origin || event.data?.type !== 'cecp-pm-height') return;
     const height = Number(event.data.height);
-    if (Number.isFinite(height) && height >= 200 && height <= 20000) iframe.style.height = height + 'px';
+    if (Number.isFinite(height) && height >= 200 && height <= 20000) {
+      iframe.style.height = height + 'px';
+      scheduleViewport();
+    }
   });
 })();

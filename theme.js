@@ -8,11 +8,20 @@
     if (value === 'dark' || value === 'light') html.dataset.resolvedTheme = value;
     else delete html.dataset.resolvedTheme;
   }
+  function applyViewport(data) {
+    const top = Number(data?.top);
+    const height = Number(data?.height);
+    if (!Number.isFinite(top) || !Number.isFinite(height) || height <= 0) return;
+    html.style.setProperty('--cecp-embed-visible-top', Math.max(0, top) + 'px');
+    html.style.setProperty('--cecp-embed-visible-height', height + 'px');
+    window.dispatchEvent(new Event('cecp-pm-viewport-change'));
+  }
   applyTheme(params.get('theme'));
 
   window.addEventListener('message', event => {
-    if (event.source !== window.parent || event.data?.type !== 'cecp-pm-theme') return;
-    applyTheme(event.data.theme);
+    if (event.source !== window.parent) return;
+    if (event.data?.type === 'cecp-pm-theme') applyTheme(event.data.theme);
+    if (event.data?.type === 'cecp-pm-viewport') applyViewport(event.data);
   });
 
   if (html.classList.contains('pm-embed')) {

@@ -46,6 +46,13 @@
     return enginePromise;
   }
 
+  function engineSource(config, pageLocation = location) {
+    const localHost = pageLocation.hostname === '127.0.0.1' || pageLocation.hostname === 'localhost';
+    return config.songEngineLocal && (pageLocation.protocol === 'file:' || localHost)
+      ? config.songEngineLocal
+      : config.songEngine;
+  }
+
   function normalizeSong(song, mediaBase) {
     const result = { ...song };
     const labels = { 'pre-chorus':'预副歌', chorus:'副歌', verse:'主歌', bridge:'桥段', intro:'前奏', outro:'尾奏', interlude:'间奏' };
@@ -264,9 +271,7 @@
       const renderScores = async () => {
         scoreHost.replaceChildren(el('p', 'muted', '正在准备歌谱…'));
         try {
-          const engineUrl = location.protocol === 'file:' && config.songEngineLocal
-            ? config.songEngineLocal
-            : config.songEngine;
+          const engineUrl = engineSource(config);
           await loadEngine(engineUrl);
           scoreHost.replaceChildren(window.YouthEngine.renderSongObjects(scores));
           // 下午页只保留移调与视频入口；歌曲名称已在上方标签显示，不再重复一整块资料。
@@ -333,5 +338,5 @@
       });
     }
   }
-  window.PMSongs = { mount, matchCatalog, songLookup, hasLyrics, centerLyric, setLyricsPanelState, enhanceSongCopy, enhancePlayer, openLyricsReader };
+  window.PMSongs = { mount, matchCatalog, songLookup, engineSource, hasLyrics, centerLyric, setLyricsPanelState, enhanceSongCopy, enhancePlayer, openLyricsReader };
 })();
