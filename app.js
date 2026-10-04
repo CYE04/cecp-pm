@@ -28,6 +28,19 @@
     return box;
   };
 
+  function scrollToSection(id) {
+    if (!id) return;
+    const target = document.getElementById(id);
+    if (!target) return;
+    if (document.documentElement.classList.contains('pm-embed')) {
+      const targetTop = target.getBoundingClientRect().top;
+      window.parent.postMessage({ type: 'cecp-pm-scroll', top: targetTop }, '*');
+    } else {
+      target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+    if (history.pushState) history.pushState(null, '', '#' + id);
+  }
+
   function render(data) {
     const date = data.date || '';
     const dateLabel = /^\d{4}-\d{2}-\d{2}$/.test(date)
@@ -57,7 +70,14 @@
         const time = [item.start, item.end].filter(Boolean).join('–');
         const title = el('span', 'schedule-title', item.title || '');
         const jump = /^[a-z][a-z0-9-]*$/.test(item.section || '') ? el('a', 'schedule-jump') : null;
-        if (jump) { jump.href = '#' + item.section; jump.appendChild(title); }
+        if (jump) {
+          jump.href = '#' + item.section;
+          jump.appendChild(title);
+          jump.addEventListener('click', event => {
+            event.preventDefault();
+            scrollToSection(item.section);
+          });
+        }
         append(row, el('time', 'schedule-time', time), jump || title);
         if (Array.isArray(item.roles) && item.roles.length) {
           const people = el('p', 'schedule-people'); people.dataset.roles = item.roles.join(','); people.hidden = true;
@@ -197,6 +217,11 @@
 
     append(page, el('footer', 'footer', [data.venue, '主日下午聚会'].filter(Boolean).join(' · ')));
     root.appendChild(page);
+
+    const initialHash = location.hash.replace(/^#/, '');
+    if (initialHash) {
+      setTimeout(() => scrollToSection(initialHash), 300);
+    }
   }
 
   async function loadRoster(body, date) {

@@ -23,6 +23,8 @@
 
   const url = new URL('./', script.src);
   url.searchParams.set('embed', '1');
+  const version = new URL(script.src).searchParams.get('v');
+  if (version) url.searchParams.set('v', version);
   const date = host.dataset.date;
   if (/^\d{4}-\d{2}-\d{2}$/.test(date || '')) url.searchParams.set('date', date);
   url.searchParams.set('theme', haloTheme());
@@ -108,6 +110,13 @@
     if (event.source !== iframe.contentWindow || event.origin !== url.origin) return;
     if (event.data?.type === 'cecp-pm-score-zoom') {
       setScoreViewer(event.data.open);
+      return;
+    }
+    if (event.data?.type === 'cecp-pm-scroll') {
+      const rect = iframe.getBoundingClientRect();
+      const targetTop = window.scrollY + rect.top + Number(event.data.top || 0);
+      const offset = Number(event.data.offset || 24);
+      window.scrollTo({ top: Math.max(0, targetTop - offset), behavior: 'smooth' });
       return;
     }
     if (event.data?.type !== 'cecp-pm-height') return;

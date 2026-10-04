@@ -94,7 +94,10 @@ h1 { margin:0; font-family:"Songti SC","Noto Serif CJK SC","SimSun",serif; font-
 .song-copy-button:focus-visible { outline:2px solid var(--ink); outline-offset:2px; }
 .song-copy-status { color:var(--muted); font-size:13px; }
 .song-lyrics { white-space:pre-line; line-height:2; }
-.plain-score { max-width:100%; border-radius:12px; display:block; margin:18px 0; }
+.plain-score-wrap { margin:14px 0; border:1px solid var(--line); border-radius:12px; overflow:hidden; background:var(--raised); }
+.plain-score-wrap .sw-score-top { padding:9px 14px; border-bottom:1px solid var(--line); display:flex; align-items:center; justify-content:space-between; background:var(--raised); }
+.plain-score-wrap .plain-score { width:100%; max-width:100%; display:block; border-radius:0; margin:0; cursor:zoom-in; }
+.plain-score { max-width:100%; border-radius:12px; display:block; margin:14px 0; cursor:zoom-in; }
 .plain-song audio { max-width:100%; width:100%; }
 .song-error { margin-top:20px; }
 .replay-frame { display:block; width:100%; aspect-ratio:16 / 9; border:0; border-radius:12px; background:#241c17; margin-bottom:18px; }

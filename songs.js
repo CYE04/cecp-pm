@@ -11,7 +11,14 @@
     return matches.length === 1 ? matches[0].id : '';
   }
   function songLookup(entry, catalog = window.PMSongCatalog || []) {
-    if (typeof entry === 'string') return { id: entry, source: 'direct' };
+    if (typeof entry === 'string') {
+      const trimmed = entry.trim();
+      if (!trimmed) return { id: '', source: '' };
+      if (/^[a-zA-Z0-9_-]+$/.test(trimmed)) return { id: trimmed, source: 'direct' };
+      const matched = matchCatalog(trimmed, catalog);
+      if (matched) return { id: matched, source: 'catalog' };
+      return { id: '', source: 'plain-title' };
+    }
     if (entry?.id) return { id: entry.id, source: 'direct' };
     if (!entry?.title || entry.sections) return { id: '', source: '' };
     const matched = matchCatalog(entry.title, catalog);
@@ -69,7 +76,7 @@
     return result;
   }
 
-  function plainSong(song) {
+  function plainSong(song, config) {
     const card = el('article', 'plain-song');
     const title = song.title || '诗歌';
     const heading = el('div', 'plain-song-heading');
@@ -95,9 +102,32 @@
       audio.setAttribute('aria-label', title + '音频'); card.appendChild(audio);
     }
     if (scoreUrl) {
-      const a = el('a'); a.href = scoreUrl; a.target = '_blank'; a.rel = 'noopener noreferrer';
-      const image = el('img', 'plain-score'); image.src = scoreUrl; image.alt = title + '歌谱，点击查看原图'; image.loading = 'lazy';
-      a.appendChild(image); card.appendChild(a);
+      const scoreWrap = el('div', 'sw-score plain-score-wrap');
+      const scoreTop = el('div', 'sw-score-top');
+      scoreTop.appendChild(el('div', 'sw-score-lbl', '简谱原稿'));
+      if (song.origKey) {
+        scoreTop.appendChild(el('span', 'sw-score-key sw-score-key-badge', '1 = ' + song.origKey));
+      }
+      const image = el('img', 'plain-score');
+      image.src = scoreUrl;
+      image.alt = title + '歌谱，点击放大';
+      image.loading = 'lazy';
+      image.style.cursor = 'zoom-in';
+      const openZoom = async () => {
+        try {
+          if (!window.CecpZoom?.openImage && config) {
+            await loadEngine(engineSource(config));
+          }
+          if (window.CecpZoom?.openImage) {
+            window.CecpZoom.openImage([scoreUrl], 0);
+            return;
+          }
+        } catch (_) {}
+        window.open(scoreUrl, '_blank', 'noopener,noreferrer');
+      };
+      image.addEventListener('click', openZoom);
+      scoreWrap.append(scoreTop, image);
+      card.appendChild(scoreWrap);
     }
     if (url) {
       const a = el('a', 'resource-link', '查看诗歌资料 ↗'); a.href = url; a.target = '_blank'; a.rel = 'noopener noreferrer'; card.appendChild(a);
@@ -250,21 +280,38 @@
       if (id) {
         if (!/^[a-zA-Z0-9_-]+$/.test(id)) throw new Error('诗歌编号不正确');
         try {
-          const localSong = location.protocol === 'file:' ? window.PMPreviewSongs?.[id] : null;
+          const isLocal = location.protocol === 'file:' || location.hostname === '127.0.0.1' || location.hostname === 'localhost';
+          const localSong = isLocal ? window.PMPreviewSongs?.[id] : null;
           const data = localSong || await json(new URL('songs/' + id + '.json', config.songBase).href);
           const extra = typeof entry === 'object' ? { ...entry } : {};
           if (source === 'title-id') delete extra.title;
           return normalizeSong({ ...data, ...extra }, mediaBase);
         } catch (error) {
-          if (source !== 'direct') return normalizeSong(entry, mediaBase);
-          throw error;
+          if (window.PMPreviewSongs?.[id]) {
+            return normalizeSong({ ...window.PMPreviewSongs[id] }, mediaBase);
+          }
+          if (typeof entry === 'object' && (entry.title || entry.scoreImg || entry.mp3)) {
+            return normalizeSong(entry, mediaBase);
+          }
+          if (source !== 'direct') {
+            const normalized = typeof entry === 'string' ? { title: entry } : entry;
+            return normalizeSong(normalized, mediaBase);
+          }
+          const catalogTitle = window.PMSongCatalog?.find?.(s => s.id === id)?.title;
+          const fallbackTitle = (typeof entry === 'object' ? entry.title : '') || catalogTitle || id;
+          return normalizeSong({ title: fallbackTitle }, mediaBase);
         }
       }
-      return normalizeSong(entry, mediaBase);
+      const normalizedEntry = typeof entry === 'string' ? { title: entry } : entry;
+      return normalizeSong(normalizedEntry, mediaBase);
     }));
     container.replaceChildren();
     const songs = results.filter(result => result.status === 'fulfilled').map(result => result.value);
     const scores = songs.filter(song => Array.isArray(song.sections) && song.sections.length);
+    const hasPlainScores = songs.some(song => (!song.sections || !song.sections.length) && song.scoreImg);
+    if (hasPlainScores && !window.CecpZoom?.openImage && config) {
+      loadEngine(engineSource(config)).catch(() => {});
+    }
     if (scores.length) {
       const scoreHost = el('div', 'shared-songs');
       container.appendChild(scoreHost);
@@ -321,7 +368,7 @@
       };
       await renderScores();
     }
-    songs.filter(song => !Array.isArray(song.sections) || !song.sections.length).forEach(song => container.appendChild(plainSong(song)));
+    songs.filter(song => !Array.isArray(song.sections) || !song.sections.length).forEach(song => container.appendChild(plainSong(song, config)));
     if (results.some(result => result.status === 'rejected')) {
       const failed = el('div', 'song-error');
       retry(failed, '部分诗歌暂时无法读取，已加载的诗歌仍可使用。', () => mount(container, entries, config));
