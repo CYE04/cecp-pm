@@ -402,25 +402,39 @@ h1 {
 }
 .stage-subheading-offering { margin-top: 28px; }
 
-/* ── 流程时间表（恢复专属环节色彩，与 Halo 主题自然相融） ── */
+/* ── 流程时间表（严格对齐标题，清除外部主题的 ul 缩进与空隙） ── */
+#cecp-pm ul.schedule,
+#cecp-pm .schedule,
+ul.schedule,
 .schedule {
-  list-style: none;
-  margin: 10px 0 0;
-  padding: 0;
+  list-style: none !important;
+  margin: 12px 0 0 !important;
+  padding: 0 !important;
+  padding-left: 0 !important;
+  padding-inline-start: 0 !important;
+  margin-left: 0 !important;
+  margin-inline-start: 0 !important;
 }
+#cecp-pm li.schedule-row,
+#cecp-pm .schedule-row,
+li.schedule-row,
 .schedule-row {
+  list-style: none !important;
   display: grid;
-  grid-template-columns: 150px 1fr;
+  grid-template-columns: 140px 1fr;
   column-gap: 16px;
   row-gap: 4px;
   align-items: baseline;
-  margin: 9px 0;
+  margin: 9px 0 !important;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
   padding: 14px 18px;
   border: 1px solid var(--row-border, var(--line));
   border-left: 4.5px solid var(--row-accent, var(--accent));
   border-radius: 0 12px 12px 0;
   background: var(--row-soft, rgba(255, 255, 255, 0.04));
   transition: transform .18s ease, background .18s ease, border-color .18s ease;
+  box-sizing: border-box;
 }
 .schedule-row:hover {
   background: var(--row-hover, var(--row-soft));

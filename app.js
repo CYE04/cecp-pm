@@ -64,6 +64,10 @@
     if (Array.isArray(data.schedule) && data.schedule.length) {
       const box = section('flow', '聚会流程');
       const list = el('ul', 'schedule');
+      list.style.padding = '0';
+      list.style.paddingLeft = '0';
+      list.style.marginLeft = '0';
+      list.style.listStyle = 'none';
       data.schedule.forEach(item => {
         const row = el('li', 'schedule-row');
         if (/^[a-z][a-z0-9-]*$/.test(item.section || '')) row.dataset.section = item.section;
@@ -245,7 +249,7 @@
       body.appendChild(list);
       const duties = Object.fromEntries(roster.duties.map(duty => [duty.key, duty]));
       root.querySelectorAll('[data-roles]').forEach(slot => {
-        slot.textContent = slot.dataset.roles.split(',').map(key => duties[key] ? duties[key].label + ' · ' + duties[key].value : '').filter(Boolean).join('　／　');
+        slot.textContent = slot.dataset.roles.split(',').map(key => duties[key] ? duties[key].label + ' · ' + duties[key].value : '').filter(Boolean).join(' / ');
         slot.hidden = !slot.textContent;
       });
       if (duties.note?.value) root.querySelectorAll('[data-roster-speaker]').forEach(slot => {
