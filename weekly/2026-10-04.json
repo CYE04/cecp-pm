@@ -5,27 +5,57 @@
   "venue": "帕多瓦教会",
   "timeZone": "Europe/Rome",
   "schedule": [
-    { "start": "14:00", "end": "14:50", "title": "祷告会", "section": "prayer", "roles": ["prayerLeader"] },
-    { "start": "15:00", "end": "15:40", "title": "诗歌敬拜、记念祷告", "section": "worship", "roles": ["worship", "praisePrayer", "memorialPrayer"] },
-    { "start": "15:40", "end": "16:00", "title": "读经、献诗", "section": "reading", "roles": ["reading"] },
-    { "start": "16:00", "end": "17:00", "title": "证道", "section": "sermon", "roles": ["note"] },
-    { "start": "17:00", "title": "祝福祷告散会", "section": "dismissal" }
+    {
+      "start": "14:00",
+      "end": "14:50",
+      "title": "祷告会",
+      "section": "prayer",
+      "roles": ["prayerLeader"]
+    },
+    {
+      "start": "15:00",
+      "end": "15:40",
+      "title": "诗歌敬拜、记念祷告",
+      "section": "worship",
+      "roles": ["worship", "praisePrayer", "memorialPrayer"]
+    },
+    {
+      "start": "15:40",
+      "end": "16:00",
+      "title": "读经、献诗",
+      "section": "reading",
+      "roles": ["reading"]
+    },
+    {
+      "start": "16:00",
+      "end": "17:00",
+      "title": "证道",
+      "section": "sermon",
+      "roles": ["note"]
+    },
+    {
+      "start": "17:00",
+      "title": "祝福祷告散会",
+      "section": "dismissal"
+    }
   ],
   "reading": "sp 39",
   "songs": [
-     { "title": "0013rongyaoguishen" },
-     { "title": "yonghengweiyidepanwang" },
-     { "title": "我心爱住" }
+    { "title": "0013rongyaoguishen" },
+    { "title": "yonghengweiyidepanwang" },
+    { "title": "我心爱主" }
   ],
-  "offeringSongs": ["0013rongyaoguishen"],
+  "offeringSongs": [
+    "0013rongyaoguishen"
+  ],
   "sermon": {
-    "ref": "罗12 9 21",
+    "ref": "罗 12:9-21",
     "title": "爱与逼迫到神的信实",
     "outline": []
   },
- "announcements": [
-  "马来西亚浸信会神学院欧洲区基督教辅导证书课程现已开始报名。\n授课讲师：王丽静牧师\n授课方式：线上授课\n课程安排：共 10 个单元、40 个课程\n课程费用：每单元 60 欧元\n请愿意参加的弟兄姐妹向恬恬姐妹报名。",
-  "Brescia 教会定于 10 月 24 日举行落成典礼。\n请愿意参加的弟兄姐妹向金展弟兄报名。当天上午 10 点在教会集合，一同出发。"
-]
+  "announcements": [
+    "马来西亚浸信会神学院欧洲区基督教辅导证书课程现已开始报名。\n授课讲师：王丽静牧师\n授课方式：线上授课\n课程安排：共 10 个单元、40 个课程\n课程费用：每单元 60 欧元\n请愿意参加的弟兄姐妹向恬恬姐妹报名。",
+    "Brescia 教会定于 10 月 24 日举行落成典礼。\n请愿意参加的弟兄姐妹向金展弟兄报名。当天上午 10 点在教会集合，一同出发。"
+  ],
   "replayUrl": ""
 }
