@@ -42,7 +42,7 @@
     const link = document.createElement('link');
     link.id = cssId;
     link.rel = 'stylesheet';
-    link.href = new URL('style.css?v=20261004-v4-colors', baseUrl).href;
+    link.href = new URL('style.css?v=20261004-v5-hero-center', baseUrl).href;
     document.head.appendChild(link);
   }
 

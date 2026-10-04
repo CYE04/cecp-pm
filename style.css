@@ -258,10 +258,10 @@ body.pm-standalone { background: #121418; color: var(--ink); }
 #cecp-pm { background: transparent !important; color: var(--ink); width: 100%; box-sizing: border-box; }
 #cecp-pm .page { max-width: 100%; margin: 0 auto; padding: 0; background: transparent; }
 
-/* ── 杂志式头部（像 Youth 的 .ym-mast 一样克制优雅，融入 Halo 博客） ── */
+/* ── 杂志式头部（字号大气醒目，主题居中突出） ── */
 .hero {
   position: relative;
-  padding: 18px 0 22px;
+  padding: 24px 0 28px;
   background: transparent !important;
   border-bottom: 1px solid var(--line);
   border-radius: 0;
@@ -272,8 +272,8 @@ body.pm-standalone { background: #121418; color: var(--ink); }
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  margin: 0 0 10px;
-  font-size: 12px;
+  margin: 0 0 12px;
+  font-size: 13px;
   font-weight: 600;
   letter-spacing: .16em;
   color: var(--muted);
@@ -289,32 +289,40 @@ body.pm-standalone { background: #121418; color: var(--ink); }
 }
 h1 {
   font-family: Georgia, "Songti SC", "Noto Serif SC", serif;
-  font-size: clamp(26px, 5.2vw, 34px);
-  font-weight: 400;
+  font-size: clamp(34px, 7vw, 48px);
+  font-weight: 600;
   letter-spacing: .01em;
-  line-height: 1.24;
-  margin: 0 0 8px;
+  line-height: 1.18;
+  margin: 0 0 10px;
   color: var(--ink);
 }
 .hero-date {
-  font-size: 15px;
+  font-size: clamp(18px, 3.5vw, 22px);
   font-weight: 600;
   color: var(--ink);
-  margin: 6px 0 2px;
+  margin: 8px 0 4px;
 }
 .hero-meta {
   font-family: 'DM Mono', 'SF Mono', ui-monospace, monospace;
-  font-size: 13px;
+  font-size: 15px;
   color: var(--muted);
-  margin: 4px 0 8px;
+  margin: 4px 0 16px;
   letter-spacing: .02em;
 }
 .hero-topic {
   font-family: Georgia, "Songti SC", "Noto Serif SC", serif;
-  font-size: 18px;
-  font-weight: 500;
+  font-size: clamp(24px, 5.5vw, 36px);
+  font-weight: 600;
   color: var(--ink);
-  margin: 8px 0 0;
+  text-align: center;
+  margin: 22px 0 8px;
+  padding: 16px 22px;
+  background: rgba(142, 107, 194, 0.10);
+  border: 1px solid rgba(142, 107, 194, 0.28);
+  border-radius: 14px;
+  line-height: 1.35;
+  letter-spacing: .02em;
+  box-sizing: border-box;
 }
 .page-actions { margin-top: 14px; }
 
