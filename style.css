@@ -1,38 +1,13 @@
-:root { color-scheme: light; --ink:#45372f; --muted:#786f68; --line:#ded6cd; --paper:#f6f2ec; --white:#fffdfa; }
+:root { color-scheme: light; --ink:#252d35; --muted:#56616b; --line:rgba(20,30,55,.10); --paper:transparent; --white:#fff; --raised:rgba(20,30,55,.03); --accent:#315f86; --accent-soft:rgba(49,95,134,.09); }
 * { box-sizing:border-box; }
 html { scroll-behavior:smooth; }
-body.pm-standalone { margin:0; background:var(--paper); color:var(--ink); font-family:-apple-system,BlinkMacSystemFont,"Noto Sans SC","PingFang SC","Microsoft YaHei",sans-serif; line-height:1.65; }
-#cecp-pm, #app { color:var(--ink); font-family:-apple-system,BlinkMacSystemFont,"Noto Sans SC","PingFang SC","Microsoft YaHei",sans-serif; line-height:1.65; width:100%; box-sizing:border-box; }
+body.pm-standalone { margin:0; background:#121418; color:var(--ink); font-family:-apple-system,BlinkMacSystemFont,"Noto Sans SC","PingFang SC","Microsoft YaHei",sans-serif; line-height:1.65; }
+#cecp-pm, #app { color:var(--ink); font-family:-apple-system,BlinkMacSystemFont,"Noto Sans SC","PingFang SC","Microsoft YaHei",sans-serif; line-height:1.65; width:100%; box-sizing:border-box; background:transparent !important; }
 #cecp-pm a, #app a { color:inherit; }
-#cecp-pm .page { max-width:100%; margin:0; padding:0; }
-.page { max-width:960px; margin:0 auto; padding:0 30px; }
-.hero { position:relative; overflow:hidden; padding:68px 52px 35px; background:var(--white); border-radius:0 0 28px 28px; box-shadow:0 10px 38px #56473a0b; }
-.hero::after { content:""; position:absolute; inset:auto -30px 0 auto; width:42%; height:100%; pointer-events:none; opacity:.38; background:repeating-linear-gradient(106deg,transparent 0,transparent 11px,#d5d0c9 12px,transparent 15px); mask-image:linear-gradient(to bottom,transparent 12%,#000 100%); }
-.hero > * { position:relative; z-index:1; }
-.eyebrow { margin:0 0 18px; font-size:12px; font-weight:750; letter-spacing:.18em; color:#8f796c; }
+#cecp-pm .page { max-width:100%; margin:0; padding:0; background:transparent; }
+.page { max-width:920px; margin:0 auto; padding:0 24px; }
 h1,h2,h3,p { overflow-wrap:anywhere; }
-h1 { margin:0; font-family:"Songti SC","Noto Serif CJK SC","SimSun",serif; font-size:clamp(42px,7vw,74px); font-weight:600; letter-spacing:.055em; line-height:1.22; }
-.hero-date { margin:32px 0 0; font-size:22px; font-weight:700; }
-.hero-meta { margin:2px 0 38px; color:var(--muted); }
-.hero-topic { margin:-18px 0 26px; font-size:20px; color:#765744; font-weight:600; }
-.page-actions { display:flex; flex-wrap:wrap; align-items:center; gap:10px; margin-top:20px; }
-.content-section { scroll-margin-top:24px; margin:34px 0; padding:36px 44px; background:var(--white); border:1px solid #e9e1d9; border-radius:22px; box-shadow:0 8px 30px #56473a08; }
-.content-section h2 { margin:0 0 24px; font-family:"Songti SC","Noto Serif CJK SC","SimSun",serif; font-size:clamp(27px,4vw,36px); font-weight:600; }
 .schedule,.simple-list { list-style:none; margin:0; padding:0; }
-.schedule-row { position:relative; display:grid; grid-template-columns:190px 1fr; column-gap:18px; row-gap:4px; align-items:baseline; padding:19px 0; }
-.schedule-people { grid-column:2; margin:0; color:var(--muted); font-size:13px; }
-.schedule-row.is-current { background:#f3ebe1; border-radius:10px; padding-left:12px; padding-right:12px; }
-.live-label { grid-column:2; color:#795433; font-size:12px; font-weight:700; }
-.schedule-time { color:#806457; font:600 clamp(17px,2.7vw,23px) Georgia,serif; font-variant-numeric:tabular-nums; white-space:nowrap; }
-.schedule-title { font-size:20px; font-weight:620; }
-.schedule-jump { color:inherit; text-decoration:none; }
-.schedule-jump:hover,.schedule-jump:focus-visible { text-decoration:underline; text-underline-offset:4px; }
-.stage-section { border-left:4px solid #a98874; }
-.stage-time { margin:-4px 0 7px; color:#806457; font:600 21px Georgia,serif; font-variant-numeric:tabular-nums; }
-.stage-section h2 { margin-bottom:16px; }
-.stage-people { margin:0 0 22px; color:#6f5a4d; font-size:15px; font-weight:600; }
-.stage-description { margin:15px 0 0; white-space:pre-line; }
-.reading-card,.sermon-card { padding:25px 28px; background:#f5eee7; border-left:4px solid #a98874; border-radius:4px 14px 14px 4px; }
 .reading-ref { margin:0; font-family:"Songti SC","Noto Serif CJK SC","SimSun",serif; font-size:27px; }
 .muted,.sermon-ref { color:var(--muted); }
 .sermon-card h3 { margin:0 0 6px; font-size:24px; }
@@ -159,70 +134,402 @@ h1 { margin:0; font-family:"Songti SC","Noto Serif CJK SC","SimSun",serif; font-
 .pm-manual-copy-actions button { padding:8px 13px; border:1px solid var(--line); border-radius:9px; background:var(--white); color:var(--ink); font:inherit; cursor:pointer; }
 
 /* 与青年页共用的编辑式排版和明暗配色。 */
-:root { color-scheme:light; --ink:#1b2333; --muted:#586173; --line:rgba(20,30,55,.12); --paper:#edeff3; --white:#fff; --raised:#f6f8fb; --accent:#1c5aa6; --accent-soft:rgba(28,90,166,.10); --rule:rgba(25,26,29,.8); }
-@media (prefers-color-scheme:dark) {
-  :root { color-scheme:dark; --ink:#eceef3; --muted:#a6aebd; --line:rgba(255,255,255,.12); --paper:#121418; --white:#1c1f26; --raised:#252932; --accent:#6ea3e6; --accent-soft:rgba(110,163,230,.16); --rule:rgba(236,238,241,.5); }
+/* ── 与青年页共用的优雅排版和明暗配色（天然混入 Halo 主题，不带突兀色块） ── */
+:root {
+  color-scheme: light;
+  --ink: #252d35;
+  --muted: #56616b;
+  --line: rgba(20, 30, 55, .10);
+  --paper: transparent;
+  --white: #ffffff;
+  --raised: rgba(20, 30, 55, .03);
+  --accent: #315f86;
+  --accent-soft: rgba(49, 95, 134, .09);
+  --rule: rgba(20, 30, 55, .10);
 }
-html[data-resolved-theme="dark"], #cecp-pm[data-theme="dark"], html[data-theme="dark"] #cecp-pm, html.dark #cecp-pm { color-scheme:dark; --ink:#eceef3; --muted:#a6aebd; --line:rgba(255,255,255,.12); --paper:#121418; --white:#1c1f26; --raised:#252932; --accent:#6ea3e6; --accent-soft:rgba(110,163,230,.16); --rule:rgba(236,238,241,.5); --ym-bg-base:#121418; --ym-bg-elevated:#1c1f26; --ym-bg-elevated-2:#252932; --ym-bg-sunken:#0d0e12; --ym-text-primary:#eceef3; --ym-text-secondary:#a6aebd; --ym-text-tertiary:#828b9b; --ym-separator:rgba(255,255,255,.09); --ym-separator-strong:rgba(255,255,255,.15); --ym-accent:#6ea3e6; --ym-accent-hover:#84b2ec; --ym-accent-pressed:#5b93da; --ym-accent-subtle:rgba(110,163,230,.16); --ym-accent-2:#5b93da; --ym-on-accent:#0a1220; --ym-rule:rgba(236,238,241,.5); --ym-line-soft:rgba(255,255,255,.07); --ym-bg:#121418; --ym-card:rgba(255,255,255,.05); --ym-ink:#eceef3; --ym-ink2:#a6aebd; --ym-ink3:#828b9b; --ym-border:rgba(255,255,255,.09); --ym-border-md:rgba(255,255,255,.15); --ym-page:#121418; --ym-panel:#1c1f26; --ym-panel-2:#252932; --ym-glass:rgba(28,31,38,.78); --ym-chip:rgba(255,255,255,.05); --ym-chip-hover:rgba(255,255,255,.09); --ym-line:rgba(255,255,255,.09); --ym-brand:#6ea3e6; --ym-brand2:#5b93da; --ym-on-brand:#0a1220; }
-html[data-resolved-theme="light"], #cecp-pm[data-theme="light"], html[data-theme="light"] #cecp-pm, html.light #cecp-pm { color-scheme:light; --ink:#1b2333; --muted:#586173; --line:rgba(20,30,55,.12); --paper:#edeff3; --white:#fff; --raised:#f6f8fb; --accent:#1c5aa6; --accent-soft:rgba(28,90,166,.10); --rule:rgba(25,26,29,.8); --ym-bg-base:#edeff3; --ym-bg-elevated:#fff; --ym-bg-elevated-2:#f6f8fb; --ym-bg-sunken:#e6eaf0; --ym-text-primary:#1b2333; --ym-text-secondary:#586173; --ym-text-tertiary:#6d7686; --ym-separator:rgba(20,30,55,.10); --ym-separator-strong:rgba(20,30,55,.16); --ym-accent:#1c5aa6; --ym-accent-hover:#174c8c; --ym-accent-pressed:#123d71; --ym-accent-subtle:rgba(28,90,166,.10); --ym-accent-2:#3e7cc0; --ym-on-accent:#fff; --ym-rule:rgba(25,26,29,.8); --ym-line-soft:rgba(20,22,30,.07); --ym-bg:#edeff3; --ym-card:#fff; --ym-ink:#1b2333; --ym-ink2:#586173; --ym-ink3:#6d7686; --ym-border:rgba(20,30,55,.10); --ym-border-md:rgba(20,30,55,.16); --ym-page:#edeff3; --ym-panel:#fff; --ym-panel-2:#f6f8fb; --ym-glass:rgba(255,255,255,.72); --ym-chip:rgba(255,255,255,.66); --ym-chip-hover:#fff; --ym-line:rgba(20,30,55,.10); --ym-brand:#1c5aa6; --ym-brand2:#3e7cc0; --ym-on-brand:#fff; }
-body.pm-standalone, #cecp-pm { background:var(--paper); color:var(--ink); }
-.page { max-width:920px; padding:0 34px; }
-.hero { padding:36px 0 32px; background:transparent; border-bottom:1px solid var(--rule); border-radius:0; box-shadow:none; }
-.hero::after { display:none; }
-.eyebrow { margin-bottom:13px; color:var(--muted); font-size:12px; letter-spacing:.18em; }
-h1 { font-size:clamp(42px,6vw,64px); font-weight:400; letter-spacing:.01em; line-height:1.18; }
-.hero-date { margin:18px 0 0; font-size:20px; font-weight:650; }
-.hero-meta { margin:6px 0 15px; color:var(--muted); font-size:17px; }
-.hero-topic { margin:0 0 10px; color:var(--ink); font-family:Georgia,"Songti SC","Noto Serif SC",serif; font-size:22px; font-weight:500; }
-.page-actions { margin-top:15px; }
-.content-section { margin:0; padding:34px 0; background:transparent; border:0; border-radius:0; box-shadow:none; }
-.content-section { --section-accent:var(--accent); --section-soft:var(--accent-soft); }
-.content-section h2 { display:flex; align-items:center; gap:11px; margin:0 0 19px; padding:0; border:0; font-size:clamp(23px,4vw,29px); font-weight:400; }
-.content-section h2::before { content:""; width:7px; height:1.05em; flex:0 0 auto; border-radius:999px; background:var(--section-accent); }
-#prayer { --section-accent:#4f79b8; --section-soft:rgba(79,121,184,.11); }
-#worship { --section-accent:#b78335; --section-soft:rgba(183,131,53,.12); }
-#reading { --section-accent:#4d8a72; --section-soft:rgba(77,138,114,.12); }
-#sermon { --section-accent:#8166a5; --section-soft:rgba(129,102,165,.12); }
-#dismissal { --section-accent:#a36363; --section-soft:rgba(163,99,99,.11); }
-#roster { --section-accent:#367e89; --section-soft:rgba(54,126,137,.11); }
-#announcements { --section-accent:#a36f45; --section-soft:rgba(163,111,69,.11); }
-#replay { --section-accent:#64738b; --section-soft:rgba(100,115,139,.11); }
-.schedule-row { grid-template-columns:160px 1fr; margin:6px 0; padding:14px 16px; border:0; border-left:3px solid var(--row-accent,var(--accent)); border-radius:0 12px 12px 0; background:var(--row-soft,var(--accent-soft)); }
-.schedule-row[data-section="prayer"] { --row-accent:#4f79b8; --row-soft:rgba(79,121,184,.08); }
-.schedule-row[data-section="worship"] { --row-accent:#b78335; --row-soft:rgba(183,131,53,.08); }
-.schedule-row[data-section="reading"] { --row-accent:#4d8a72; --row-soft:rgba(77,138,114,.08); }
-.schedule-row[data-section="sermon"] { --row-accent:#8166a5; --row-soft:rgba(129,102,165,.08); }
-.schedule-row[data-section="dismissal"] { --row-accent:#a36363; --row-soft:rgba(163,99,99,.08); }
-.schedule-row.is-current { background:var(--accent-soft); }
-.schedule-time,.stage-time { color:var(--ink); font-family:'DM Mono','SF Mono',ui-monospace,monospace; font-size:17px; font-weight:600; }
-.schedule-title { font-family:Georgia,'Songti SC','Noto Serif SC',serif; font-size:20px; font-weight:400; }
-.stage-section { border-left:0; }
-.stage-time { margin:0 0 9px; color:var(--section-accent); font-size:13px; }
-.stage-people { color:var(--muted); }
-.stage-subheading { display:flex; align-items:center; gap:9px; margin:22px 0 11px; color:var(--ink); font-size:18px; font-weight:700; letter-spacing:.06em; }
-.stage-subheading::before { content:""; width:18px; height:3px; flex:0 0 auto; border-radius:999px; background:var(--section-accent); }
-.stage-subheading-offering { margin-top:30px; }
-.live-label { color:var(--accent); }
-.reading-card,.sermon-card { background:var(--section-soft); border:0; border-left:4px solid var(--section-accent); border-radius:4px 12px 12px 4px; }
-.roster-duty { background:var(--raised); border:1px solid var(--line); border-radius:12px; }
-.notice,.plain-song { margin:10px 0; padding:17px 18px; border:0; border-left:3px solid var(--section-accent); border-radius:0 11px 11px 0; background:var(--section-soft); }
-.reading-ref { font-size:23px; }
-.roster-duty dt,.notice p,.sermon-ref,.muted,.replay-empty { color:var(--muted); }
-.roster-duty dd { font-size:17px; }
-.resource-link,.roster-retry,.song-copy-button { background:var(--raised); border:1px solid var(--line); color:var(--ink); }
-.resource-link:hover,.resource-link:focus-visible,.roster-retry:hover,.song-copy-button:hover,.control-button:hover { background:var(--accent-soft); }
-.control-button { background:transparent; color:var(--ink); }
-.bible-verse sup { color:var(--accent); }
-.reader-dialog { background:var(--white); }
-.preview-banner { background:var(--accent-soft); color:var(--ink); }
-html.pm-embed,html.pm-embed body,html.pm-embed .hero { background:transparent; }
-html.pm-embed,html.pm-embed body { overflow:hidden; }
-html.pm-embed .page { max-width:920px; padding:0 2px; }
-html.pm-embed .hero { padding-top:10px; border-bottom-color:transparent; }
-html.pm-embed .footer { padding-bottom:24px; }
-.content-section + .content-section { padding-top:28px; }
-@media (max-width:620px) { .page { padding:0 14px; } .hero { min-height:auto; padding:42px 25px 28px; } .hero-meta { margin-bottom:28px; } .content-section { padding:27px 23px; margin:18px 0; } .schedule-row { grid-template-columns:1fr; gap:2px; padding:14px 12px; } .schedule-people,.live-label { grid-column:1; } .schedule-title { font-size:18px; } .schedule-time { font-size:17px; } .reading-card,.sermon-card { padding:20px; } .roster-grid { grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; } .roster-duty { padding:15px 12px; } .roster-duty dd { font-size:18px; } .reader-dialog { padding:20px; } .bible-form { gap:8px; } }
-@media (max-width:620px) { .page { padding:0 18px; } .hero { padding:25px 0 24px; } .hero-meta { margin-bottom:12px; } .content-section { padding:26px 0; margin:0; } html.pm-embed .page { padding:0 2px; } html.pm-embed .hero { padding-top:8px; } }
+@media (prefers-color-scheme: dark) {
+  :root {
+    color-scheme: dark;
+    --ink: #eceef3;
+    --muted: #a6aebd;
+    --line: rgba(255, 255, 255, .09);
+    --paper: transparent;
+    --white: #1c1f26;
+    --raised: rgba(255, 255, 255, .04);
+    --accent: #6ea3e6;
+    --accent-soft: rgba(110, 163, 230, .14);
+    --rule: rgba(255, 255, 255, .09);
+  }
+}
+html[data-resolved-theme="dark"], #cecp-pm[data-theme="dark"], html[data-theme="dark"] #cecp-pm, html.dark #cecp-pm {
+  color-scheme: dark;
+  --ink: #eceef3;
+  --muted: #a6aebd;
+  --line: rgba(255, 255, 255, .09);
+  --paper: transparent;
+  --white: #1c1f26;
+  --raised: rgba(255, 255, 255, .04);
+  --accent: #6ea3e6;
+  --accent-soft: rgba(110, 163, 230, .14);
+  --rule: rgba(255, 255, 255, .09);
+  --ym-bg-base: transparent;
+  --ym-bg-elevated: #1c1f26;
+  --ym-bg-elevated-2: #252932;
+  --ym-bg-sunken: #0d0e12;
+  --ym-text-primary: #eceef3;
+  --ym-text-secondary: #a6aebd;
+  --ym-text-tertiary: #828b9b;
+  --ym-separator: rgba(255, 255, 255, .09);
+  --ym-separator-strong: rgba(255, 255, 255, .15);
+  --ym-accent: #6ea3e6;
+  --ym-accent-hover: #84b2ec;
+  --ym-accent-pressed: #5b93da;
+  --ym-accent-subtle: rgba(110, 163, 230, .14);
+  --ym-accent-2: #5b93da;
+  --ym-on-accent: #0a1220;
+  --ym-rule: rgba(255, 255, 255, .09);
+  --ym-line-soft: rgba(255, 255, 255, .07);
+  --ym-bg: transparent;
+  --ym-card: rgba(255, 255, 255, .04);
+  --ym-ink: #eceef3;
+  --ym-ink2: #a6aebd;
+  --ym-ink3: #828b9b;
+  --ym-border: rgba(255, 255, 255, .09);
+  --ym-border-md: rgba(255, 255, 255, .15);
+  --ym-page: transparent;
+  --ym-panel: #1c1f26;
+  --ym-panel-2: #252932;
+  --ym-glass: rgba(28, 31, 38, .78);
+  --ym-chip: rgba(255, 255, 255, .05);
+  --ym-chip-hover: rgba(255, 255, 255, .09);
+  --ym-line: rgba(255, 255, 255, .09);
+  --ym-brand: #6ea3e6;
+  --ym-brand2: #5b93da;
+  --ym-on-brand: #0a1220;
+}
+html[data-resolved-theme="light"], #cecp-pm[data-theme="light"], html[data-theme="light"] #cecp-pm, html.light #cecp-pm {
+  color-scheme: light;
+  --ink: #252d35;
+  --muted: #56616b;
+  --line: rgba(20, 30, 55, .10);
+  --paper: transparent;
+  --white: #ffffff;
+  --raised: rgba(20, 30, 55, .03);
+  --accent: #315f86;
+  --accent-soft: rgba(49, 95, 134, .09);
+  --rule: rgba(20, 30, 55, .10);
+  --ym-bg-base: transparent;
+  --ym-bg-elevated: #ffffff;
+  --ym-bg-elevated-2: #f6f8fb;
+  --ym-bg-sunken: #e6eaf0;
+  --ym-text-primary: #252d35;
+  --ym-text-secondary: #56616b;
+  --ym-text-tertiary: #6d7686;
+  --ym-separator: rgba(20, 30, 55, .10);
+  --ym-separator-strong: rgba(20, 30, 55, .16);
+  --ym-accent: #315f86;
+  --ym-accent-hover: #254d70;
+  --ym-accent-pressed: #1d3e5b;
+  --ym-accent-subtle: rgba(49, 95, 134, .09);
+  --ym-accent-2: #527ea1;
+  --ym-on-accent: #ffffff;
+  --ym-rule: rgba(20, 30, 55, .10);
+  --ym-line-soft: rgba(20, 22, 30, .07);
+  --ym-bg: transparent;
+  --ym-card: #ffffff;
+  --ym-ink: #252d35;
+  --ym-ink2: #56616b;
+  --ym-ink3: #6d7686;
+  --ym-border: rgba(20, 30, 55, .10);
+  --ym-border-md: rgba(20, 30, 55, .16);
+  --ym-page: transparent;
+  --ym-panel: #ffffff;
+  --ym-panel-2: #f6f8fb;
+  --ym-glass: rgba(255, 255, 255, .72);
+  --ym-chip: rgba(255, 255, 255, .66);
+  --ym-chip-hover: #ffffff;
+  --ym-line: rgba(20, 30, 55, .10);
+  --ym-brand: #315f86;
+  --ym-brand2: #527ea1;
+  --ym-on-brand: #ffffff;
+}
+
+body.pm-standalone { background: #121418; color: var(--ink); }
+#cecp-pm { background: transparent !important; color: var(--ink); width: 100%; box-sizing: border-box; }
+#cecp-pm .page { max-width: 100%; margin: 0 auto; padding: 0; background: transparent; }
+
+/* ── 杂志式头部（像 Youth 的 .ym-mast 一样克制优雅，融入 Halo 博客） ── */
+.hero {
+  position: relative;
+  padding: 18px 0 22px;
+  background: transparent !important;
+  border-bottom: 1px solid var(--line);
+  border-radius: 0;
+  box-shadow: none;
+}
+.hero::after { display: none; }
+.eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 10px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: .16em;
+  color: var(--muted);
+  text-transform: uppercase;
+}
+.eyebrow::after {
+  content: "";
+  display: inline-block;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--accent);
+}
+h1 {
+  font-family: Georgia, "Songti SC", "Noto Serif SC", serif;
+  font-size: clamp(26px, 5.2vw, 34px);
+  font-weight: 400;
+  letter-spacing: .01em;
+  line-height: 1.24;
+  margin: 0 0 8px;
+  color: var(--ink);
+}
+.hero-date {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--ink);
+  margin: 6px 0 2px;
+}
+.hero-meta {
+  font-family: 'DM Mono', 'SF Mono', ui-monospace, monospace;
+  font-size: 13px;
+  color: var(--muted);
+  margin: 4px 0 8px;
+  letter-spacing: .02em;
+}
+.hero-topic {
+  font-family: Georgia, "Songti SC", "Noto Serif SC", serif;
+  font-size: 18px;
+  font-weight: 500;
+  color: var(--ink);
+  margin: 8px 0 0;
+}
+.page-actions { margin-top: 14px; }
+
+/* ── 各聚会环节布局 ── */
+.content-section {
+  scroll-margin-top: 24px;
+  margin: 0;
+  padding: 30px 0 16px;
+  background: transparent !important;
+  border: 0;
+  border-bottom: 1px solid var(--line);
+  border-radius: 0;
+  box-shadow: none;
+}
+.content-section:last-of-type { border-bottom: 0; }
+.content-section h2 {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  margin: 0 0 16px;
+  padding: 0;
+  border: 0;
+  font-family: Georgia, "Songti SC", "Noto Serif SC", serif;
+  font-size: clamp(21px, 4.2vw, 25px);
+  font-weight: 400;
+  letter-spacing: .01em;
+  color: var(--ink);
+}
+.content-section h2::before { display: none; }
+.stage-section { border-left: 0; }
+.stage-time {
+  margin: 0 0 6px;
+  color: var(--muted);
+  font-family: 'DM Mono', 'SF Mono', ui-monospace, monospace;
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: .02em;
+}
+.stage-people {
+  margin: 0 0 16px;
+  color: var(--muted);
+  font-size: 13.5px;
+  font-weight: 400;
+}
+.stage-subheading {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  margin: 22px 0 11px;
+  color: var(--ink);
+  font-size: 17px;
+  font-weight: 600;
+}
+.stage-subheading::before {
+  content: "";
+  width: 14px;
+  height: 2px;
+  border-radius: 999px;
+  background: var(--accent);
+}
+.stage-subheading-offering { margin-top: 28px; }
+
+/* ── 流程时间表（与 Youth 的 .ym-ord-row 风格对齐：无粗黑底色，纤细分隔线） ── */
+.schedule {
+  list-style: none;
+  margin: 6px 0 0;
+  padding: 0;
+}
+.schedule-row {
+  display: grid;
+  grid-template-columns: 140px 1fr auto;
+  gap: 14px;
+  align-items: baseline;
+  padding: 15px 4px;
+  border: 0;
+  border-bottom: 1px solid var(--line);
+  border-radius: 0;
+  background: transparent !important;
+  transition: background .15s ease;
+}
+.schedule-row:last-child { border-bottom: 0; }
+.schedule-row:hover { background: var(--raised) !important; }
+.schedule-time {
+  color: var(--ink);
+  font-family: 'DM Mono', 'SF Mono', ui-monospace, monospace;
+  font-size: 16px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -.01em;
+}
+.schedule-title {
+  font-family: Georgia, "Songti SC", "Noto Serif SC", serif;
+  font-size: 18.5px;
+  font-weight: 400;
+  color: var(--ink);
+}
+.schedule-jump {
+  color: inherit;
+  text-decoration: none;
+  cursor: pointer;
+  transition: color .18s ease;
+}
+.schedule-jump:hover {
+  color: var(--accent);
+  text-decoration: none;
+}
+.schedule-people {
+  grid-column: 2;
+  margin: 3px 0 0;
+  color: var(--muted);
+  font-size: 12.5px;
+}
+.schedule-row.is-current {
+  background: var(--accent-soft) !important;
+  border-radius: 8px;
+  padding-left: 10px;
+  padding-right: 10px;
+}
+.live-label { color: var(--accent); font-weight: 600; font-size: 12px; }
+
+/* ── 卡片与嵌入容器（半透明轻盈感，与主题底色融合） ── */
+.reading-card, .sermon-card {
+  margin: 14px 0;
+  padding: 22px 24px;
+  background: var(--raised);
+  border: 1px solid var(--line);
+  border-left: 3px solid var(--accent);
+  border-radius: 14px;
+  box-shadow: none;
+}
+.reading-ref {
+  font-family: Georgia, "Songti SC", "Noto Serif SC", serif;
+  font-size: 23px;
+  font-weight: 500;
+  color: var(--ink);
+  margin: 0 0 8px;
+}
+.sermon-card h3 {
+  font-family: Georgia, "Songti SC", "Noto Serif SC", serif;
+  font-size: 21px;
+  font-weight: 500;
+  color: var(--ink);
+  margin: 0 0 8px;
+}
+.roster-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  margin: 0;
+}
+.roster-duty {
+  padding: 16px 18px;
+  background: var(--raised);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+}
+.roster-duty dt, .notice p, .sermon-ref, .muted, .replay-empty { color: var(--muted); }
+.roster-duty dd { font-size: 17px; font-weight: 600; color: var(--ink); }
+.notice, .plain-song {
+  margin: 12px 0;
+  padding: 18px 20px;
+  background: var(--raised);
+  border: 1px solid var(--line);
+  border-left: 3px solid var(--accent);
+  border-radius: 14px;
+}
+.resource-link, .roster-retry, .song-copy-button {
+  background: var(--raised);
+  border: 1px solid var(--line);
+  color: var(--ink);
+}
+.resource-link:hover, .resource-link:focus-visible, .roster-retry:hover, .song-copy-button:hover, .control-button:hover {
+  background: var(--accent-soft);
+}
+.control-button { background: transparent; color: var(--ink); }
+.bible-verse sup { color: var(--accent); }
+.reader-dialog { background: var(--white); }
+.preview-banner { background: var(--accent-soft); color: var(--ink); }
+
+/* ── 圣经展开器 ── */
+.bible-reader-icon {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 36px;
+  flex: 0 0 auto;
+  border-radius: 8px;
+  background: var(--accent-soft);
+}
+.bible-reader-book {
+  display: block;
+  width: 36px;
+  height: 30px;
+  object-fit: contain;
+}
+.bible-reader-svg-icon {
+  width: 24px;
+  height: 24px;
+  color: var(--accent);
+}
+
+@media (max-width: 620px) {
+  .page { padding: 0 4px; }
+  .hero { padding: 16px 0 18px; }
+  .schedule-row {
+    grid-template-columns: 1fr;
+    gap: 3px;
+    padding: 13px 2px;
+  }
+  .schedule-people, .live-label { grid-column: 1; }
+  .schedule-title { font-size: 17.5px; }
+  .schedule-time { font-size: 15px; }
+  .reading-card, .sermon-card { padding: 18px 16px; }
+  .roster-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+}
 @media (max-width:620px) { .shared-songs .ym-song-tabs { display:flex; flex-wrap:nowrap; overflow-x:auto; overflow-y:hidden; -webkit-overflow-scrolling:touch; scrollbar-width:none; gap:18px; padding:0 0 4px; border-bottom:1px solid var(--line); } .shared-songs .ym-song-tabs::-webkit-scrollbar { display:none; } .shared-songs .ym-song-tab { flex-shrink:0; max-width:none; padding:5px 0 7px; } .shared-songs .ym-song-tab.active::after { bottom:-2px; height:2px; } .shared-songs .pm-compact-player { padding:6px; gap:4px; } .shared-songs .pm-compact-player .ym-pl-stage { grid-template-columns:64px minmax(0,1fr); gap:7px; } .shared-songs .pm-compact-player .ym-pl-cover-wrap,.shared-songs .pm-compact-player .ym-pl-stage.playing .ym-pl-cover-wrap { width:64px; } .shared-songs .pm-compact-player .ym-pl-lrc-panel,.shared-songs .pm-compact-player .ym-pl-stage.playing .ym-pl-lrc-panel { height:82px; } .shared-songs .pm-compact-player .ym-pl-lrc-inner { padding:32px 0 40px; } .shared-songs .pm-compact-player .ym-pl-lrc-line { font-size:12px; } .shared-songs .pm-compact-player .ym-pl-lrc-line.active { font-size:15px; } .shared-songs .pm-compact-player .pm-inline-volume { display:none!important; } .shared-songs .pm-song-actions .sw-tog { min-height:36px; padding:7px 10px; } .shared-songs .pm-video-button { min-width:104px; height:36px; padding:0 11px; font-size:13px; } .pm-lyrics-inline-lines { max-height:min(58dvh,420px); padding:22px 10px; } .pm-lyrics-inline-line { font-size:17px; padding:7px 6px; } .pm-lyrics-inline-line.active { font-size:20px; } }
 @media (prefers-reduced-motion:reduce) { html { scroll-behavior:auto; } .bible-reader-panel,.bible-reader-arrow,.pm-lyrics-inline,.pm-lyrics-inline-line { transition:none!important; } .pm-lyrics-inline-lines { scroll-behavior:auto; } }
 @keyframes pm-sheet-up { from { opacity:0; transform:translateY(38px); } to { opacity:1; transform:translateY(0); } }

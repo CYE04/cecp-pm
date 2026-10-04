@@ -7,6 +7,7 @@
   host.dataset.pmMounted = 'true';
 
   const baseUrl = host.dataset?.baseUrl || (script?.src ? new URL('./', script.src).href : 'https://cye04.github.io/cecp-pm/');
+  host.dataset.baseUrl = baseUrl;
 
   function detectTheme() {
     for (let node = host; node; node = node.parentElement) {
@@ -41,7 +42,7 @@
     const link = document.createElement('link');
     link.id = cssId;
     link.rel = 'stylesheet';
-    link.href = new URL('style.css?v=20261004-no-iframe', baseUrl).href;
+    link.href = new URL('style.css?v=20261004-seamless-v3', baseUrl).href;
     document.head.appendChild(link);
   }
 
@@ -59,11 +60,11 @@
 
   async function mount() {
     try {
-      if (!window.PMFeatures) await loadScript('features.js?v=20261004-no-iframe');
-      if (!window.PMRoster) await loadScript('roster.js?v=20261004-no-iframe');
-      if (!window.PMSongs) await loadScript('songs.js?v=20261004-no-iframe');
-      if (!window.PMBible) await loadScript('bible.js?v=20261004-no-iframe');
-      if (!window.PMEngine) await loadScript('app.js?v=20261004-no-iframe');
+      if (!window.PMFeatures) await loadScript('features.js?v=20261004-seamless-v3');
+      if (!window.PMRoster) await loadScript('roster.js?v=20261004-seamless-v3');
+      if (!window.PMSongs) await loadScript('songs.js?v=20261004-seamless-v3');
+      if (!window.PMBible) await loadScript('bible.js?v=20261004-open-bible');
+      if (!window.PMEngine) await loadScript('app.js?v=20261004-seamless-v3');
       if (!window.PMSongCatalog) {
         try { await loadScript('song-catalog.js'); } catch (_) {}
       }

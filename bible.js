@@ -73,9 +73,14 @@
     summaryText.append(el('span', 'bible-reader-label', '展开经文'), el('span', 'bible-reader-reference', passageReference(passage)));
     const scriptureIcon = el('span', 'bible-reader-icon');
     const scriptureBook = el('img', 'bible-reader-book');
-    scriptureBook.src = './assets/open-bible.png';
+    const rootEl = host?.closest?.('#cecp-pm, #app') || document.getElementById('cecp-pm') || document.getElementById('app');
+    const baseUrl = rootEl?.dataset?.baseUrl || window.PMEngine?.baseUrl || 'https://cye04.github.io/cecp-pm/';
+    scriptureBook.src = new URL('assets/open-bible.png', baseUrl).href;
     scriptureBook.alt = '';
     scriptureBook.setAttribute('aria-hidden', 'true');
+    scriptureBook.onerror = () => {
+      scriptureIcon.replaceChildren(yesicon('bible', 'yesicon bible-reader-svg-icon'));
+    };
     scriptureIcon.appendChild(scriptureBook);
     summary.append(scriptureIcon, summaryText, yesicon('chevron-down', 'yesicon bible-reader-arrow'));
     details.appendChild(summary);
