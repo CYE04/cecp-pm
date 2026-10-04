@@ -6,7 +6,7 @@
   if (!host || host.dataset.pmMounted) return;
   host.dataset.pmMounted = 'true';
 
-  const baseUrl = script?.src ? new URL('./', script.src).href : 'https://cye04.github.io/cecp-pm/';
+  const baseUrl = host.dataset?.baseUrl || (script?.src ? new URL('./', script.src).href : 'https://cye04.github.io/cecp-pm/');
 
   function detectTheme() {
     for (let node = host; node; node = node.parentElement) {
@@ -52,23 +52,25 @@
       const s = document.createElement('script');
       s.src = new URL(path, baseUrl).href;
       s.onload = resolve;
-      s.onerror = reject;
+      s.onerror = () => reject(new Error('无法加载模块: ' + path));
       document.head.appendChild(s);
     });
   }
 
   async function mount() {
     try {
-      if (!window.PMFeatures) await loadScript('features.js?v=20261003-inline-lyrics4');
-      if (!window.PMRoster) await loadScript('roster.js');
-      if (!window.PMSongCatalog) await loadScript('song-catalog.js');
-      if (!window.PMSongs) await loadScript('songs.js?v=20261004-zoom-direct2');
-      if (!window.PMBible) await loadScript('bible.js?v=20261003-inline-lyrics4');
+      if (!window.PMFeatures) await loadScript('features.js?v=20261004-no-iframe');
+      if (!window.PMRoster) await loadScript('roster.js?v=20261004-no-iframe');
+      if (!window.PMSongs) await loadScript('songs.js?v=20261004-no-iframe');
+      if (!window.PMBible) await loadScript('bible.js?v=20261004-no-iframe');
       if (!window.PMEngine) await loadScript('app.js?v=20261004-no-iframe');
+      if (!window.PMSongCatalog) {
+        try { await loadScript('song-catalog.js'); } catch (_) {}
+      }
 
       await window.PMEngine.render(host, { baseUrl });
     } catch (err) {
-      host.innerHTML = `<div style="text-align:center;padding:50px 20px;color:#ef4444;font-family:system-ui;"><div style="font-size:32px;margin-bottom:12px;">❌</div><div>无法加载聚会内容，请刷新重试。</div><div style="font-size:12px;color:var(--muted,#999);margin-top:8px;">${err.message || ''}</div></div>`;
+      host.innerHTML = `<div style="text-align:center;padding:50px 20px;color:#ef4444;font-family:system-ui;"><div style="font-size:32px;margin-bottom:12px;">❌</div><div>无法加载聚会内容，请刷新重试。</div><div style="font-size:12px;color:var(--muted,#999);margin-top:8px;">${err?.message || '网络连接失败，请检查网络后重试'}</div></div>`;
       console.error('[CECP-PM]', err);
     }
   }
