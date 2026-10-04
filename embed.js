@@ -1,11 +1,14 @@
 (function () {
   'use strict';
+
   const script = document.currentScript;
-  const host = document.getElementById('cecp-pm');
-  if (!script?.src || !host || host.dataset.pmMounted) return;
+  const host = document.getElementById('cecp-pm') || document.querySelector('[data-cecp-pm]');
+  if (!host || host.dataset.pmMounted) return;
   host.dataset.pmMounted = 'true';
 
-  function haloTheme() {
+  const baseUrl = script?.src ? new URL('./', script.src).href : 'https://cye04.github.io/cecp-pm/';
+
+  function detectTheme() {
     for (let node = host; node; node = node.parentElement) {
       const value = node.dataset?.resolvedTheme || node.dataset?.theme || node.dataset?.colorMode;
       if (value === 'dark' || value === 'light') return value;
@@ -21,110 +24,58 @@
     return window.matchMedia?.('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
   }
 
-  const url = new URL('./', script.src);
-  url.searchParams.set('embed', '1');
-  const version = new URL(script.src).searchParams.get('v');
-  if (version) url.searchParams.set('v', version);
-  const date = host.dataset.date;
-  if (/^\d{4}-\d{2}-\d{2}$/.test(date || '')) url.searchParams.set('date', date);
-  url.searchParams.set('theme', haloTheme());
-  const iframe = document.createElement('iframe');
-  iframe.title = '主日下午聚会程序';
-  iframe.src = url.href;
-  iframe.loading = 'lazy';
-  iframe.allow = 'clipboard-write';
-  iframe.style.cssText = 'display:block;width:100%;height:1100px;border:0;background:transparent';
-  host.replaceChildren(iframe);
+  function applyTheme() {
+    host.dataset.theme = detectTheme();
+  }
+  applyTheme();
 
-  let measuredHeight = 1100;
-  let viewerOpen = false;
-  let pageOverflow = null;
-
-  function setScoreViewer(open) {
-    open = Boolean(open);
-    if (open === viewerOpen) return;
-    viewerOpen = open;
-    if (open) {
-      pageOverflow = {
-        html: document.documentElement.style.overflow,
-        body: document.body?.style.overflow || ''
-      };
-      document.documentElement.style.overflow = 'hidden';
-      if (document.body) document.body.style.overflow = 'hidden';
-      host.dataset.pmScoreViewer = 'open';
-      iframe.style.position = 'fixed';
-      iframe.style.inset = '0';
-      iframe.style.width = '100vw';
-      iframe.style.maxWidth = 'none';
-      iframe.style.height = '100dvh';
-      iframe.style.margin = '0';
-      iframe.style.zIndex = '2147481000';
-      iframe.style.background = 'transparent';
-      syncViewport();
-      return;
-    }
-    delete host.dataset.pmScoreViewer;
-    iframe.style.cssText = `display:block;width:100%;height:${measuredHeight}px;border:0;background:transparent`;
-    if (pageOverflow) {
-      document.documentElement.style.overflow = pageOverflow.html;
-      if (document.body) document.body.style.overflow = pageOverflow.body;
-    }
-    pageOverflow = null;
-    scheduleViewport();
+  window.matchMedia?.('(prefers-color-scheme: dark)')?.addEventListener?.('change', applyTheme);
+  const themeObserver = new MutationObserver(applyTheme);
+  themeObserver.observe(document.documentElement, { attributes: true, attributeFilter: ['class', 'style', 'data-theme', 'data-color-mode'] });
+  if (document.body) {
+    themeObserver.observe(document.body, { attributes: true, attributeFilter: ['class', 'style', 'data-theme', 'data-color-mode'] });
   }
 
-  const syncTheme = () => iframe.contentWindow?.postMessage({ type:'cecp-pm-theme', theme:haloTheme() }, url.origin);
-  const syncViewport = () => {
-    const rect = iframe.getBoundingClientRect();
-    const visual = window.visualViewport;
-    const viewportTop = visual?.offsetTop || 0;
-    const viewportBottom = viewportTop + (visual?.height || window.innerHeight);
-    const visibleTop = Math.max(rect.top, viewportTop);
-    const visibleBottom = Math.min(rect.bottom, viewportBottom);
-    const height = Math.max(0, visibleBottom - visibleTop);
-    iframe.contentWindow?.postMessage({
-      type:'cecp-pm-viewport',
-      top:Math.max(0, visibleTop - rect.top),
-      height,
-      width:rect.width
-    }, url.origin);
-  };
-  const syncFrame = () => { syncTheme(); syncViewport(); };
-  let viewportFrame = 0;
-  const scheduleViewport = () => {
-    if (viewportFrame) return;
-    viewportFrame = requestAnimationFrame(() => { viewportFrame = 0; syncViewport(); });
-  };
-  iframe.addEventListener('load', syncFrame);
-  window.addEventListener('scroll', scheduleViewport, { passive:true });
-  window.addEventListener('resize', scheduleViewport, { passive:true });
-  window.visualViewport?.addEventListener?.('scroll', scheduleViewport, { passive:true });
-  window.visualViewport?.addEventListener?.('resize', scheduleViewport, { passive:true });
-  const observer = new MutationObserver(syncTheme);
-  for (let node = host; node; node = node.parentElement) {
-    observer.observe(node, { attributes:true, attributeFilter:['class','style','data-theme','data-color-mode','data-resolved-theme'] });
+  const cssId = 'cecp-pm-style';
+  if (!document.getElementById(cssId)) {
+    const link = document.createElement('link');
+    link.id = cssId;
+    link.rel = 'stylesheet';
+    link.href = new URL('style.css?v=20261004-no-iframe', baseUrl).href;
+    document.head.appendChild(link);
   }
-  const media = window.matchMedia?.('(prefers-color-scheme: dark)');
-  media?.addEventListener?.('change', syncTheme);
-  window.addEventListener('message', event => {
-    if (event.source !== iframe.contentWindow || event.origin !== url.origin) return;
-    if (event.data?.type === 'cecp-pm-score-zoom') {
-      setScoreViewer(event.data.open);
-      return;
+
+  host.innerHTML = '<div style="text-align:center;padding:60px 20px;color:var(--muted,#888);font-family:system-ui;"><div style="font-size:32px;margin-bottom:12px;">⏳</div><div>正在加载聚会内容…</div></div>';
+
+  function loadScript(path) {
+    return new Promise((resolve, reject) => {
+      const s = document.createElement('script');
+      s.src = new URL(path, baseUrl).href;
+      s.onload = resolve;
+      s.onerror = reject;
+      document.head.appendChild(s);
+    });
+  }
+
+  async function mount() {
+    try {
+      if (!window.PMFeatures) await loadScript('features.js?v=20261003-inline-lyrics4');
+      if (!window.PMRoster) await loadScript('roster.js');
+      if (!window.PMSongCatalog) await loadScript('song-catalog.js');
+      if (!window.PMSongs) await loadScript('songs.js?v=20261004-zoom-direct2');
+      if (!window.PMBible) await loadScript('bible.js?v=20261003-inline-lyrics4');
+      if (!window.PMEngine) await loadScript('app.js?v=20261004-no-iframe');
+
+      await window.PMEngine.render(host, { baseUrl });
+    } catch (err) {
+      host.innerHTML = `<div style="text-align:center;padding:50px 20px;color:#ef4444;font-family:system-ui;"><div style="font-size:32px;margin-bottom:12px;">❌</div><div>无法加载聚会内容，请刷新重试。</div><div style="font-size:12px;color:var(--muted,#999);margin-top:8px;">${err.message || ''}</div></div>`;
+      console.error('[CECP-PM]', err);
     }
-    if (event.data?.type === 'cecp-pm-scroll') {
-      const rect = iframe.getBoundingClientRect();
-      const targetTop = window.scrollY + rect.top + Number(event.data.top || 0);
-      const offset = Number(event.data.offset || 24);
-      window.scrollTo({ top: Math.max(0, targetTop - offset), behavior: 'smooth' });
-      return;
-    }
-    if (event.data?.type !== 'cecp-pm-height') return;
-    const height = Number(event.data.height);
-    if (Number.isFinite(height) && height >= 200 && height <= 20000) {
-      measuredHeight = height;
-      if (!viewerOpen) iframe.style.height = height + 'px';
-      scheduleViewport();
-    }
-  });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', mount);
+  } else {
+    mount();
+  }
 })();

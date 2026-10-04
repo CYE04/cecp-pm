@@ -1,7 +1,7 @@
 (function () {
   'use strict';
 
-  const root = document.getElementById('app');
+  let root = document.getElementById('cecp-pm') || document.getElementById('app');
   const el = (tag, className, content) => {
     const node = document.createElement(tag);
     if (className) node.className = className;
@@ -46,7 +46,7 @@
     const dateLabel = /^\d{4}-\d{2}-\d{2}$/.test(date)
       ? new Intl.DateTimeFormat('zh-CN', { year: 'numeric', month: 'long', day: 'numeric', timeZone: 'UTC' }).format(new Date(date + 'T12:00:00Z'))
       : date;
-    document.title = `${dateLabel}｜主日下午聚会`;
+    if (root?.id === 'app') document.title = `${dateLabel}｜主日下午聚会`;
     root.replaceChildren();
 
     const page = el('main', 'page');
@@ -263,24 +263,58 @@
     return window.PMFeatures.json(path);
   }
 
-  async function start() {
+  async function start(targetRoot, options = {}) {
+    if (targetRoot) root = targetRoot;
+    if (!root) root = document.getElementById('cecp-pm') || document.getElementById('app');
+    if (!root) return;
+
+    const ds = root.dataset;
+    ds.api = ds.api || options.api || 'https://script.google.com/macros/s/AKfycbzGQA4R7AFyCOnWX6E74WpnZkF1z_im2DD3sX_bmTCzhW9FVu_Wl77AmPT6GaWfP2nX/exec';
+    ds.songBase = ds.songBase || options.songBase || 'https://cye04.github.io/Cecp/';
+    ds.songEngine = ds.songEngine || options.songEngine || 'https://cye04.github.io/Cecp/youth-engine.js?v=20261004-halo-score2';
+    ds.songEngineLocal = ds.songEngineLocal || options.songEngineLocal || '../youth-engine.js?v=20261004-youth-viewer';
+    ds.mediaBase = ds.mediaBase || options.mediaBase || 'https://cecp.it/';
+    ds.bibleApi = ds.bibleApi || options.bibleApi || 'https://bible.cecp.workers.dev/';
+
+    const baseUrl = options.baseUrl || './';
+
     try {
-      let date = new URLSearchParams(location.search).get('date');
-      if (!date) date = location.protocol === 'file:' ? window.PMWeeklyData?.latest?.date : (await loadJson('./weekly/latest.json')).date;
+      let date = options.date || ds.date || new URLSearchParams(location.search).get('date');
+      if (!date) {
+        if (location.protocol === 'file:' && window.PMWeeklyData?.latest?.date) {
+          date = window.PMWeeklyData.latest.date;
+        } else {
+          const latestData = await loadJson(new URL('weekly/latest.json', baseUrl).href);
+          date = latestData.date;
+        }
+      }
       if (!/^\d{4}-\d{2}-\d{2}$/.test(date || '')) throw new Error('日期格式不正确，请使用例如 2026-09-20 的日期');
-      const data = location.protocol === 'file:'
-        ? (window.PMPreviewData || window.PMWeeklyData?.weeks?.[date])
-        : await loadJson(root.dataset.content || './weekly/' + date + '.json');
+      let data = null;
+      if (location.protocol === 'file:' && (window.PMPreviewData || window.PMWeeklyData?.weeks?.[date])) {
+        data = window.PMPreviewData || window.PMWeeklyData.weeks[date];
+      } else {
+        const weeklyUrl = ds.content ? new URL(ds.content, baseUrl).href : new URL('weekly/' + date + '.json', baseUrl).href;
+        data = await loadJson(weeklyUrl);
+      }
       if (!data) throw new Error('找不到这一周的聚会内容');
       if (data.date !== date) throw new Error('内容日期与文件名不一致');
       render(data);
     } catch (error) {
       const message = '聚会内容暂时无法打开，请检查日期或稍后重试。';
       const box = el('div', 'error', message);
-      box.appendChild(window.PMFeatures.button('重新加载', start));
+      box.appendChild(window.PMFeatures.button('重新加载', () => start(root, options)));
       root.replaceChildren(box);
     }
   }
 
-  start();
+  window.PMEngine = {
+    render: (targetRoot, options) => start(targetRoot, options),
+    start
+  };
+
+  // 独立页面（含 #app）自动启动；嵌入模式由 embed.js 或外部调用 PMEngine.render
+  if (document.getElementById('app') && !document.getElementById('cecp-pm')) {
+    document.body?.classList.add('pm-standalone');
+    start(document.getElementById('app'));
+  }
 })();
