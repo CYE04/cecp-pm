@@ -34,6 +34,43 @@
   iframe.style.cssText = 'display:block;width:100%;height:1100px;border:0;background:transparent';
   host.replaceChildren(iframe);
 
+  let measuredHeight = 1100;
+  let viewerOpen = false;
+  let pageOverflow = null;
+
+  function setScoreViewer(open) {
+    open = Boolean(open);
+    if (open === viewerOpen) return;
+    viewerOpen = open;
+    if (open) {
+      pageOverflow = {
+        html: document.documentElement.style.overflow,
+        body: document.body?.style.overflow || ''
+      };
+      document.documentElement.style.overflow = 'hidden';
+      if (document.body) document.body.style.overflow = 'hidden';
+      host.dataset.pmScoreViewer = 'open';
+      iframe.style.position = 'fixed';
+      iframe.style.inset = '0';
+      iframe.style.width = '100vw';
+      iframe.style.maxWidth = 'none';
+      iframe.style.height = '100dvh';
+      iframe.style.margin = '0';
+      iframe.style.zIndex = '2147481000';
+      iframe.style.background = 'transparent';
+      syncViewport();
+      return;
+    }
+    delete host.dataset.pmScoreViewer;
+    iframe.style.cssText = `display:block;width:100%;height:${measuredHeight}px;border:0;background:transparent`;
+    if (pageOverflow) {
+      document.documentElement.style.overflow = pageOverflow.html;
+      if (document.body) document.body.style.overflow = pageOverflow.body;
+    }
+    pageOverflow = null;
+    scheduleViewport();
+  }
+
   const syncTheme = () => iframe.contentWindow?.postMessage({ type:'cecp-pm-theme', theme:haloTheme() }, url.origin);
   const syncViewport = () => {
     const rect = iframe.getBoundingClientRect();
@@ -68,10 +105,16 @@
   const media = window.matchMedia?.('(prefers-color-scheme: dark)');
   media?.addEventListener?.('change', syncTheme);
   window.addEventListener('message', event => {
-    if (event.source !== iframe.contentWindow || event.origin !== url.origin || event.data?.type !== 'cecp-pm-height') return;
+    if (event.source !== iframe.contentWindow || event.origin !== url.origin) return;
+    if (event.data?.type === 'cecp-pm-score-zoom') {
+      setScoreViewer(event.data.open);
+      return;
+    }
+    if (event.data?.type !== 'cecp-pm-height') return;
     const height = Number(event.data.height);
     if (Number.isFinite(height) && height >= 200 && height <= 20000) {
-      iframe.style.height = height + 'px';
+      measuredHeight = height;
+      if (!viewerOpen) iframe.style.height = height + 'px';
       scheduleViewport();
     }
   });
