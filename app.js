@@ -161,9 +161,9 @@
           if (!sermon.speaker) speaker.dataset.rosterSpeaker = 'true';
           card.appendChild(speaker);
           if (Array.isArray(sermon.outline) && sermon.outline.length) {
-            const points = el('ul', 'outline');
-            sermon.outline.forEach(point => points.appendChild(el('li', '', point)));
-            card.appendChild(points);
+            const outline = el('div', 'outline');
+            outline.textContent = sermon.outline.map(point => String(point || '').trim()).filter(Boolean).join('\n');
+            card.appendChild(outline);
           }
           box.appendChild(card);
           window.PMBible.mount(box, sermon, root.dataset.bibleApi);
