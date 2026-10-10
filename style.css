@@ -719,7 +719,13 @@ summary.bible-reader-toggle {
     gap: 2px;
     padding: 12px 14px;
   }
-  .schedule-people, .live-label { grid-column: 1; }
+  .schedule-people {
+    grid-column: 1;
+    justify-self: end;
+    max-width: 100%;
+    text-align: right;
+  }
+  .live-label { grid-column: 1; }
   .schedule-time { font-size: 15.5px; }
   .schedule-title { font-size: 18px; }
   .reading-card, .sermon-card { padding: 18px 16px; }
