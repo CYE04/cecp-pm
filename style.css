@@ -720,10 +720,10 @@ summary.bible-reader-toggle {
     padding: 12px 14px;
   }
   .schedule-people {
-    grid-column: 1;
-    justify-self: end;
+    grid-column: 2;
+    justify-self: start;
     max-width: 100%;
-    text-align: right;
+    text-align: left;
   }
   .live-label { grid-column: 1; }
   .schedule-time { font-size: 15.5px; }
