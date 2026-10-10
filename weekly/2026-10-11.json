@@ -40,8 +40,14 @@
     }
   ],
   "reading": "sp 40",
-  "songs": [],
-  "offeringSongs": [],
+  "songs": [
+    { "title": "yehehuashenyizhangquan" },
+    { "title": "shijiadeai" },
+    { "title": "younitongxing" }
+  ],
+  "offeringSongs": [
+    
+  ],
   "sermon": {
     "ref": "glxs 1 3 8",
     "title": "健康教会的模范 I",
