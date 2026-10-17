@@ -186,11 +186,9 @@
 
     {
       const box = section('announcements', '通知');
-      const announcements = window.PMFeatures.announcementTexts(data.announcements);
-      announcements.forEach(copy => {
-        const card = el('div', 'notice');
-        card.appendChild(el('p', '', copy));
-        box.appendChild(card);
+      const announcements = window.PMFeatures.announcementCards(data.announcements);
+      announcements.forEach(item => {
+        box.appendChild(window.PMFeatures.announcementCard(item));
       });
       if (!announcements.length) box.appendChild(emptyState('本周暂无通知。'));
       page.appendChild(box);

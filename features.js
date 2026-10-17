@@ -154,6 +154,28 @@
       return String(item.detail || item.title || '').trim();
     }).filter(Boolean);
   }
+  function announcementCards(value) {
+    if (!Array.isArray(value)) return [];
+    return value.map(item => {
+      const object = item && typeof item === 'object' ? item : {};
+      const title = typeof object.title === 'string' ? object.title.trim() : '';
+      const detail = typeof item === 'string' ? item.trim() : String(object.detail || '').trim();
+      const url = safeUrl(object.url, 'https://cecp.it/');
+      return { title, detail, url, linkText: String(object.linkText || '查看详情').trim() || '查看详情' };
+    }).filter(item => item.title || item.detail);
+  }
+  function announcementCard(item) {
+    const card = el(item.url ? 'a' : 'div', item.url ? 'notice notice-link' : 'notice');
+    if (item.url) {
+      card.href = item.url;
+      card.target = '_blank';
+      card.rel = 'noopener noreferrer';
+    }
+    if (item.title) card.appendChild(el('h3', '', item.title));
+    if (item.detail) card.appendChild(el('p', '', item.detail));
+    if (item.url) card.appendChild(el('span', 'notice-action', item.linkText + ' ↗'));
+    return card;
+  }
   function videoEmbed(value) {
     const safe = safeUrl(value, 'https://cecp.it');
     if (!safe) return '';
@@ -194,5 +216,5 @@
     const interval = setInterval(update, 30000);
     window.addEventListener('pagehide', () => clearInterval(interval), { once: true });
   }
-  return { el, button, yesicon, copyText, copyOrSelect, showManualCopy, safeUrl, json, retry, filledSongs, announcementTexts, videoEmbed, activeSchedule, mountSchedule };
+  return { el, button, yesicon, copyText, copyOrSelect, showManualCopy, safeUrl, json, retry, filledSongs, announcementTexts, announcementCards, announcementCard, videoEmbed, activeSchedule, mountSchedule };
 });
