@@ -282,7 +282,7 @@
         try {
           const isLocal = location.protocol === 'file:' || location.hostname === '127.0.0.1' || location.hostname === 'localhost';
           const localSong = isLocal ? window.PMPreviewSongs?.[id] : null;
-          const data = localSong || await json(new URL('songs/' + id + '.json', config.songBase).href);
+          const data = localSong || await json(new URL(id + '.json', config.songBase).href);
           const extra = typeof entry === 'object' ? { ...entry } : {};
           if (source === 'title-id') delete extra.title;
           return normalizeSong({ ...data, ...extra }, mediaBase);

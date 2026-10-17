@@ -62,9 +62,9 @@
     try {
       if (!window.PMFeatures) await loadScript('features.js?v=20261004-v6-align');
       if (!window.PMRoster) await loadScript('roster.js?v=20261004-v6-align');
-      if (!window.PMSongs) await loadScript('songs.js?v=20261004-v6-align');
+      if (!window.PMSongs) await loadScript('songs.js?v=20261017-songs-repo');
       if (!window.PMBible) await loadScript('bible.js?v=20261004-v6-align');
-      if (!window.PMEngine) await loadScript('app.js?v=20261007-outline-lines');
+      if (!window.PMEngine) await loadScript('app.js?v=20261017-songs-repo');
       if (!window.PMSongCatalog) {
         try { await loadScript('song-catalog.js'); } catch (_) {}
       }
