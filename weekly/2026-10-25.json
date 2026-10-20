@@ -1,0 +1,67 @@
+{
+  "date": "2026-10-25",
+  "title": "主日下午聚会",
+  "time": "14:00–17:00",
+  "venue": "帕多瓦教会",
+  "timeZone": "Europe/Rome",
+  "schedule": [
+    {
+      "start": "14:00",
+      "end": "14:50",
+      "title": "祷告会",
+      "section": "prayer",
+      "roles": ["prayerLeader"]
+    },
+    {
+      "start": "15:00",
+      "end": "15:40",
+      "title": "诗歌敬拜、记念祷告",
+      "section": "worship",
+      "roles": ["worship", "praisePrayer", "memorialPrayer"]
+    },
+    {
+      "start": "15:40",
+      "end": "16:00",
+      "title": "读经、献诗",
+      "section": "reading",
+      "roles": ["reading"]
+    },
+    {
+      "start": "16:00",
+      "end": "17:00",
+      "title": "证道",
+      "section": "sermon",
+      "roles": ["note"]
+    },
+    {
+      "start": "17:00",
+      "title": "祝福祷告散会",
+      "section": "dismissal"
+    }
+  ],
+  "reading": "sp 42",
+  "songs": [
+    { "title": "" },
+    { "title": "" },
+    { "title": "" },
+    { "title": "" }
+  ],
+  "offeringSongs": [
+    ""
+  ],
+  "sermon": {
+    "ref": "",
+    "title": "",
+     "outline": []
+  },
+  "announcements": [
+  {
+    "title": "感恩节菜品认领",
+    "detail": "今年的感恩节菜单已经开始认领。弟兄姐妹可以在接待厅表格上填写，也可以点击卡片，在网页上填写认领。欢迎大家踊跃参与！",
+    "linkText": "点击认领菜品",
+    "url": "https://thanksgiving.cecp.it/"
+  },
+  "2、马来西亚浸信会神学院欧洲区基督教辅导证书课程开始报名：\n授课讲师：王丽静牧师\n授课方式：线上授课\n课程时间：明年一月开始，每月4次，每月一单元，共10单元、40个课程\n课程费用：每单元60欧元\n请愿意参加的弟兄姐妹向恬恬姐妹报名。"
+],
+  "replayUrl": ""
+}
