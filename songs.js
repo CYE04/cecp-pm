@@ -27,14 +27,6 @@
     if (/^[a-zA-Z0-9_-]+$/.test(entry.title)) return { id: entry.title, source: 'title-id' };
     return { id: '', source: '' };
   }
-  function hasLyrics(lines) {
-    return Array.from(lines || []).some(line => String(line.textContent || '').trim());
-  }
-  function centerLyric(container, line, behavior = 'smooth') {
-    if (!container || !line || typeof container.scrollTo !== 'function') return;
-    const top = Math.max(0, line.offsetTop - (container.clientHeight - line.offsetHeight) / 2);
-    container.scrollTo({ top, behavior });
-  }
   function loadEngine(url) {
     if (window.YouthEngine?.renderSongObjects) return Promise.resolve();
     if (!enginePromise) {
@@ -135,74 +127,6 @@
     return card;
   }
 
-  function setLyricsPanelState(panel, trigger, open) {
-    panel.dataset.open = String(open);
-    panel.classList.toggle('is-open', open);
-    panel.inert = !open;
-    panel.setAttribute('aria-hidden', String(!open));
-    trigger.textContent = open ? '收起歌词' : '查看歌词';
-    trigger.setAttribute('aria-expanded', String(open));
-    trigger.setAttribute('aria-label', open ? '收起完整歌词' : '展开完整歌词');
-    if (!open) panel._lyricsObserver?.disconnect();
-  }
-
-  function ensureLyricsPanel(player, trigger) {
-    const songPanel = player.closest('.ym-song-panel');
-    let panel = songPanel?.querySelector('.pm-lyrics-inline');
-    if (panel) return panel;
-    panel = el('section', 'pm-lyrics-inline');
-    const frame = el('div', 'pm-lyrics-inline-frame');
-    const header = el('header', 'pm-lyrics-inline-header');
-    const title = el('h3', 'pm-lyrics-inline-title', '完整歌词');
-    const close = window.PMFeatures.button('收起', () => setLyricsPanelState(panel, trigger, false));
-    close.classList.add('pm-lyrics-inline-close');
-    header.append(title, close);
-    const lines = el('div', 'pm-lyrics-inline-lines');
-    frame.append(header, lines);
-    panel.appendChild(frame);
-    setLyricsPanelState(panel, trigger, false);
-    const anchor = trigger.closest('.sw-hd') || player;
-    anchor.insertAdjacentElement('afterend', panel);
-    return panel;
-  }
-
-  function openLyricsReader(player, trigger) {
-    const source = player?.querySelector('.ym-pl-lrc-inner');
-    const sourceLines = source?.querySelectorAll('.ym-pl-lrc-line');
-    if (!hasLyrics(sourceLines)) return;
-    const panel = ensureLyricsPanel(player, trigger);
-    if (panel.dataset.open === 'true') {
-      setLyricsPanelState(panel, trigger, false);
-      return;
-    }
-    const title = panel.querySelector('.pm-lyrics-inline-title');
-    const target = panel.querySelector('.pm-lyrics-inline-lines');
-    title.textContent = player.querySelector('.ym-pl-title')?.textContent || '完整歌词';
-    let activeIndex = -1;
-    const sync = (rebuild, shouldScroll = true) => {
-      const lines = Array.from(source.querySelectorAll('.ym-pl-lrc-line'));
-      if (rebuild || target.children.length !== lines.length) {
-        target.replaceChildren(...lines.map((line, index) => {
-          const copy = el('p', 'pm-lyrics-inline-line', line.textContent);
-          copy.dataset.index = index;
-          return copy;
-        }));
-      }
-      const next = lines.findIndex(line => line.classList.contains('active'));
-      Array.from(target.children).forEach((line, index) => line.classList.toggle('active', index === next));
-      if (next >= 0 && next !== activeIndex) {
-        activeIndex = next;
-        if (shouldScroll) centerLyric(target, target.children[next]);
-      }
-    };
-    sync(true, false);
-    panel._lyricsObserver?.disconnect();
-    panel._lyricsObserver = new MutationObserver(records => sync(records.some(record => record.type === 'childList')));
-    panel._lyricsObserver.observe(source, { childList:true, subtree:true, attributes:true, attributeFilter:['class'] });
-    setLyricsPanelState(panel, trigger, true);
-    if (activeIndex >= 0) centerLyric(target, target.children[activeIndex], 'auto');
-  }
-
   function enhancePlayer(scoreHost) {
     scoreHost.querySelectorAll('.ym-pl').forEach(player => {
       if (player.dataset.pmEnhanced) return;
@@ -219,26 +143,6 @@
           controls.appendChild(volume);
         }
       }
-      const lyrics = player.querySelector('.ym-pl-lrc-panel');
-      if (!lyrics) return;
-      const actions = player.closest('.ym-song-panel')?.querySelector('.pm-song-actions');
-      const activate = () => {
-        const available = hasLyrics(lyrics.querySelectorAll('.ym-pl-lrc-line'));
-        let openButton = actions?.querySelector('.pm-lyrics-button');
-        if (available && actions && !openButton) {
-          openButton = window.PMFeatures.button('查看歌词', () => openLyricsReader(player, openButton));
-          openButton.classList.add('sw-tog', 'pm-lyrics-button');
-          openButton.setAttribute('aria-expanded', 'false');
-          openButton.setAttribute('aria-label', '展开完整歌词');
-          const transpose = actions.querySelector('.pm-transpose-button');
-          transpose ? transpose.after(openButton) : actions.prepend(openButton);
-        } else if (!available) {
-          player.closest('.ym-song-panel')?.querySelector('.pm-lyrics-inline')?.remove();
-          openButton?.remove();
-        }
-      };
-      activate();
-      new MutationObserver(activate).observe(lyrics, { childList:true, subtree:true });
     });
   }
 
@@ -385,5 +289,5 @@
       });
     }
   }
-  window.PMSongs = { mount, matchCatalog, songLookup, engineSource, hasLyrics, centerLyric, setLyricsPanelState, enhanceSongCopy, enhancePlayer, openLyricsReader };
+  window.PMSongs = { mount, matchCatalog, songLookup, engineSource, enhanceSongCopy, enhancePlayer };
 })();

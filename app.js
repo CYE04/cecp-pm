@@ -56,7 +56,7 @@
       el('p', 'eyebrow', data.venue || '主日相聚'),
       el('h1', '', data.title || '主日下午聚会'),
       el('p', 'hero-date', dateLabel),
-      el('p', 'hero-meta', [data.time, data.venue].filter(Boolean).join('　·　'))
+      el('p', 'hero-meta', data.time || '')
     );
     if (data.sermon?.title) hero.appendChild(el('p', 'hero-topic', data.sermon.title));
     page.appendChild(hero);
