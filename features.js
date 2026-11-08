@@ -161,19 +161,47 @@
       const title = typeof object.title === 'string' ? object.title.trim() : '';
       const detail = typeof item === 'string' ? item.trim() : String(object.detail || '').trim();
       const url = safeUrl(object.url, 'https://cecp.it/');
-      return { title, detail, url, linkText: String(object.linkText || '查看详情').trim() || '查看详情' };
-    }).filter(item => item.title || item.detail);
+      const schedules = (Array.isArray(object.schedules) ? object.schedules : []).map(group => {
+        const items = (Array.isArray(group?.items) ? group.items : []).map(row => {
+          if (!row || typeof row !== 'object') return null;
+          const text = key => typeof row[key] === 'string' ? row[key].trim() : '';
+          const time = text('time') || [text('start'), text('end')].filter(Boolean).join('–');
+          return { time, title: text('title') };
+        }).filter(row => row && row.title);
+        const title = typeof group?.title === 'string' ? group.title.trim() : '';
+        return { title: title || '时间安排', items };
+      }).filter(group => group.items.length);
+      return { title, detail, url, schedules, linkText: String(object.linkText || '查看详情').trim() || '查看详情' };
+    }).filter(item => item.title || item.detail || item.schedules.length);
   }
   function announcementCard(item) {
-    const card = el(item.url ? 'a' : 'div', item.url ? 'notice notice-link' : 'notice');
-    if (item.url) {
-      card.href = item.url;
-      card.target = '_blank';
-      card.rel = 'noopener noreferrer';
-    }
+    const linkedCard = item.url && !item.schedules?.length;
+    const card = el(linkedCard ? 'a' : 'div', linkedCard ? 'notice notice-link' : 'notice');
     if (item.title) card.appendChild(el('h3', '', item.title));
     if (item.detail) card.appendChild(el('p', '', item.detail));
-    if (item.url) card.appendChild(el('span', 'notice-action', item.linkText + ' ↗'));
+    (item.schedules || []).forEach(group => {
+      const table = el('table', 'notice-timetable');
+      table.appendChild(el('caption', '', group.title));
+      const body = el('tbody');
+      group.items.forEach(item => {
+        const row = el('tr');
+        const time = el('th', 'notice-timetable-time', item.time || '待定');
+        time.scope = 'row';
+        row.appendChild(time);
+        row.appendChild(el('td', '', item.title));
+        body.appendChild(row);
+      });
+      table.appendChild(body);
+      card.appendChild(table);
+    });
+    if (item.url) {
+      const action = el(linkedCard ? 'span' : 'a', 'notice-action', item.linkText + ' ↗');
+      const link = linkedCard ? card : action;
+      link.href = item.url;
+      link.target = '_blank';
+      link.rel = 'noopener noreferrer';
+      card.appendChild(action);
+    }
     return card;
   }
   function videoEmbed(value) {

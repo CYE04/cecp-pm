@@ -755,4 +755,53 @@ summary.bible-reader-toggle {
   color: #fff;
   font-size: 15px;
   font-weight: 600;
+  text-decoration: none;
+}
+
+/* Each notice can contain separate afternoon/evening timetables. */
+#announcements .notice { min-width: 0; overflow-wrap: anywhere; }
+#announcements .notice-timetable {
+  display: table;
+  width: 100%;
+  table-layout: fixed;
+  border-collapse: collapse;
+  margin: 20px 0 0;
+  color: var(--ink);
+  font-size: 16px;
+  line-height: 1.6;
+  background: transparent;
+}
+#announcements .notice-timetable caption {
+  caption-side: top;
+  text-align: left;
+  padding: 0 0 9px;
+  color: var(--ink);
+  font-size: 17px;
+  font-weight: 650;
+}
+#announcements .notice-timetable th,
+#announcements .notice-timetable td {
+  padding: 11px 12px;
+  border: 0;
+  border-bottom: 1px solid rgba(163, 111, 69, 0.22);
+  text-align: left;
+  vertical-align: top;
+  background: transparent;
+  white-space: pre-line;
+}
+#announcements .notice-timetable .notice-timetable-time {
+  width: 40%;
+  padding-left: 0;
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+}
+#announcements .notice-timetable td { padding-right: 0; }
+#announcements .notice-timetable tr:last-child > * { border-bottom: 0; }
+#announcements a.notice-action:focus-visible { outline: 3px solid #a36f45; outline-offset: 4px; }
+@media (max-width: 480px) {
+  #announcements .notice { padding: 16px; }
+  #announcements .notice-timetable { font-size: 14px; }
+  #announcements .notice-timetable th,
+  #announcements .notice-timetable td { padding-top: 10px; padding-bottom: 10px; }
+  #announcements .notice-timetable .notice-timetable-time { width: 46%; padding-right: 8px; }
 }

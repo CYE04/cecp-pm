@@ -42,7 +42,7 @@
     const link = document.createElement('link');
     link.id = cssId;
     link.rel = 'stylesheet';
-    link.href = new URL('style.css?v=20261022-no-lyrics-toggle', baseUrl).href;
+    link.href = new URL('style.css?v=20261108-notice-timetables', baseUrl).href;
     document.head.appendChild(link);
   }
 
@@ -60,7 +60,7 @@
 
   async function mount() {
     try {
-      if (!window.PMFeatures) await loadScript('features.js?v=20261004-v6-align');
+      if (!window.PMFeatures) await loadScript('features.js?v=20261108-notice-timetables');
       if (!window.PMRoster) await loadScript('roster.js?v=20261004-v6-align');
       if (!window.PMSongs) await loadScript('songs.js?v=20261022-no-lyrics-toggle');
       if (!window.PMBible) await loadScript('bible.js?v=20261004-v6-align');
