@@ -42,7 +42,7 @@
     const link = document.createElement('link');
     link.id = cssId;
     link.rel = 'stylesheet';
-    link.href = new URL('style.css?v=20261108-theme-notices-v2', baseUrl).href;
+    link.href = new URL('style.css?v=20261108-multicolor-aligned-v5', baseUrl).href;
     document.head.appendChild(link);
   }
 

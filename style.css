@@ -745,8 +745,26 @@ summary.bible-reader-toggle {
   --notice-surface: var(--surface, var(--raised));
   --notice-soft: var(--surface-2, var(--raised));
   --notice-line: var(--cecp-line, var(--line));
-  --notice-accent: var(--cecp-gold, var(--ink));
+  --notice-accent: var(--accent-strong, #8f6425);
+  --notice-day: #446553;
+  --notice-evening: #506780;
+  --notice-row-green: #38604d;
+  --notice-row-amber: #805329;
+  --notice-row-blue: #405c7d;
+  --notice-row-purple: #69507e;
+  --notice-row-rose: #834f5d;
   color: var(--notice-ink);
+}
+#cecp-pm[data-theme="dark"] #announcements,
+html[data-resolved-theme="dark"] #app #announcements {
+  --notice-accent: var(--accent-strong, #d4a85c);
+  --notice-day: #a2c5b2;
+  --notice-evening: #afbfda;
+  --notice-row-green: #a2c5b2;
+  --notice-row-amber: #d9b48f;
+  --notice-row-blue: #aabfdc;
+  --notice-row-purple: #c2b0d9;
+  --notice-row-rose: #d7aab9;
 }
 :is(#cecp-pm, #app) #announcements > h2 {
   color: var(--notice-ink);
@@ -768,6 +786,10 @@ summary.bible-reader-toggle {
   border: 1px solid var(--notice-line);
   border-radius: var(--radius-card, 18px);
   background: var(--notice-surface);
+  background: linear-gradient(135deg,
+    color-mix(in srgb, var(--notice-accent) 10%, var(--notice-surface)),
+    color-mix(in srgb, var(--notice-evening) 8%, var(--notice-surface)) 55%,
+    color-mix(in srgb, var(--notice-day) 8%, var(--notice-surface)));
   color: var(--notice-ink);
   font: inherit;
   text-decoration: none;
@@ -792,6 +814,7 @@ summary.bible-reader-toggle {
   line-height: 1.85;
 }
 :is(#cecp-pm, #app) #announcements .notice-timetable {
+  --timetable-accent: var(--notice-day);
   display: block;
   width: 100%;
   margin: 24px 0 0;
@@ -801,38 +824,82 @@ summary.bible-reader-toggle {
   color: inherit;
   box-shadow: none;
 }
+:is(#cecp-pm, #app) #announcements .notice-timetable:nth-of-type(even) {
+  --timetable-accent: var(--notice-evening);
+}
 :is(#cecp-pm, #app) #announcements .notice-timetable-heading {
-  margin: 0 0 6px;
-  padding: 0 0 10px;
+  display: flex;
+  align-items: center;
+  gap: 25px;
+  margin: 0 0 14px;
+  padding: 12px;
   border: 0;
-  border-bottom: 1px solid var(--notice-line);
-  color: var(--notice-ink);
+  border-radius: 11px;
+  background: color-mix(in srgb, var(--timetable-accent) 11%, transparent);
+  color: var(--timetable-accent);
   font-family: inherit;
   font-size: 15px;
   font-weight: 600;
   line-height: 1.6;
   letter-spacing: 0;
 }
+:is(#cecp-pm, #app) #announcements .notice-timetable-heading::before {
+  content: "";
+  width: 8px;
+  height: 8px;
+  flex: 0 0 auto;
+  border-radius: 999px;
+  background: var(--timetable-accent);
+  opacity: .75;
+}
 :is(#cecp-pm, #app) #announcements .notice-timetable-items {
-  display: block;
+  position: relative;
+  display: grid;
+  gap: 8px;
   margin: 0;
-  padding: 0;
+  padding: 0 0 0 32px;
   border: 0;
   background: transparent;
+}
+:is(#cecp-pm, #app) #announcements .notice-timetable-items::before {
+  content: "";
+  position: absolute;
+  left: 15.5px;
+  top: 27px;
+  bottom: 27px;
+  width: 1px;
+  background: color-mix(in srgb, var(--timetable-accent) 28%, transparent);
+  pointer-events: none;
 }
 :is(#cecp-pm, #app) #announcements .notice-timetable-row {
+  --row-accent: var(--notice-row-green);
+  position: relative;
   display: grid;
-  grid-template-columns: minmax(108px, 132px) minmax(0, 1fr);
-  align-items: baseline;
-  gap: 16px;
+  grid-template-columns: 118px minmax(0, 1fr);
+  align-items: center;
+  gap: 14px;
+  min-height: 54px;
   margin: 0;
-  padding: 11px 0;
-  border: 0;
-  border-bottom: 1px solid var(--notice-line);
-  background: transparent;
+  padding: 10px 12px;
+  border: 1px solid color-mix(in srgb, var(--row-accent) 16%, transparent);
+  border-radius: 11px;
+  background: color-mix(in srgb, var(--row-accent) 9%, var(--notice-surface));
 }
-:is(#cecp-pm, #app) #announcements .notice-timetable-row:last-child {
-  border-bottom: 0;
+:is(#cecp-pm, #app) #announcements .notice-timetable-row:nth-child(5n + 2) { --row-accent: var(--notice-row-amber); }
+:is(#cecp-pm, #app) #announcements .notice-timetable-row:nth-child(5n + 3) { --row-accent: var(--notice-row-blue); }
+:is(#cecp-pm, #app) #announcements .notice-timetable-row:nth-child(5n + 4) { --row-accent: var(--notice-row-purple); }
+:is(#cecp-pm, #app) #announcements .notice-timetable-row:nth-child(5n + 5) { --row-accent: var(--notice-row-rose); }
+:is(#cecp-pm, #app) #announcements .notice-timetable-row::before {
+  content: "";
+  position: absolute;
+  left: -21px;
+  top: calc(50% - 4px);
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--row-accent);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--row-accent) 10%, transparent);
+  pointer-events: none;
 }
 :is(#cecp-pm, #app) #announcements .notice-timetable-time,
 :is(#cecp-pm, #app) #announcements .notice-timetable-content {
@@ -848,8 +915,17 @@ summary.bible-reader-toggle {
   white-space: pre-line;
 }
 :is(#cecp-pm, #app) #announcements .notice-timetable-time {
-  color: var(--notice-muted);
-  font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 32px;
+  padding: 6px 8px;
+  border-radius: 7px;
+  background: color-mix(in srgb, var(--row-accent) 14%, transparent);
+  color: var(--row-accent);
+  font-size: 13px;
+  font-weight: 500;
+  text-align: center;
   font-variant-numeric: tabular-nums;
 }
 :is(#cecp-pm, #app) #announcements .notice-timetable-content {
@@ -866,7 +942,9 @@ summary.bible-reader-toggle {
   border: 1px solid var(--notice-line);
   border-radius: var(--radius-pill, 999px);
   background: var(--notice-soft);
-  color: var(--notice-ink);
+  background: color-mix(in srgb, var(--notice-accent) 9%, var(--notice-surface));
+  border-color: color-mix(in srgb, var(--notice-accent) 28%, transparent);
+  color: var(--notice-accent);
   font-family: inherit;
   font-size: 14px;
   font-weight: 500;
@@ -877,6 +955,10 @@ summary.bible-reader-toggle {
 :is(#cecp-pm, #app) #announcements .notice-link:hover {
   border-color: var(--notice-accent);
 }
+:is(#cecp-pm, #app) #announcements a.notice-action:hover,
+:is(#cecp-pm, #app) #announcements .notice-link:hover .notice-action {
+  background: color-mix(in srgb, var(--notice-accent) 14%, var(--notice-surface));
+}
 :is(#cecp-pm, #app) #announcements a:focus-visible {
   outline: 2px solid var(--notice-accent);
   outline-offset: 4px;
@@ -884,15 +966,17 @@ summary.bible-reader-toggle {
 @media (max-width: 480px) {
   :is(#cecp-pm, #app) #announcements .notice { padding: 18px 16px; }
   :is(#cecp-pm, #app) #announcements .notice h3 { font-size: 18px; }
+  :is(#cecp-pm, #app) #announcements .notice-timetable-heading { gap: 23px; }
   :is(#cecp-pm, #app) #announcements .notice-timetable-row {
-    grid-template-columns: 108px minmax(0, 1fr);
-    gap: 12px;
+    grid-template-columns: 100px minmax(0, 1fr);
+    gap: 10px;
+    padding: 10px;
   }
-  :is(#cecp-pm, #app) #announcements .notice-timetable-time { font-size: 13px; }
+  :is(#cecp-pm, #app) #announcements .notice-timetable-time { font-size: 12px; padding: 6px; }
 }
 @media (max-width: 340px) {
   :is(#cecp-pm, #app) #announcements .notice-timetable-row {
-    grid-template-columns: 96px minmax(0, 1fr);
+    grid-template-columns: 90px minmax(0, 1fr);
     gap: 8px;
   }
 }
