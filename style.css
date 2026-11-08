@@ -1,4 +1,4 @@
-:root { color-scheme: light; --ink:#252d35; --muted:#56616b; --line:rgba(20,30,55,.10); --paper:transparent; --white:#fff; --raised:rgba(20,30,55,.03); --accent:#315f86; --accent-soft:rgba(49,95,134,.09); }
+#app, #cecp-pm { color-scheme: light; --ink:#252d35; --muted:#56616b; --line:rgba(20,30,55,.10); --paper:transparent; --white:#fff; --raised:rgba(20,30,55,.03); --accent:#315f86; --accent-soft:rgba(49,95,134,.09); }
 * { box-sizing:border-box; }
 html { scroll-behavior:smooth; }
 body.pm-standalone { margin:0; background:#121418; color:var(--ink); font-family:-apple-system,BlinkMacSystemFont,"Noto Sans SC","PingFang SC","Microsoft YaHei",sans-serif; line-height:1.65; }
@@ -124,7 +124,7 @@ h1,h2,h3,p { overflow-wrap:anywhere; }
 
 /* 与青年页共用的编辑式排版和明暗配色。 */
 /* ── 与青年页共用的优雅排版和明暗配色（天然混入 Halo 主题，不带突兀色块） ── */
-:root {
+#app, #cecp-pm {
   color-scheme: light;
   --ink: #252d35;
   --muted: #56616b;
@@ -137,7 +137,7 @@ h1,h2,h3,p { overflow-wrap:anywhere; }
   --rule: rgba(20, 30, 55, .10);
 }
 @media (prefers-color-scheme: dark) {
-  :root {
+  #app, #cecp-pm {
     color-scheme: dark;
     --ink: #eceef3;
     --muted: #a6aebd;
@@ -150,7 +150,7 @@ h1,h2,h3,p { overflow-wrap:anywhere; }
     --rule: rgba(255, 255, 255, .09);
   }
 }
-html[data-resolved-theme="dark"], #cecp-pm[data-theme="dark"], html[data-theme="dark"] #cecp-pm, html.dark #cecp-pm {
+html[data-resolved-theme="dark"] #app, html[data-resolved-theme="dark"] #cecp-pm, #cecp-pm[data-theme="dark"], html[data-theme="dark"] #cecp-pm, html.dark #cecp-pm {
   color-scheme: dark;
   --ink: #eceef3;
   --muted: #a6aebd;
@@ -196,7 +196,7 @@ html[data-resolved-theme="dark"], #cecp-pm[data-theme="dark"], html[data-theme="
   --ym-brand2: #5b93da;
   --ym-on-brand: #0a1220;
 }
-html[data-resolved-theme="light"], #cecp-pm[data-theme="light"], html[data-theme="light"] #cecp-pm, html.light #cecp-pm {
+html[data-resolved-theme="light"] #app, html[data-resolved-theme="light"] #cecp-pm, #cecp-pm[data-theme="light"], html[data-theme="light"] #cecp-pm, html.light #cecp-pm {
   color-scheme: light;
   --ink: #252d35;
   --muted: #56616b;
@@ -733,75 +733,166 @@ summary.bible-reader-toggle {
 .bible-form select { padding-right:32px; background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23888' stroke-width='1.6' fill='none' stroke-linecap='round'/%3E%3C/svg%3E"); background-repeat:no-repeat; background-position:right 10px center; }
 .bible-form .control-button { height:46px; padding:0 20px; border-radius:10px; font-size:15px; font-weight:600; }
 
-/* Linked notices keep one native link for touch and keyboard access. */
-#announcements .notice-link {
-  display: block;
-  color: var(--ink);
-  text-decoration: none;
-  border-radius: 16px;
-  border: 1px solid rgba(163, 111, 69, 0.3);
-  background: rgba(163, 111, 69, 0.07);
-  overflow-wrap: anywhere;
+/* Notices share the host theme's tokens. Avoid native tables: Halo's Markdown
+   table stripes apply to tr elements even when table/td backgrounds are reset. */
+#cecp-pm, #app {
+  font-family: var(--font-sans, -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif);
 }
-#announcements .notice-link:hover { background: rgba(163, 111, 69, 0.14); }
-#announcements .notice-link:focus-visible { outline: 3px solid #a36f45; outline-offset: 4px; }
-#announcements .notice-link h3 { margin: 0 0 8px; color: var(--ink); }
-#announcements .notice-action {
-  display: inline-block;
-  margin-top: 16px;
-  padding: 8px 14px;
-  border-radius: 9px;
-  background: #20523e;
-  color: #fff;
+#cecp-pm #announcements,
+#app #announcements {
+  --notice-ink: var(--text, var(--ink));
+  --notice-muted: var(--text-2, var(--muted));
+  --notice-surface: var(--surface, var(--raised));
+  --notice-soft: var(--surface-2, var(--raised));
+  --notice-line: var(--cecp-line, var(--line));
+  --notice-accent: var(--cecp-gold, var(--ink));
+  color: var(--notice-ink);
+}
+:is(#cecp-pm, #app) #announcements > h2 {
+  color: var(--notice-ink);
+  font-family: inherit;
+  font-size: 23px;
+  font-weight: 600;
+  letter-spacing: 0;
+}
+:is(#cecp-pm, #app) #announcements > h2::before {
+  background: var(--notice-accent);
+  width: 3px;
+  height: 18px;
+}
+:is(#cecp-pm, #app) #announcements .notice {
+  display: block;
+  min-width: 0;
+  margin: 16px 0 0;
+  padding: 24px;
+  border: 1px solid var(--notice-line);
+  border-radius: var(--radius-card, 18px);
+  background: var(--notice-surface);
+  color: var(--notice-ink);
+  font: inherit;
+  text-decoration: none;
+  overflow-wrap: anywhere;
+  box-shadow: none;
+}
+:is(#cecp-pm, #app) #announcements .notice h3 {
+  margin: 0 0 10px;
+  padding: 0;
+  border: 0;
+  color: var(--notice-ink);
+  font-family: inherit;
+  font-size: 19px;
+  font-weight: 600;
+  line-height: 1.5;
+  letter-spacing: 0;
+}
+:is(#cecp-pm, #app) #announcements .notice p {
+  margin: 0;
+  color: var(--notice-muted);
+  font-size: 15px;
+  line-height: 1.85;
+}
+:is(#cecp-pm, #app) #announcements .notice-timetable {
+  display: block;
+  width: 100%;
+  margin: 24px 0 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  box-shadow: none;
+}
+:is(#cecp-pm, #app) #announcements .notice-timetable-heading {
+  margin: 0 0 6px;
+  padding: 0 0 10px;
+  border: 0;
+  border-bottom: 1px solid var(--notice-line);
+  color: var(--notice-ink);
+  font-family: inherit;
   font-size: 15px;
   font-weight: 600;
-  text-decoration: none;
-}
-
-/* Each notice can contain separate afternoon/evening timetables. */
-#announcements .notice { min-width: 0; overflow-wrap: anywhere; }
-#announcements .notice-timetable {
-  display: table;
-  width: 100%;
-  table-layout: fixed;
-  border-collapse: collapse;
-  margin: 20px 0 0;
-  color: var(--ink);
-  font-size: 16px;
   line-height: 1.6;
-  background: transparent;
+  letter-spacing: 0;
 }
-#announcements .notice-timetable caption {
-  caption-side: top;
-  text-align: left;
-  padding: 0 0 9px;
-  color: var(--ink);
-  font-size: 17px;
-  font-weight: 650;
-}
-#announcements .notice-timetable th,
-#announcements .notice-timetable td {
-  padding: 11px 12px;
+:is(#cecp-pm, #app) #announcements .notice-timetable-items {
+  display: block;
+  margin: 0;
+  padding: 0;
   border: 0;
-  border-bottom: 1px solid rgba(163, 111, 69, 0.22);
-  text-align: left;
-  vertical-align: top;
   background: transparent;
+}
+:is(#cecp-pm, #app) #announcements .notice-timetable-row {
+  display: grid;
+  grid-template-columns: minmax(108px, 132px) minmax(0, 1fr);
+  align-items: baseline;
+  gap: 16px;
+  margin: 0;
+  padding: 11px 0;
+  border: 0;
+  border-bottom: 1px solid var(--notice-line);
+  background: transparent;
+}
+:is(#cecp-pm, #app) #announcements .notice-timetable-row:last-child {
+  border-bottom: 0;
+}
+:is(#cecp-pm, #app) #announcements .notice-timetable-time,
+:is(#cecp-pm, #app) #announcements .notice-timetable-content {
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  font-family: inherit;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 1.65;
   white-space: pre-line;
 }
-#announcements .notice-timetable .notice-timetable-time {
-  width: 40%;
-  padding-left: 0;
+:is(#cecp-pm, #app) #announcements .notice-timetable-time {
+  color: var(--notice-muted);
+  font-size: 14px;
   font-variant-numeric: tabular-nums;
-  font-weight: 600;
 }
-#announcements .notice-timetable td { padding-right: 0; }
-#announcements .notice-timetable tr:last-child > * { border-bottom: 0; }
-#announcements a.notice-action:focus-visible { outline: 3px solid #a36f45; outline-offset: 4px; }
+:is(#cecp-pm, #app) #announcements .notice-timetable-content {
+  color: var(--notice-ink);
+  font-size: 15px;
+}
+:is(#cecp-pm, #app) #announcements .notice-action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  margin: 20px 0 0;
+  padding: 9px 18px;
+  border: 1px solid var(--notice-line);
+  border-radius: var(--radius-pill, 999px);
+  background: var(--notice-soft);
+  color: var(--notice-ink);
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.5;
+  text-decoration: none;
+}
+:is(#cecp-pm, #app) #announcements a.notice-action:hover,
+:is(#cecp-pm, #app) #announcements .notice-link:hover {
+  border-color: var(--notice-accent);
+}
+:is(#cecp-pm, #app) #announcements a:focus-visible {
+  outline: 2px solid var(--notice-accent);
+  outline-offset: 4px;
+}
 @media (max-width: 480px) {
-  #announcements .notice { padding: 16px; }
-  #announcements .notice-timetable { font-size: 14px; }
-  #announcements .notice-timetable th,
-  #announcements .notice-timetable td { padding-top: 10px; padding-bottom: 10px; }
-  #announcements .notice-timetable .notice-timetable-time { width: 46%; padding-right: 8px; }
+  :is(#cecp-pm, #app) #announcements .notice { padding: 18px 16px; }
+  :is(#cecp-pm, #app) #announcements .notice h3 { font-size: 18px; }
+  :is(#cecp-pm, #app) #announcements .notice-timetable-row {
+    grid-template-columns: 108px minmax(0, 1fr);
+    gap: 12px;
+  }
+  :is(#cecp-pm, #app) #announcements .notice-timetable-time { font-size: 13px; }
+}
+@media (max-width: 340px) {
+  :is(#cecp-pm, #app) #announcements .notice-timetable-row {
+    grid-template-columns: 96px minmax(0, 1fr);
+    gap: 8px;
+  }
 }

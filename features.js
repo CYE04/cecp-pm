@@ -180,15 +180,14 @@
     if (item.title) card.appendChild(el('h3', '', item.title));
     if (item.detail) card.appendChild(el('p', '', item.detail));
     (item.schedules || []).forEach(group => {
-      const table = el('table', 'notice-timetable');
-      table.appendChild(el('caption', '', group.title));
-      const body = el('tbody');
+      const table = el('section', 'notice-timetable');
+      table.appendChild(el('h4', 'notice-timetable-heading', group.title));
+      const body = el('dl', 'notice-timetable-items');
       group.items.forEach(item => {
-        const row = el('tr');
-        const time = el('th', 'notice-timetable-time', item.time || '待定');
-        time.scope = 'row';
+        const row = el('div', 'notice-timetable-row');
+        const time = el('dt', 'notice-timetable-time', item.time || '待定');
         row.appendChild(time);
-        row.appendChild(el('td', '', item.title));
+        row.appendChild(el('dd', 'notice-timetable-content', item.title));
         body.appendChild(row);
       });
       table.appendChild(body);
