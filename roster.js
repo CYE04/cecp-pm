@@ -156,7 +156,7 @@
         curMonth = `${parseInt(mFull[1], 10)}年${parseInt(mFull[2], 10)}月`;
         curType = '';
       } else {
-        const mShort = c1.match(/^(\d{1,2})\s*月\s*主日大堂调音/);
+        const mShort = c0.match(/(?:^|\D)(\d{1,2})\s*月(?:\s|$|主日)/) || c1.match(/^(\d{1,2})\s*月\s*主日大堂调音/);
         if (mShort) {
           curMonth = `${defaultYear}年${parseInt(mShort[1], 10)}月`;
           curType = '';
@@ -276,9 +276,9 @@
       rows.forEach(r => {
         const k = `${text(r.month)}|${text(r.week)}|${text(r.type)}`;
         const sm = soundMap[k];
-        r.sound = (sm && sm.sound) ? sm.sound : '';
-        r.ppt = (sm && sm.ppt) ? sm.ppt : '';
-        r.broadcast = (sm && sm.broadcast) ? sm.broadcast : '';
+        r.sound = text(r.sound) || (sm && sm.sound) || '';
+        r.ppt = text(r.ppt) || (sm && sm.ppt) || '';
+        r.broadcast = text(r.broadcast) || (sm && sm.broadcast) || '';
       });
     }
 
