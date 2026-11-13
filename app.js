@@ -498,7 +498,8 @@
     if (!root) return;
 
     const ds = root.dataset;
-    ds.api = ds.api || options.api || 'https://script.google.com/macros/s/AKfycbzGQA4R7AFyCOnWX6E74WpnZkF1z_im2DD3sX_bmTCzhW9FVu_Wl77AmPT6GaWfP2nX/exec';
+    ds.api = (ds.api || options.api || 'https://script.google.com/macros/s/AKfycbxJaY7RxxThCIGMeuxnlPW7diAJs0M34b5lK8Qn_CzxbIbCZY3AeuYKJadPF8gsLpvK/exec')
+      .replace('AKfycbzGQA4R7AFyCOnWX6E74WpnZkF1z_im2DD3sX_bmTCzhW9FVu_Wl77AmPT6GaWfP2nX', 'AKfycbxJaY7RxxThCIGMeuxnlPW7diAJs0M34b5lK8Qn_CzxbIbCZY3AeuYKJadPF8gsLpvK');
     ds.songBase = ds.songBase || options.songBase || 'https://cye04.github.io/songs/';
     ds.songEngine = ds.songEngine || options.songEngine || 'https://cye04.github.io/Cecp/youth-engine.js?v=20261004-halo-score2';
     ds.songEngineLocal = ds.songEngineLocal || options.songEngineLocal || '../youth-engine.js?v=20261004-youth-viewer';
