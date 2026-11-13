@@ -25,10 +25,10 @@
   ];
   const SHEET_ID = '1o0FkHnVtvKCZwjIhzPEHSEW-3oZeNsJnh68Qs3GU0TQ';
   const MAIN_SHEET_URL =
-    'https://docs.google.com/spreadsheets/d/' + SHEET_ID + '/gviz/tq?tqx=out:json&headers=0&sheet=' +
+    'https://docs.google.com/spreadsheets/d/' + SHEET_ID + '/gviz/tq?tqx=out:csv&sheet=' +
     encodeURIComponent('服事安排');
   const SOUND_SHEET_URL =
-    'https://docs.google.com/spreadsheets/d/' + SHEET_ID + '/gviz/tq?tqx=out:json&headers=0&sheet=' +
+    'https://docs.google.com/spreadsheets/d/' + SHEET_ID + '/gviz/tq?tqx=out:csv&sheet=' +
     encodeURIComponent('🎛 调音组安排');
   const OLD_API_ID = 'AKfycbzGQA4R7AFyCOnWX6E74WpnZkF1z_im2DD3sX_bmTCzhW9FVu_Wl77AmPT6GaWfP2nX';
   const NEW_API_ID = 'AKfycbxJaY7RxxThCIGMeuxnlPW7diAJs0M34b5lK8Qn_CzxbIbCZY3AeuYKJadPF8gsLpvK';
@@ -47,9 +47,64 @@
     };
   }
 
+  function parseCsvRows(raw) {
+    const rows = [];
+    if (!raw || raw.trim().startsWith('<')) return rows;
+    let curRow = [];
+    let curCell = '';
+    let inQuotes = false;
+    for (let i = 0; i < raw.length; i++) {
+      const ch = raw[i];
+      if (inQuotes) {
+        if (ch === '"') {
+          if (raw[i + 1] === '"') {
+            curCell += '"';
+            i++;
+          } else {
+            inQuotes = false;
+          }
+        } else {
+          curCell += ch;
+        }
+      } else if (ch === '"') {
+        inQuotes = true;
+      } else if (ch === ',') {
+        curRow.push(text(curCell));
+        curCell = '';
+      } else if (ch === '\n' || ch === '\r') {
+        if (ch === '\r' && raw[i + 1] === '\n') i++;
+        curRow.push(text(curCell));
+        rows.push(curRow);
+        curRow = [];
+        curCell = '';
+      } else {
+        curCell += ch;
+      }
+    }
+    if (curCell.length > 0 || curRow.length > 0) {
+      curRow.push(text(curCell));
+      rows.push(curRow);
+    }
+    return rows;
+  }
+
+  function extractCellRows(rawText) {
+    if (!rawText) return [];
+    if (rawText.indexOf('"status":"ok"') >= 0 && rawText.indexOf('{') >= 0) {
+      try {
+        const json = JSON.parse(rawText.slice(rawText.indexOf('{'), rawText.lastIndexOf('}') + 1));
+        const tRows = json?.table?.rows || [];
+        return tRows.map(r => (r && Array.isArray(r.c) ? r.c : []).map(c => c ? text(c.f != null ? c.f : c.v) : ''));
+      } catch (_) {
+        return [];
+      }
+    }
+    return parseCsvRows(rawText);
+  }
+
   function normalizeGvizMonth(raw) {
     const s = text(raw);
-    const m = s.match(/^(\d{4})\s*年\s*(\d{1,2})\s*月$/);
+    const m = s.match(/(\d{4})\s*[年\/\-]\s*(\d{1,2})/);
     if (m) return `${parseInt(m[1], 10)}年${parseInt(m[2], 10)}月`;
     const md = s.match(/^Date\((\d{4}),\s*(\d{1,2}),/);
     if (md) return `${parseInt(md[1], 10)}年${parseInt(md[2], 10) + 1}月`;
@@ -58,26 +113,13 @@
 
   function parseGvizMainSchedule(rawText) {
     const result = [];
-    if (!rawText || rawText.indexOf('"status":"ok"') < 0) return result;
-    const start = rawText.indexOf('{');
-    const end = rawText.lastIndexOf('}');
-    if (start < 0 || end <= start) return result;
-    let json;
-    try {
-      json = JSON.parse(rawText.slice(start, end + 1));
-    } catch (_) {
-      return result;
-    }
-    const tableRows = json && json.table && Array.isArray(json.table.rows) ? json.table.rows : [];
+    const tableRows = extractCellRows(rawText);
+    if (!tableRows.length) return result;
     let blankStreak = 0;
     let hasStarted = false;
 
     for (let i = 0; i < tableRows.length; i++) {
-      const r = tableRows[i];
-      const cells = (r && Array.isArray(r.c) ? r.c : []).map(c => {
-        if (!c) return '';
-        return text(c.f != null ? c.f : c.v);
-      });
+      const cells = tableRows[i];
       const month = normalizeGvizMonth(cells[0]);
       const week = text(cells[1]);
       const type = text(cells[2]);
@@ -128,39 +170,35 @@
 
   function parseGvizSoundTable(rawText, defaultYear = 2026) {
     const map = {};
-    if (!rawText || rawText.indexOf('"status":"ok"') < 0) return map;
-    const start = rawText.indexOf('{');
-    const end = rawText.lastIndexOf('}');
-    if (start < 0 || end <= start) return map;
-    let json;
-    try {
-      json = JSON.parse(rawText.slice(start, end + 1));
-    } catch (_) {
-      return map;
-    }
-    const tableRows = json && json.table && Array.isArray(json.table.rows) ? json.table.rows : [];
+    const tableRows = extractCellRows(rawText);
+    if (!tableRows.length) return map;
     let curMonth = '';
+    let bannerMonth = '';
     let curType = '';
 
-    tableRows.forEach(r => {
-      const cells = (r && Array.isArray(r.c) ? r.c : []).map(c => {
-        if (!c) return '';
-        return text(c.f != null ? c.f : c.v);
-      });
-      const c0 = cells[0] || '';
-      const c1 = cells[1] || '';
-      const c2 = cells[2] || '';
+    tableRows.forEach(cells => {
+      const c0 = text(cells[0]);
+      const c1 = text(cells[1]);
+      const c2 = text(cells[2]);
 
-      const mFull = c0.match(/(\d{4})\s*年\s*(\d{1,2})\s*月/) || c1.match(/(\d{4})\s*年\s*(\d{1,2})\s*月/);
-      if (mFull) {
-        curMonth = `${parseInt(mFull[1], 10)}年${parseInt(mFull[2], 10)}月`;
-        curType = '';
-      } else {
+      const isBannerRow = (c1 === '聚会时段' || c2 === '服事岗位' || c0.indexOf('📅') >= 0);
+      let parsedM = normalizeGvizMonth(c0) || normalizeGvizMonth(c1);
+      if (!parsedM) {
         const mShort = c0.match(/(?:^|\D)(\d{1,2})\s*月(?:\s|$|主日)/) || c1.match(/^(\d{1,2})\s*月\s*主日大堂调音/);
-        if (mShort) {
-          curMonth = `${defaultYear}年${parseInt(mShort[1], 10)}月`;
-          curType = '';
-        }
+        if (mShort) parsedM = `${defaultYear}年${parseInt(mShort[1], 10)}月`;
+      }
+
+      if (isBannerRow) {
+        if (parsedM) bannerMonth = parsedM;
+        curMonth = '';
+        curType = '';
+        return;
+      }
+
+      if (parsedM) {
+        curMonth = parsedM;
+      } else if (!curMonth && bannerMonth) {
+        curMonth = bannerMonth;
       }
 
       if (c1.indexOf('主日学') >= 0) {
@@ -251,8 +289,7 @@
     ]);
 
     let rows = parseGvizMainSchedule(mainRaw);
-    const hasSoundSheet = Boolean(soundRaw && soundRaw.indexOf('"status":"ok"') >= 0);
-    const soundMap = hasSoundSheet ? parseGvizSoundTable(soundRaw) : null;
+    const soundMap = soundRaw ? parseGvizSoundTable(soundRaw) : null;
 
     if (!rows.length) {
       url.searchParams.set('action', 'all');
