@@ -42,7 +42,7 @@
     const link = document.createElement('link');
     link.id = cssId;
     link.rel = 'stylesheet';
-    link.href = new URL('style.css?v=20261108-multicolor-aligned-v5', baseUrl).href;
+    link.href = new URL('style.css?v=20261114-pm-roster-sound-v1', baseUrl).href;
     document.head.appendChild(link);
   }
 
@@ -61,10 +61,10 @@
   async function mount() {
     try {
       if (!window.PMFeatures) await loadScript('features.js?v=20261108-theme-notices-v2');
-      if (!window.PMRoster) await loadScript('roster.js?v=20261004-v6-align');
+      if (!window.PMRoster) await loadScript('roster.js?v=20261114-pm-roster-sound-v1');
       if (!window.PMSongs) await loadScript('songs.js?v=20261022-no-lyrics-toggle');
       if (!window.PMBible) await loadScript('bible.js?v=20261004-v6-align');
-      if (!window.PMEngine) await loadScript('app.js?v=20261022-venue-once');
+      if (!window.PMEngine) await loadScript('app.js?v=20261114-pm-roster-sound-v1');
       if (!window.PMSongCatalog) {
         try { await loadScript('song-catalog.js'); } catch (_) {}
       }

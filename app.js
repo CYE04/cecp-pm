@@ -228,6 +228,237 @@
     }
   }
 
+  const ROSTER_GROUPS = [
+    { id: 'lead', title: '领会与祷告', keys: ['leader', 'worship', 'prayerLeader', 'praisePrayer', 'memorialPrayer'] },
+    { id: 'worship', title: '敬拜与司琴乐队', keys: ['piano', 'drums', 'guitar', 'bass'] },
+    { id: 'word', title: '读经与证道', keys: ['reading', 'note'] },
+    { id: 'media', title: '音控 · 投影 · 转播', keys: ['sound', 'ppt', 'broadcast'] }
+  ];
+  const PERSON_PALETTES = [
+    { bg: '#e8f5ee', fg: '#1e6f43', bd: '#bbe3cd', dBg: 'rgba(46, 160, 95, 0.20)', dFg: '#7ee2a8', dBd: 'rgba(84, 198, 132, 0.36)' },
+    { bg: '#e8f2fa', fg: '#1c5d99', bd: '#b8d8f2', dBg: 'rgba(56, 139, 219, 0.20)', dFg: '#85c6ff', dBd: 'rgba(96, 170, 240, 0.36)' },
+    { bg: '#f3ecfa', fg: '#5e358c', bd: '#d8c2f0', dBg: 'rgba(148, 102, 214, 0.22)', dFg: '#c8a6ff', dBd: 'rgba(172, 130, 235, 0.36)' },
+    { bg: '#fdf0ed', fg: '#9a3422', bd: '#f3c6bd', dBg: 'rgba(219, 98, 76, 0.20)', dFg: '#ffaba0', dBd: 'rgba(235, 125, 108, 0.36)' },
+    { bg: '#fbf3e4', fg: '#855312', bd: '#edd4a7', dBg: 'rgba(212, 148, 52, 0.20)', dFg: '#f5c97b', dBd: 'rgba(230, 172, 85, 0.36)' },
+    { bg: '#e6f5f6', fg: '#19676d', bd: '#b2e0e3', dBg: 'rgba(42, 162, 171, 0.20)', dFg: '#7de2e8', dBd: 'rgba(79, 193, 201, 0.36)' },
+    { bg: '#f9edf3', fg: '#8f2d59', bd: '#ecc1d4', dBg: 'rgba(209, 86, 141, 0.20)', dFg: '#f79ec6', dBd: 'rgba(227, 118, 166, 0.36)' },
+    { bg: '#eef0fa', fg: '#394393', bd: '#c4caed', dBg: 'rgba(99, 113, 219, 0.20)', dFg: '#a8b3ff', dBd: 'rgba(130, 143, 235, 0.36)' }
+  ];
+  const PM_HIDDEN_ROLES_KEY = 'cecp_pm_hidden_roles_v1';
+
+  function readHiddenRosterRoles() {
+    try {
+      const raw = localStorage.getItem(PM_HIDDEN_ROLES_KEY);
+      const parsed = raw ? JSON.parse(raw) : [];
+      return Array.isArray(parsed) ? parsed : [];
+    } catch (_) {
+      return [];
+    }
+  }
+
+  function writeHiddenRosterRoles(list) {
+    try {
+      localStorage.setItem(PM_HIDDEN_ROLES_KEY, JSON.stringify(list));
+    } catch (_) {}
+  }
+
+  function personPalette(name) {
+    const clean = String(name || '').replace(/\s+/g, '');
+    let hash = 0;
+    for (let i = 0; i < clean.length; i++) {
+      hash = ((hash << 5) - hash) + clean.charCodeAt(i);
+      hash |= 0;
+    }
+    return PERSON_PALETTES[Math.abs(hash) % PERSON_PALETTES.length];
+  }
+
+  function splitDutyTokens(duty) {
+    const raw = String(duty.value || '').trim();
+    if (!raw) return { prefixChip: '', names: [] };
+    if (duty.key === 'reading') {
+      const m = raw.match(/^(\S+)\s+(.+)$/);
+      if (m) {
+        return {
+          prefixChip: m[1],
+          names: m[2].split(/[\/、,，]+/).map(s => s.trim()).filter(Boolean)
+        };
+      }
+    }
+    return {
+      prefixChip: '',
+      names: raw.split(/[\/、,，]+/).map(s => s.trim()).filter(Boolean)
+    };
+  }
+
+  function renderRosterBoard(body, roster) {
+    body.replaceChildren();
+    let activePerson = '';
+
+    const updatePersonHighlight = person => {
+      activePerson = activePerson === person ? '' : person;
+      body.classList.toggle('has-person-highlight', Boolean(activePerson));
+      body.querySelectorAll('.roster-person-badge').forEach(btn => {
+        const matched = Boolean(activePerson) && btn.dataset.person === activePerson;
+        btn.classList.toggle('is-active', matched);
+        btn.setAttribute('aria-pressed', matched ? 'true' : 'false');
+      });
+      body.querySelectorAll('.roster-duty').forEach(row => {
+        const people = (row.dataset.people || '').split('|').filter(Boolean);
+        row.classList.toggle('is-highlighted', Boolean(activePerson) && people.includes(activePerson));
+      });
+    };
+
+    const hiddenKeys = readHiddenRosterRoles();
+    const visibleDuties = roster.duties.filter(d => !hiddenKeys.includes(d.key));
+
+    // Top bar
+    const topBar = el('div', 'roster-bar');
+    const metaWrap = el('div', 'roster-meta');
+    append(
+      metaWrap,
+      el('p', 'roster-caption', roster.label + ' · 主日下午'),
+      el('span', 'roster-subhint', '点击姓名可高亮同工全部服事')
+    );
+
+    const actionsWrap = el('div', 'roster-actions');
+    const filterDetails = el('details', 'roster-filter');
+    const filterSummary = el('summary', 'roster-filter-btn');
+    filterSummary.textContent = hiddenKeys.length ? `👁 岗位筛选 (已隐藏 ${hiddenKeys.length})` : '👁 岗位筛选';
+    const filterMenu = el('div', 'roster-filter-menu');
+    const filterHead = el('div', 'roster-filter-head');
+    filterHead.appendChild(el('span', '', '勾选要显示的服事岗位'));
+    const resetBtn = el('button', 'roster-filter-reset', '全部显示');
+    resetBtn.type = 'button';
+    resetBtn.disabled = !hiddenKeys.length;
+    resetBtn.addEventListener('click', () => {
+      writeHiddenRosterRoles([]);
+      renderRosterBoard(body, roster);
+    });
+    filterHead.appendChild(resetBtn);
+    filterMenu.appendChild(filterHead);
+
+    const filterList = el('div', 'roster-filter-list');
+    roster.duties.forEach(duty => {
+      const itemLabel = el('label', 'roster-filter-item');
+      const checkbox = el('input', '');
+      checkbox.type = 'checkbox';
+      checkbox.checked = !hiddenKeys.includes(duty.key);
+      checkbox.addEventListener('change', () => {
+        const next = readHiddenRosterRoles().filter(k => k !== duty.key);
+        if (!checkbox.checked) next.push(duty.key);
+        writeHiddenRosterRoles(next);
+        renderRosterBoard(body, roster);
+      });
+      append(itemLabel, checkbox, el('span', '', duty.label));
+      filterList.appendChild(itemLabel);
+    });
+    filterMenu.appendChild(filterList);
+    append(filterDetails, filterSummary, filterMenu);
+    actionsWrap.appendChild(filterDetails);
+    append(topBar, metaWrap, actionsWrap);
+    body.appendChild(topBar);
+
+    // Hidden roles restore bar
+    const hiddenDuties = roster.duties.filter(d => hiddenKeys.includes(d.key));
+    if (hiddenDuties.length) {
+      const hiddenBar = el('div', 'roster-hidden-bar');
+      hiddenBar.appendChild(el('span', 'roster-hidden-label', '已隐藏岗位（点击恢复）：'));
+      hiddenDuties.forEach(duty => {
+        const chip = el('button', 'roster-hidden-chip', '👁 ' + duty.label);
+        chip.type = 'button';
+        chip.addEventListener('click', () => {
+          writeHiddenRosterRoles(readHiddenRosterRoles().filter(k => k !== duty.key));
+          renderRosterBoard(body, roster);
+        });
+        hiddenBar.appendChild(chip);
+      });
+      const showAll = el('button', 'roster-hidden-reset', '恢复全部');
+      showAll.type = 'button';
+      showAll.addEventListener('click', () => {
+        writeHiddenRosterRoles([]);
+        renderRosterBoard(body, roster);
+      });
+      hiddenBar.appendChild(showAll);
+      body.appendChild(hiddenBar);
+    }
+
+    if (!visibleDuties.length) {
+      body.appendChild(el('p', 'roster-status', '所有岗位均已隐藏，请点击上方按钮恢复显示。'));
+      return;
+    }
+
+    const board = el('div', 'roster-board');
+    const groupedKeys = new Set();
+
+    ROSTER_GROUPS.forEach(group => {
+      const groupDuties = visibleDuties.filter(d => d.group === group.id || group.keys.includes(d.key));
+      if (!groupDuties.length) return;
+      groupDuties.forEach(d => groupedKeys.add(d.key));
+
+      const groupBox = el('div', 'roster-group');
+      groupBox.dataset.group = group.id;
+      const groupHd = el('div', 'roster-group-hd');
+      append(
+        groupHd,
+        el('span', 'roster-group-title', group.title),
+        el('span', 'roster-group-count', `${groupDuties.length} 项`)
+      );
+      groupBox.appendChild(groupHd);
+
+      const list = el('dl', 'roster-grid');
+      groupDuties.forEach(duty => {
+        const row = el('div', 'roster-duty');
+        row.dataset.roleKey = duty.key;
+        const dt = el('dt', '');
+        const labelSpan = el('span', 'roster-duty-label', duty.label);
+        const hideBtn = el('button', 'roster-duty-hide', '👁');
+        hideBtn.type = 'button';
+        hideBtn.title = `隐藏「${duty.label}」`;
+        hideBtn.setAttribute('aria-label', `隐藏${duty.label}`);
+        hideBtn.addEventListener('click', event => {
+          event.stopPropagation();
+          const next = readHiddenRosterRoles();
+          if (!next.includes(duty.key)) next.push(duty.key);
+          writeHiddenRosterRoles(next);
+          renderRosterBoard(body, roster);
+        });
+        append(dt, labelSpan, hideBtn);
+
+        const dd = el('dd', '');
+        const { prefixChip, names } = splitDutyTokens(duty);
+        const normalizedPeople = [];
+        if (prefixChip) {
+          dd.appendChild(el('span', 'roster-ref-chip', '📖 ' + prefixChip));
+        }
+        names.forEach(name => {
+          const cleanName = name.replace(/\s+/g, '');
+          normalizedPeople.push(cleanName);
+          const pal = personPalette(cleanName);
+          const badge = el('button', 'roster-person-badge', name);
+          badge.type = 'button';
+          badge.dataset.person = cleanName;
+          badge.setAttribute('aria-pressed', 'false');
+          badge.style.setProperty('--p-bg', pal.bg);
+          badge.style.setProperty('--p-fg', pal.fg);
+          badge.style.setProperty('--p-bd', pal.bd);
+          badge.style.setProperty('--p-bg-dark', pal.dBg);
+          badge.style.setProperty('--p-fg-dark', pal.dFg);
+          badge.style.setProperty('--p-bd-dark', pal.dBd);
+          badge.addEventListener('click', () => updatePersonHighlight(cleanName));
+          dd.appendChild(badge);
+        });
+        row.dataset.people = normalizedPeople.join('|');
+        append(row, dt, dd);
+        list.appendChild(row);
+      });
+
+      groupBox.appendChild(list);
+      board.appendChild(groupBox);
+    });
+
+    body.appendChild(board);
+  }
+
   async function loadRoster(body, date) {
     body.setAttribute('aria-busy', 'true');
     body.replaceChildren(el('p', 'roster-status', '正在读取本周服事安排…'));
@@ -238,13 +469,7 @@
         body.appendChild(el('p', 'roster-status', '这一天的下午服事安排尚未公布。'));
         return;
       }
-      body.appendChild(el('p', 'roster-caption', roster.label + ' · 主日下午'));
-      const list = el('dl', 'roster-grid');
-      roster.duties.forEach(duty => {
-        append(list, append(el('div', 'roster-duty'),
-          el('dt', '', duty.label), el('dd', '', duty.value)));
-      });
-      body.appendChild(list);
+      renderRosterBoard(body, roster);
       const duties = Object.fromEntries(roster.duties.map(duty => [duty.key, duty]));
       root.querySelectorAll('[data-roles]').forEach(slot => {
         slot.textContent = slot.dataset.roles.split(',').map(key => duties[key] ? duties[key].label + ' · ' + duties[key].value : '').filter(Boolean).join(' / ');

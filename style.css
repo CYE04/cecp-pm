@@ -544,25 +544,359 @@ li.schedule-row,
   color: var(--ink);
   margin: 0 0 8px;
 }
+.roster-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px 16px;
+  margin: -4px 0 16px;
+}
+.roster-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 6px 12px;
+}
+.roster-caption {
+  margin: 0;
+  color: var(--ink);
+  font-size: 14.5px;
+  font-weight: 600;
+}
+.roster-subhint {
+  color: var(--muted);
+  font-size: 12.5px;
+}
+.roster-actions {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.roster-filter {
+  position: relative;
+}
+.roster-filter summary::-webkit-details-marker {
+  display: none;
+}
+.roster-filter-btn {
+  list-style: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: var(--raised);
+  color: var(--ink);
+  font-size: 12.5px;
+  font-weight: 600;
+  cursor: pointer;
+  user-select: none;
+  transition: background .18s ease, border-color .18s ease;
+}
+.roster-filter-btn:hover,
+.roster-filter[open] .roster-filter-btn {
+  background: var(--accent-soft);
+  border-color: rgba(54, 126, 137, 0.45);
+}
+.roster-filter-menu {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 6px);
+  z-index: 30;
+  width: 248px;
+  padding: 12px;
+  border-radius: 14px;
+  border: 1px solid var(--line);
+  background: var(--white);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.22);
+}
+.roster-filter-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding-bottom: 8px;
+  margin-bottom: 8px;
+  border-bottom: 1px solid var(--line);
+  font-size: 12px;
+  color: var(--muted);
+}
+.roster-filter-reset {
+  padding: 3px 8px;
+  border-radius: 6px;
+  border: 1px solid var(--line);
+  background: var(--raised);
+  color: var(--ink);
+  font: inherit;
+  font-size: 11.5px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.roster-filter-reset:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+.roster-filter-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 6px;
+  max-height: 240px;
+  overflow-y: auto;
+}
+.roster-filter-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 6px;
+  border-radius: 7px;
+  font-size: 12.5px;
+  color: var(--ink);
+  cursor: pointer;
+}
+.roster-filter-item:hover {
+  background: var(--raised);
+}
+.roster-hidden-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 8px;
+  margin: 0 0 14px;
+  padding: 9px 12px;
+  border-radius: 11px;
+  border: 1px dashed rgba(54, 126, 137, 0.35);
+  background: rgba(54, 126, 137, 0.06);
+  font-size: 12.5px;
+}
+.roster-hidden-label {
+  color: var(--muted);
+}
+.roster-hidden-chip,
+.roster-hidden-reset {
+  padding: 3px 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(54, 126, 137, 0.32);
+  background: var(--white);
+  color: var(--ink);
+  font: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform .15s ease, border-color .15s ease;
+}
+.roster-hidden-chip:hover,
+.roster-hidden-reset:hover {
+  border-color: #367e89;
+  transform: translateY(-1px);
+}
+.roster-board {
+  display: grid;
+  gap: 14px;
+}
+.roster-group {
+  --group-accent: #367e89;
+  --group-soft: rgba(54, 126, 137, 0.08);
+  --group-border: rgba(54, 126, 137, 0.24);
+  border: 1px solid var(--group-border);
+  border-radius: 14px;
+  background: var(--raised);
+  overflow: hidden;
+}
+.roster-group[data-group="lead"] {
+  --group-accent: #4f79b8;
+  --group-soft: rgba(79, 121, 184, 0.10);
+  --group-border: rgba(79, 121, 184, 0.25);
+}
+.roster-group[data-group="worship"] {
+  --group-accent: #b78335;
+  --group-soft: rgba(183, 131, 53, 0.10);
+  --group-border: rgba(183, 131, 53, 0.26);
+}
+.roster-group[data-group="word"] {
+  --group-accent: #4d8a72;
+  --group-soft: rgba(77, 138, 114, 0.10);
+  --group-border: rgba(77, 138, 114, 0.26);
+}
+.roster-group[data-group="media"] {
+  --group-accent: #367e89;
+  --group-soft: rgba(54, 126, 137, 0.10);
+  --group-border: rgba(54, 126, 137, 0.26);
+}
+.roster-group-hd {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 9px 15px;
+  background: var(--group-soft);
+  border-bottom: 1px solid var(--group-border);
+}
+.roster-group-title {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13.5px;
+  font-weight: 700;
+  color: var(--group-accent);
+  letter-spacing: .02em;
+}
+.roster-group-title::before {
+  content: "";
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--group-accent);
+}
+.roster-group-count {
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--muted);
+  padding: 1px 8px;
+  border-radius: 999px;
+  background: rgba(127, 127, 127, 0.10);
+}
 .roster-grid {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 12px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0;
   margin: 0;
 }
 .roster-duty {
-  padding: 16px 18px;
-  background: rgba(54, 126, 137, 0.09);
-  border: 1px solid rgba(54, 126, 137, 0.26);
-  border-left: 3.5px solid #367e89;
-  border-radius: 12px;
+  display: grid;
+  grid-template-columns: 112px minmax(0, 1fr);
+  align-items: center;
+  gap: 12px;
+  padding: 11px 15px;
+  background: transparent;
+  border: 0;
+  border-bottom: 1px solid var(--line);
+  border-right: 1px solid var(--line);
+  border-radius: 0;
+  transition: background .16s ease;
+}
+.roster-duty:nth-child(2n) {
+  border-right: 0;
+}
+.roster-duty:hover {
+  background: var(--group-soft);
+}
+.roster-duty.is-highlighted {
+  background: var(--group-soft);
+  box-shadow: inset 3px 0 0 var(--group-accent);
 }
 .roster-duty dt {
-  color: #367e89;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  margin: 0;
+  color: var(--muted);
   font-weight: 600;
   font-size: 13.5px;
 }
-.roster-duty dd { font-size: 17px; font-weight: 600; color: var(--ink); }
+.roster-duty-label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.roster-duty-hide {
+  opacity: 0;
+  padding: 2px 5px;
+  border: 0;
+  border-radius: 5px;
+  background: transparent;
+  color: var(--muted);
+  font-size: 11.5px;
+  line-height: 1;
+  cursor: pointer;
+  transition: opacity .15s ease, background .15s ease;
+}
+.roster-duty:hover .roster-duty-hide,
+.roster-duty-hide:focus-visible {
+  opacity: 0.72;
+}
+.roster-duty-hide:hover {
+  opacity: 1 !important;
+  background: rgba(127, 127, 127, 0.15);
+}
+.roster-duty dd {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  margin: 0;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--ink);
+}
+.roster-ref-chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 9px;
+  border-radius: 7px;
+  background: rgba(77, 138, 114, 0.14);
+  border: 1px solid rgba(77, 138, 114, 0.30);
+  color: #3b765f;
+  font-family: 'DM Mono', 'SF Mono', ui-monospace, monospace;
+  font-size: 12.5px;
+  font-weight: 700;
+}
+.roster-person-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px 11px;
+  border-radius: 8px;
+  border: 1px solid var(--p-bd, rgba(54, 126, 137, 0.28));
+  background: var(--p-bg, rgba(54, 126, 137, 0.12));
+  color: var(--p-fg, var(--ink));
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.35;
+  cursor: pointer;
+  transition: transform .15s ease, box-shadow .15s ease, opacity .15s ease;
+}
+.roster-person-badge:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.10);
+}
+.roster-body.has-person-highlight .roster-person-badge:not(.is-active) {
+  opacity: 0.42;
+}
+.roster-person-badge.is-active {
+  outline: 2px solid var(--p-fg, var(--accent));
+  outline-offset: 1px;
+  transform: translateY(-1px);
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.16);
+}
+@media (prefers-color-scheme: dark) {
+  .roster-person-badge {
+    background: var(--p-bg-dark, rgba(54, 126, 137, 0.22));
+    color: var(--p-fg-dark, #eceef3);
+    border-color: var(--p-bd-dark, rgba(54, 126, 137, 0.38));
+  }
+  .roster-ref-chip {
+    color: #8ce0be;
+    background: rgba(77, 138, 114, 0.20);
+    border-color: rgba(114, 196, 164, 0.35);
+  }
+}
+:is(html[data-resolved-theme="dark"], html[data-theme="dark"], html.dark) :is(#app, #cecp-pm) .roster-person-badge,
+#cecp-pm[data-theme="dark"] .roster-person-badge {
+  background: var(--p-bg-dark, rgba(54, 126, 137, 0.22));
+  color: var(--p-fg-dark, #eceef3);
+  border-color: var(--p-bd-dark, rgba(54, 126, 137, 0.38));
+}
+:is(html[data-resolved-theme="dark"], html[data-theme="dark"], html.dark) :is(#app, #cecp-pm) .roster-ref-chip,
+#cecp-pm[data-theme="dark"] .roster-ref-chip {
+  color: #8ce0be;
+  background: rgba(77, 138, 114, 0.20);
+  border-color: rgba(114, 196, 164, 0.35);
+}
 .notice, .plain-song {
   margin: 12px 0;
   padding: 18px 22px;
@@ -719,7 +1053,9 @@ summary.bible-reader-toggle {
   .schedule-time { font-size: 15.5px; }
   .schedule-title { font-size: 18px; }
   .reading-card, .sermon-card { padding: 18px 16px; }
-  .roster-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+  .roster-grid { grid-template-columns: 1fr; gap: 0; }
+  .roster-duty { border-right: 0; grid-template-columns: 102px minmax(0, 1fr); padding: 10px 12px; }
+  .roster-duty-hide { opacity: 0.55; }
 }
 @media (max-width:620px) { .shared-songs .ym-song-tabs { display:flex; flex-wrap:nowrap; overflow-x:auto; overflow-y:hidden; -webkit-overflow-scrolling:touch; scrollbar-width:none; gap:18px; padding:0 0 4px; border-bottom:1px solid var(--line); } .shared-songs .ym-song-tabs::-webkit-scrollbar { display:none; } .shared-songs .ym-song-tab { flex-shrink:0; max-width:none; padding:5px 0 7px; } .shared-songs .ym-song-tab.active::after { bottom:-2px; height:2px; } .shared-songs .pm-compact-player { padding:6px; gap:4px; } .shared-songs .pm-compact-player .ym-pl-stage { grid-template-columns:64px minmax(0,1fr); gap:7px; } .shared-songs .pm-compact-player .ym-pl-cover-wrap,.shared-songs .pm-compact-player .ym-pl-stage.playing .ym-pl-cover-wrap { width:64px; } .shared-songs .pm-compact-player .ym-pl-lrc-panel,.shared-songs .pm-compact-player .ym-pl-stage.playing .ym-pl-lrc-panel { height:82px; } .shared-songs .pm-compact-player .ym-pl-lrc-inner { padding:32px 0 40px; } .shared-songs .pm-compact-player .ym-pl-lrc-line { font-size:12px; } .shared-songs .pm-compact-player .ym-pl-lrc-line.active { font-size:15px; } .shared-songs .pm-compact-player .pm-inline-volume { display:none!important; } .shared-songs .pm-song-actions .sw-tog { min-height:36px; padding:7px 10px; } .shared-songs .pm-video-button { min-width:104px; height:36px; padding:0 11px; font-size:13px; } }
 @media (prefers-reduced-motion:reduce) { html { scroll-behavior:auto; } .bible-reader-panel,.bible-reader-arrow { transition:none!important; } }
