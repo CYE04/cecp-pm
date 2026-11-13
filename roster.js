@@ -23,8 +23,12 @@
     ['ppt', 'PPT播放', 'media'],
     ['broadcast', '转播和话筒', 'media']
   ];
+  const SHEET_ID = '1o0FkHnVtvKCZwjIhzPEHSEW-3oZeNsJnh68Qs3GU0TQ';
+  const MAIN_SHEET_URL =
+    'https://docs.google.com/spreadsheets/d/' + SHEET_ID + '/gviz/tq?tqx=out:json&headers=0&sheet=' +
+    encodeURIComponent('服事安排');
   const SOUND_SHEET_URL =
-    'https://docs.google.com/spreadsheets/d/1o0FkHnVtvKCZwjIhzPEHSEW-3oZeNsJnh68Qs3GU0TQ/gviz/tq?tqx=out:json&headers=0&sheet=' +
+    'https://docs.google.com/spreadsheets/d/' + SHEET_ID + '/gviz/tq?tqx=out:json&headers=0&sheet=' +
     encodeURIComponent('🎛 调音组安排');
   const OLD_API_ID = 'AKfycbzGQA4R7AFyCOnWX6E74WpnZkF1z_im2DD3sX_bmTCzhW9FVu_Wl77AmPT6GaWfP2nX';
   const NEW_API_ID = 'AKfycbxJaY7RxxThCIGMeuxnlPW7diAJs0M34b5lK8Qn_CzxbIbCZY3AeuYKJadPF8gsLpvK';
@@ -43,9 +47,88 @@
     };
   }
 
+  function normalizeGvizMonth(raw) {
+    const s = text(raw);
+    const m = s.match(/^(\d{4})\s*年\s*(\d{1,2})\s*月$/);
+    if (m) return `${parseInt(m[1], 10)}年${parseInt(m[2], 10)}月`;
+    const md = s.match(/^Date\((\d{4}),\s*(\d{1,2}),/);
+    if (md) return `${parseInt(md[1], 10)}年${parseInt(md[2], 10) + 1}月`;
+    return '';
+  }
+
+  function parseGvizMainSchedule(rawText) {
+    const result = [];
+    if (!rawText || rawText.indexOf('"status":"ok"') < 0) return result;
+    const start = rawText.indexOf('{');
+    const end = rawText.lastIndexOf('}');
+    if (start < 0 || end <= start) return result;
+    let json;
+    try {
+      json = JSON.parse(rawText.slice(start, end + 1));
+    } catch (_) {
+      return result;
+    }
+    const tableRows = json && json.table && Array.isArray(json.table.rows) ? json.table.rows : [];
+    let blankStreak = 0;
+    let hasStarted = false;
+
+    for (let i = 0; i < tableRows.length; i++) {
+      const r = tableRows[i];
+      const cells = (r && Array.isArray(r.c) ? r.c : []).map(c => {
+        if (!c) return '';
+        return text(c.f != null ? c.f : c.v);
+      });
+      const month = normalizeGvizMonth(cells[0]);
+      const week = text(cells[1]);
+      const type = text(cells[2]);
+      const subtype = text(cells[3]);
+
+      if (!month) {
+        if (hasStarted) {
+          blankStreak++;
+          if (blankStreak >= 5) break;
+        }
+        continue;
+      }
+      hasStarted = true;
+      blankStreak = 0;
+      if (!week || !type) continue;
+
+      let vSound = text(cells[16]);
+      let vPpt = text(cells[17]);
+      let vBroadcast = text(cells[18]);
+      if (vSound === '—' || vSound === '-') vSound = '';
+      if (vPpt === '—' || vPpt === '-') vPpt = '';
+      if (vBroadcast === '—' || vBroadcast === '-') vBroadcast = '';
+
+      result.push({
+        month,
+        week,
+        type,
+        subtype,
+        leader: text(cells[4]),
+        worship: text(cells[5]),
+        prayerLeader: text(cells[6]),
+        praisePrayer: text(cells[7]),
+        memorialPrayer: text(cells[8]),
+        piano: text(cells[9]),
+        drums: text(cells[10]),
+        guitar: text(cells[11]),
+        bass: text(cells[12]),
+        reading: text(cells[13]),
+        note: text(cells[14]),
+        time: text(cells[15]),
+        sound: vSound,
+        ppt: vPpt,
+        broadcast: vBroadcast
+      });
+    }
+    return result;
+  }
+
   function parseGvizSoundTable(rawText, defaultYear = 2026) {
     const map = {};
-    if (!rawText) return map;
+    if (!rawText || rawText.indexOf('"status":"ok"') < 0) return map;
     const start = rawText.indexOf('{');
     const end = rawText.lastIndexOf('}');
     if (start < 0 || end <= start) return map;
@@ -119,43 +202,17 @@
     return map;
   }
 
-  async function enrichPayloadWithSound(payload, date) {
-    if (!payload || !Array.isArray(payload.data)) return payload;
-    const key = dateKey(date);
-    if (!key) return payload;
-    const targetMonth = `${key.year}年${key.month}月`;
-    const matched = payload.data.find(row => {
-      if (!row || typeof row !== 'object') return false;
-      const m = text(row.month).match(/^(\d{4})年\s*(\d{1,2})月$/);
-      return m && +m[1] === key.year && +m[2] === key.month &&
-        text(row.week) === key.week && text(row.type) === '主日下午';
-    });
-    if (!matched) return payload;
-
+  async function fetchTextSafe(url, timeoutMs = 5000) {
     const controller = new AbortController();
-    const timer = setTimeout(() => controller.abort(), 5000);
+    const timer = setTimeout(() => controller.abort(), timeoutMs);
     try {
-      const res = await fetch(SOUND_SHEET_URL + '&_ts=' + Date.now(), {
-        signal: controller.signal,
-        cache: 'no-store',
-        credentials: 'omit'
-      });
-      if (res.ok) {
-        const raw = await res.text();
-        if (raw && raw.indexOf('"status":"ok"') >= 0) {
-          const soundMap = parseGvizSoundTable(raw, key.year);
-          const entry = soundMap[`${targetMonth}|${key.week}|主日下午`];
-          matched.sound = (entry && entry.sound) ? entry.sound : '';
-          matched.ppt = (entry && entry.ppt) ? entry.ppt : '';
-          matched.broadcast = (entry && entry.broadcast) ? entry.broadcast : '';
-        }
-      }
+      const res = await fetch(url, { signal: controller.signal, cache: 'no-store', credentials: 'omit' });
+      return res.ok ? await res.text() : '';
     } catch (_) {
-      // Ignore fallback error and keep payload values
+      return '';
     } finally {
       clearTimeout(timer);
     }
-    return payload;
   }
 
   function select(payload, date) {
@@ -186,20 +243,47 @@
     const normalizedApi = String(api || '').replace(OLD_API_ID, NEW_API_ID);
     const url = new URL(normalizedApi);
     if (url.protocol !== 'https:') throw new Error('服事安排链接无效');
-    url.searchParams.set('action', 'all');
-    url.searchParams.set('_ts', String(Date.now()));
-    const controller = new AbortController();
-    const timer = setTimeout(() => controller.abort(), 15000);
-    try {
-      const response = await fetch(url.href, { signal: controller.signal, cache: 'no-store', credentials: 'omit' });
-      if (!response.ok) throw new Error('服事安排暂时无法读取');
-      const payload = await response.json();
-      await enrichPayloadWithSound(payload, date);
-      return select(payload, date);
-    } finally {
-      clearTimeout(timer);
+    const ts = String(Date.now());
+
+    const [mainRaw, soundRaw] = await Promise.all([
+      fetchTextSafe(`${MAIN_SHEET_URL}&_ts=${ts}`, 5000),
+      fetchTextSafe(`${SOUND_SHEET_URL}&_ts=${ts}`, 5000)
+    ]);
+
+    let rows = parseGvizMainSchedule(mainRaw);
+    const hasSoundSheet = Boolean(soundRaw && soundRaw.indexOf('"status":"ok"') >= 0);
+    const soundMap = hasSoundSheet ? parseGvizSoundTable(soundRaw) : null;
+
+    if (!rows.length) {
+      url.searchParams.set('action', 'all');
+      url.searchParams.set('_ts', ts);
+      let apiTxt = await fetchTextSafe(url.href, 8000);
+      if (!apiTxt && normalizedApi.indexOf(NEW_API_ID) >= 0) {
+        const fallbackUrl = new URL(normalizedApi.replace(NEW_API_ID, OLD_API_ID));
+        fallbackUrl.searchParams.set('action', 'all');
+        fallbackUrl.searchParams.set('_ts', ts);
+        apiTxt = await fetchTextSafe(fallbackUrl.href, 8000);
+      }
+      if (!apiTxt) throw new Error('服事安排暂时无法读取');
+      const parsed = JSON.parse(apiTxt);
+      if (!parsed || parsed.ok !== true || !Array.isArray(parsed.data)) {
+        throw new Error('服事安排暂时无法读取');
+      }
+      rows = parsed.data;
     }
+
+    if (soundMap) {
+      rows.forEach(r => {
+        const k = `${text(r.month)}|${text(r.week)}|${text(r.type)}`;
+        const sm = soundMap[k];
+        r.sound = (sm && sm.sound) ? sm.sound : '';
+        r.ppt = (sm && sm.ppt) ? sm.ppt : '';
+        r.broadcast = (sm && sm.broadcast) ? sm.broadcast : '';
+      });
+    }
+
+    return select({ ok: true, data: rows }, date);
   }
 
-  return { roles, dateKey, select, load, parseGvizSoundTable };
+  return { roles, dateKey, select, load, parseGvizSoundTable, parseGvizMainSchedule };
 });
