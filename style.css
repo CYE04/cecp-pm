@@ -19,11 +19,6 @@ h1,h2,h3,p { overflow-wrap:anywhere; }
 .notice p { margin:0; color:var(--muted); white-space:pre-line; }
 .resource-link { display:inline-block; padding:11px 17px; border-radius:9px; background:#eadfd5; text-decoration:none; font-size:14px; font-weight:650; }
 .resource-link:hover,.resource-link:focus-visible { background:#d9c5b5; }
-.roster-caption { margin:-10px 0 22px; color:var(--muted); font-size:14px; }
-.roster-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:12px; margin:0; }
-.roster-duty { padding:18px 20px; background:#f5eee7; border-radius:12px; min-width:0; }
-.roster-duty dt { color:var(--muted); font-size:13px; margin-bottom:7px; }
-.roster-duty dd { margin:0; font-size:20px; font-weight:600; overflow-wrap:anywhere; }
 .roster-status { color:var(--muted); margin:0; }
 .roster-retry { margin-top:14px; padding:10px 18px; border:1px solid var(--line); border-radius:9px; background:#eadfd5; color:var(--ink); font:inherit; cursor:pointer; }
 .roster-retry:hover { background:#d9c5b5; }
@@ -544,7 +539,7 @@ li.schedule-row,
   color: var(--ink);
   margin: 0 0 8px;
 }
-.roster-bar {
+:is(#cecp-pm, #app) .roster-bar {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
@@ -552,79 +547,101 @@ li.schedule-row,
   gap: 10px 16px;
   margin: -4px 0 16px;
 }
-.roster-meta {
+:is(#cecp-pm, #app) .roster-meta {
   display: flex;
   flex-wrap: wrap;
   align-items: baseline;
   gap: 6px 12px;
 }
-.roster-caption {
-  margin: 0;
+:is(#cecp-pm, #app) .roster-caption {
+  margin: 0 !important;
   color: var(--ink);
   font-size: 14.5px;
   font-weight: 600;
+  line-height: 1.4;
 }
-.roster-subhint {
+:is(#cecp-pm, #app) .roster-subhint {
   color: var(--muted);
   font-size: 12.5px;
+  line-height: 1.4;
 }
-.roster-actions {
+:is(#cecp-pm, #app) .roster-actions {
   position: relative;
   display: flex;
   align-items: center;
   gap: 8px;
 }
-.roster-filter {
+:is(#cecp-pm, #app) .roster-filter {
   position: relative;
+  margin: 0 !important;
 }
-.roster-filter summary::-webkit-details-marker {
+:is(#cecp-pm, #app) .roster-filter summary::-webkit-details-marker {
   display: none;
 }
-.roster-filter-btn {
+:is(#cecp-pm, #app) .roster-filter-btn {
   list-style: none;
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 6px;
-  padding: 6px 12px;
+  min-height: 32px;
+  margin: 0 !important;
+  padding: 5px 12px;
   border-radius: 999px;
   border: 1px solid var(--line);
   background: var(--raised);
   color: var(--ink);
   font-size: 12.5px;
   font-weight: 600;
+  line-height: 1.2;
   cursor: pointer;
   user-select: none;
-  transition: background .18s ease, border-color .18s ease;
+  transition: background .18s ease, border-color .18s ease, color .18s ease;
 }
-.roster-filter-btn:hover,
-.roster-filter[open] .roster-filter-btn {
+:is(#cecp-pm, #app) .roster-filter-btn svg {
+  width: 15px;
+  height: 15px;
+  display: block;
+  flex: none;
+  color: var(--muted);
+  transition: color .18s ease;
+}
+:is(#cecp-pm, #app) .roster-filter-btn:hover,
+:is(#cecp-pm, #app) .roster-filter[open] .roster-filter-btn,
+:is(#cecp-pm, #app) .roster-filter-btn.has-hidden {
   background: var(--accent-soft);
   border-color: rgba(54, 126, 137, 0.45);
 }
-.roster-filter-menu {
+:is(#cecp-pm, #app) .roster-filter-btn:hover svg,
+:is(#cecp-pm, #app) .roster-filter[open] .roster-filter-btn svg,
+:is(#cecp-pm, #app) .roster-filter-btn.has-hidden svg {
+  color: currentColor;
+}
+:is(#cecp-pm, #app) .roster-filter-menu {
   position: absolute;
   right: 0;
-  top: calc(100% + 6px);
+  top: calc(100% + 8px);
   z-index: 30;
-  width: 248px;
-  padding: 12px;
+  width: 230px;
+  padding: 8px;
   border-radius: 14px;
   border: 1px solid var(--line);
   background: var(--white);
-  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.22);
+  box-shadow: 0 18px 36px rgba(18, 24, 38, 0.20);
 }
-.roster-filter-head {
+:is(#cecp-pm, #app) .roster-filter-head {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 8px;
-  padding-bottom: 8px;
-  margin-bottom: 8px;
+  padding: 2px 6px 8px;
+  margin-bottom: 4px;
   border-bottom: 1px solid var(--line);
-  font-size: 12px;
+  font-size: 11.5px;
+  font-weight: 600;
   color: var(--muted);
 }
-.roster-filter-reset {
+:is(#cecp-pm, #app) .roster-filter-reset {
   padding: 3px 8px;
   border-radius: 6px;
   border: 1px solid var(--line);
@@ -633,49 +650,91 @@ li.schedule-row,
   font: inherit;
   font-size: 11.5px;
   font-weight: 600;
+  line-height: 1.2;
   cursor: pointer;
 }
-.roster-filter-reset:disabled {
+:is(#cecp-pm, #app) .roster-filter-reset:disabled {
   opacity: 0.4;
   cursor: default;
 }
-.roster-filter-list {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 6px;
-  max-height: 240px;
+:is(#cecp-pm, #app) .roster-filter-list {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  max-height: 300px;
   overflow-y: auto;
 }
-.roster-filter-item {
+:is(#cecp-pm, #app) .roster-filter-item {
+  width: 100%;
+  min-height: 34px;
+  margin: 0;
+  padding: 0 10px;
+  border-radius: 9px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--ink);
   display: flex;
   align-items: center;
-  gap: 6px;
-  padding: 4px 6px;
-  border-radius: 7px;
+  justify-content: space-between;
+  gap: 8px;
+  font: inherit;
   font-size: 12.5px;
-  color: var(--ink);
+  font-weight: 600;
+  line-height: 1.2;
   cursor: pointer;
+  text-align: left;
 }
-.roster-filter-item:hover {
+:is(#cecp-pm, #app) .roster-filter-item:hover {
   background: var(--raised);
+  border-color: var(--line);
 }
-.roster-hidden-bar {
+:is(#cecp-pm, #app) .roster-filter-item.is-hidden {
+  color: var(--muted);
+  opacity: 0.62;
+}
+:is(#cecp-pm, #app) .roster-filter-item-left {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+:is(#cecp-pm, #app) .roster-filter-item svg {
+  width: 14px;
+  height: 14px;
+  display: block;
+  flex: none;
+}
+:is(#cecp-pm, #app) .roster-filter-item-state {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--muted);
+  flex: none;
+}
+:is(#cecp-pm, #app) .roster-hidden-bar {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   gap: 6px 8px;
-  margin: 0 0 14px;
+  margin: 0 0 14px !important;
   padding: 9px 12px;
   border-radius: 11px;
   border: 1px dashed rgba(54, 126, 137, 0.35);
   background: rgba(54, 126, 137, 0.06);
   font-size: 12.5px;
+  line-height: 1.3;
 }
-.roster-hidden-label {
+:is(#cecp-pm, #app) .roster-hidden-label {
   color: var(--muted);
+  font-weight: 600;
 }
-.roster-hidden-chip,
-.roster-hidden-reset {
+:is(#cecp-pm, #app) .roster-hidden-chip,
+:is(#cecp-pm, #app) .roster-hidden-reset {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  min-height: 26px;
+  margin: 0;
   padding: 3px 10px;
   border-radius: 999px;
   border: 1px solid rgba(54, 126, 137, 0.32);
@@ -684,19 +743,27 @@ li.schedule-row,
   font: inherit;
   font-size: 12px;
   font-weight: 600;
+  line-height: 1.2;
   cursor: pointer;
   transition: transform .15s ease, border-color .15s ease;
 }
-.roster-hidden-chip:hover,
-.roster-hidden-reset:hover {
+:is(#cecp-pm, #app) .roster-hidden-chip svg {
+  width: 13px;
+  height: 13px;
+  display: block;
+  flex: none;
+  color: var(--muted);
+}
+:is(#cecp-pm, #app) .roster-hidden-chip:hover,
+:is(#cecp-pm, #app) .roster-hidden-reset:hover {
   border-color: #367e89;
   transform: translateY(-1px);
 }
-.roster-board {
+:is(#cecp-pm, #app) .roster-board {
   display: grid;
   gap: 14px;
 }
-.roster-group {
+:is(#cecp-pm, #app) .roster-group {
   --group-accent: #367e89;
   --group-soft: rgba(54, 126, 137, 0.08);
   --group-border: rgba(54, 126, 137, 0.24);
@@ -705,27 +772,27 @@ li.schedule-row,
   background: var(--raised);
   overflow: hidden;
 }
-.roster-group[data-group="lead"] {
+:is(#cecp-pm, #app) .roster-group[data-group="lead"] {
   --group-accent: #4f79b8;
   --group-soft: rgba(79, 121, 184, 0.10);
   --group-border: rgba(79, 121, 184, 0.25);
 }
-.roster-group[data-group="worship"] {
+:is(#cecp-pm, #app) .roster-group[data-group="worship"] {
   --group-accent: #b78335;
   --group-soft: rgba(183, 131, 53, 0.10);
   --group-border: rgba(183, 131, 53, 0.26);
 }
-.roster-group[data-group="word"] {
+:is(#cecp-pm, #app) .roster-group[data-group="word"] {
   --group-accent: #4d8a72;
   --group-soft: rgba(77, 138, 114, 0.10);
   --group-border: rgba(77, 138, 114, 0.26);
 }
-.roster-group[data-group="media"] {
+:is(#cecp-pm, #app) .roster-group[data-group="media"] {
   --group-accent: #367e89;
   --group-soft: rgba(54, 126, 137, 0.10);
   --group-border: rgba(54, 126, 137, 0.26);
 }
-.roster-group-hd {
+:is(#cecp-pm, #app) .roster-group-hd {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -733,8 +800,9 @@ li.schedule-row,
   padding: 9px 15px;
   background: var(--group-soft);
   border-bottom: 1px solid var(--group-border);
+  line-height: 1.3;
 }
-.roster-group-title {
+:is(#cecp-pm, #app) .roster-group-title {
   display: inline-flex;
   align-items: center;
   gap: 8px;
@@ -742,34 +810,43 @@ li.schedule-row,
   font-weight: 700;
   color: var(--group-accent);
   letter-spacing: .02em;
+  line-height: 1.3;
 }
-.roster-group-title::before {
+:is(#cecp-pm, #app) .roster-group-title::before {
   content: "";
   width: 7px;
   height: 7px;
+  flex: none;
   border-radius: 50%;
   background: var(--group-accent);
 }
-.roster-group-count {
+:is(#cecp-pm, #app) .roster-group-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   font-size: 11.5px;
   font-weight: 600;
+  line-height: 1.2;
   color: var(--muted);
-  padding: 1px 8px;
+  padding: 2px 8px;
   border-radius: 999px;
   background: rgba(127, 127, 127, 0.10);
 }
-.roster-grid {
+:is(#cecp-pm, #app) .roster-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 0;
-  margin: 0;
+  margin: 0 !important;
+  padding: 0 !important;
 }
-.roster-duty {
+:is(#cecp-pm, #app) .roster-duty {
   display: grid;
-  grid-template-columns: 112px minmax(0, 1fr);
+  grid-template-columns: 122px minmax(0, 1fr);
   align-items: center;
   gap: 12px;
-  padding: 11px 15px;
+  min-height: 50px;
+  margin: 0 !important;
+  padding: 10px 15px;
   background: transparent;
   border: 0;
   border-bottom: 1px solid var(--line);
@@ -777,97 +854,145 @@ li.schedule-row,
   border-radius: 0;
   transition: background .16s ease;
 }
-.roster-duty:nth-child(2n) {
+:is(#cecp-pm, #app) .roster-duty:nth-child(2n) {
   border-right: 0;
 }
-.roster-duty:hover {
+:is(#cecp-pm, #app) .roster-duty:only-child {
+  grid-column: 1 / -1;
+  border-right: 0;
+}
+:is(#cecp-pm, #app) .roster-duty:last-child,
+:is(#cecp-pm, #app) .roster-duty:nth-last-child(2):nth-child(odd) {
+  border-bottom: 0;
+}
+:is(#cecp-pm, #app) .roster-duty:hover {
   background: var(--group-soft);
 }
-.roster-duty.is-highlighted {
+:is(#cecp-pm, #app) .roster-duty.is-highlighted {
   background: var(--group-soft);
   box-shadow: inset 3px 0 0 var(--group-accent);
 }
-.roster-duty dt {
+:is(#cecp-pm, #app) .roster-duty dt {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 6px;
-  margin: 0;
+  min-width: 0;
+  min-height: 28px;
+  margin: 0 !important;
+  padding: 0 !important;
   color: var(--muted);
+  font-family: inherit;
+  font-style: normal !important;
   font-weight: 600;
   font-size: 13.5px;
+  line-height: 1.3;
 }
-.roster-duty-label {
+:is(#cecp-pm, #app) .roster-duty-label {
+  min-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  line-height: 1.3;
 }
-.roster-duty-hide {
-  opacity: 0;
-  padding: 2px 5px;
+:is(#cecp-pm, #app) .roster-duty-hide {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  flex: 0 0 22px;
+  margin: 0;
+  padding: 0;
   border: 0;
-  border-radius: 5px;
+  border-radius: 6px;
   background: transparent;
   color: var(--muted);
-  font-size: 11.5px;
+  opacity: 0;
   line-height: 1;
   cursor: pointer;
-  transition: opacity .15s ease, background .15s ease;
+  transition: opacity .15s ease, background .15s ease, color .15s ease;
 }
-.roster-duty:hover .roster-duty-hide,
-.roster-duty-hide:focus-visible {
+:is(#cecp-pm, #app) .roster-duty-hide svg {
+  width: 14px;
+  height: 14px;
+  display: block;
+  flex: none;
+}
+:is(#cecp-pm, #app) .roster-duty:hover .roster-duty-hide,
+:is(#cecp-pm, #app) .roster-duty-hide:focus-visible {
   opacity: 0.72;
 }
-.roster-duty-hide:hover {
+:is(#cecp-pm, #app) .roster-duty-hide:hover {
   opacity: 1 !important;
-  background: rgba(127, 127, 127, 0.15);
+  background: rgba(127, 127, 127, 0.16);
+  color: var(--ink);
 }
-.roster-duty dd {
+:is(#cecp-pm, #app) .roster-duty dd {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   gap: 6px;
-  margin: 0;
-  font-size: 15px;
+  min-width: 0;
+  min-height: 28px;
+  margin: 0 !important;
+  padding: 0 !important;
+  font-family: inherit;
+  font-style: normal !important;
+  font-size: 14px;
   font-weight: 600;
+  line-height: 1.3;
   color: var(--ink);
 }
-.roster-ref-chip {
-  display: inline-flex;
-  align-items: center;
-  padding: 3px 9px;
-  border-radius: 7px;
-  background: rgba(77, 138, 114, 0.14);
-  border: 1px solid rgba(77, 138, 114, 0.30);
-  color: #3b765f;
-  font-family: 'DM Mono', 'SF Mono', ui-monospace, monospace;
-  font-size: 12.5px;
-  font-weight: 700;
-}
-.roster-person-badge {
+:is(#cecp-pm, #app) .roster-ref-chip {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 4px 11px;
+  gap: 5px;
+  min-height: 28px;
+  margin: 0;
+  padding: 3px 10px;
+  border-radius: 8px;
+  background: rgba(77, 138, 114, 0.14);
+  border: 1px solid rgba(77, 138, 114, 0.30);
+  color: #3b765f;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.25;
+}
+:is(#cecp-pm, #app) .roster-ref-chip svg {
+  width: 13.5px;
+  height: 13.5px;
+  display: block;
+  flex: none;
+}
+:is(#cecp-pm, #app) .roster-person-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 28px;
+  margin: 0;
+  padding: 3px 11px;
   border-radius: 8px;
   border: 1px solid var(--p-bd, rgba(54, 126, 137, 0.28));
   background: var(--p-bg, rgba(54, 126, 137, 0.12));
   color: var(--p-fg, var(--ink));
   font: inherit;
-  font-size: 14px;
+  font-size: 13.5px;
   font-weight: 600;
-  line-height: 1.35;
+  line-height: 1.25;
   cursor: pointer;
   transition: transform .15s ease, box-shadow .15s ease, opacity .15s ease;
 }
-.roster-person-badge:hover {
+:is(#cecp-pm, #app) .roster-person-badge:hover {
   transform: translateY(-1px);
   box-shadow: 0 3px 8px rgba(0, 0, 0, 0.10);
 }
-.roster-body.has-person-highlight .roster-person-badge:not(.is-active) {
+:is(#cecp-pm, #app) .roster-body.has-person-highlight .roster-person-badge:not(.is-active) {
   opacity: 0.42;
 }
-.roster-person-badge.is-active {
+:is(#cecp-pm, #app) .roster-person-badge.is-active {
   outline: 2px solid var(--p-fg, var(--accent));
   outline-offset: 1px;
   transform: translateY(-1px);
@@ -1053,9 +1178,10 @@ summary.bible-reader-toggle {
   .schedule-time { font-size: 15.5px; }
   .schedule-title { font-size: 18px; }
   .reading-card, .sermon-card { padding: 18px 16px; }
-  .roster-grid { grid-template-columns: 1fr; gap: 0; }
-  .roster-duty { border-right: 0; grid-template-columns: 102px minmax(0, 1fr); padding: 10px 12px; }
-  .roster-duty-hide { opacity: 0.55; }
+  :is(#cecp-pm, #app) .roster-grid { grid-template-columns: 1fr; gap: 0; }
+  :is(#cecp-pm, #app) .roster-duty { border-right: 0; grid-template-columns: 114px minmax(0, 1fr); padding: 10px 12px; }
+  :is(#cecp-pm, #app) .roster-duty:nth-last-child(2):nth-child(odd) { border-bottom: 1px solid var(--line); }
+  :is(#cecp-pm, #app) .roster-duty-hide { opacity: 0.55; }
 }
 @media (max-width:620px) { .shared-songs .ym-song-tabs { display:flex; flex-wrap:nowrap; overflow-x:auto; overflow-y:hidden; -webkit-overflow-scrolling:touch; scrollbar-width:none; gap:18px; padding:0 0 4px; border-bottom:1px solid var(--line); } .shared-songs .ym-song-tabs::-webkit-scrollbar { display:none; } .shared-songs .ym-song-tab { flex-shrink:0; max-width:none; padding:5px 0 7px; } .shared-songs .ym-song-tab.active::after { bottom:-2px; height:2px; } .shared-songs .pm-compact-player { padding:6px; gap:4px; } .shared-songs .pm-compact-player .ym-pl-stage { grid-template-columns:64px minmax(0,1fr); gap:7px; } .shared-songs .pm-compact-player .ym-pl-cover-wrap,.shared-songs .pm-compact-player .ym-pl-stage.playing .ym-pl-cover-wrap { width:64px; } .shared-songs .pm-compact-player .ym-pl-lrc-panel,.shared-songs .pm-compact-player .ym-pl-stage.playing .ym-pl-lrc-panel { height:82px; } .shared-songs .pm-compact-player .ym-pl-lrc-inner { padding:32px 0 40px; } .shared-songs .pm-compact-player .ym-pl-lrc-line { font-size:12px; } .shared-songs .pm-compact-player .ym-pl-lrc-line.active { font-size:15px; } .shared-songs .pm-compact-player .pm-inline-volume { display:none!important; } .shared-songs .pm-song-actions .sw-tog { min-height:36px; padding:7px 10px; } .shared-songs .pm-video-button { min-width:104px; height:36px; padding:0 11px; font-size:13px; } }
 @media (prefers-reduced-motion:reduce) { html { scroll-behavior:auto; } .bible-reader-panel,.bible-reader-arrow { transition:none!important; } }

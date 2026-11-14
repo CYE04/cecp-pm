@@ -290,7 +290,52 @@
     };
   }
 
-  function renderRosterBoard(body, roster) {
+  function eyeIcon(off) {
+    const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    svg.setAttribute('viewBox', '0 0 24 24');
+    svg.setAttribute('aria-hidden', 'true');
+    if (off) {
+      const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+      path.setAttribute('d', 'M3 3l18 18M10.6 10.6a2 2 0 0 0 2.8 2.8M9.9 5.1A10.7 10.7 0 0 1 12 5c5 0 9.3 3.1 11 7.5a11.8 11.8 0 0 1-4 5.2M6.6 6.6A11.8 11.8 0 0 0 1 12.5C2.7 16.9 7 20 12 20c1.8 0 3.5-.4 5-1.1');
+      path.setAttribute('fill', 'none');
+      path.setAttribute('stroke', 'currentColor');
+      path.setAttribute('stroke-width', '1.8');
+      path.setAttribute('stroke-linecap', 'round');
+      path.setAttribute('stroke-linejoin', 'round');
+      svg.appendChild(path);
+    } else {
+      const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+      path.setAttribute('d', 'M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7Z');
+      path.setAttribute('fill', 'none');
+      path.setAttribute('stroke', 'currentColor');
+      path.setAttribute('stroke-width', '1.8');
+      path.setAttribute('stroke-linecap', 'round');
+      path.setAttribute('stroke-linejoin', 'round');
+      const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+      circle.setAttribute('cx', '12');
+      circle.setAttribute('cy', '12');
+      circle.setAttribute('r', '3');
+      circle.setAttribute('fill', 'none');
+      circle.setAttribute('stroke', 'currentColor');
+      circle.setAttribute('stroke-width', '1.8');
+      svg.append(path, circle);
+    }
+    return svg;
+  }
+
+  let rosterOutsideBound = false;
+  function bindRosterOutsideClose() {
+    if (rosterOutsideBound || typeof document === 'undefined') return;
+    rosterOutsideBound = true;
+    document.addEventListener('click', event => {
+      document.querySelectorAll('.roster-filter[open]').forEach(details => {
+        if (!details.contains(event.target)) details.open = false;
+      });
+    });
+  }
+
+  function renderRosterBoard(body, roster, keepMenuOpen = false) {
+    bindRosterOutsideClose();
     body.replaceChildren();
     let activePerson = '';
 
@@ -322,35 +367,43 @@
 
     const actionsWrap = el('div', 'roster-actions');
     const filterDetails = el('details', 'roster-filter');
+    if (keepMenuOpen) filterDetails.open = true;
     const filterSummary = el('summary', 'roster-filter-btn');
-    filterSummary.textContent = hiddenKeys.length ? `👁 岗位筛选 (已隐藏 ${hiddenKeys.length})` : '👁 岗位筛选';
+    if (hiddenKeys.length) filterSummary.classList.add('has-hidden');
+    append(
+      filterSummary,
+      eyeIcon(false),
+      el('span', '', hiddenKeys.length ? `岗位筛选 (已隐藏 ${hiddenKeys.length})` : '岗位筛选')
+    );
     const filterMenu = el('div', 'roster-filter-menu');
     const filterHead = el('div', 'roster-filter-head');
-    filterHead.appendChild(el('span', '', '勾选要显示的服事岗位'));
+    filterHead.appendChild(el('span', '', '点击切换显示 / 隐藏'));
     const resetBtn = el('button', 'roster-filter-reset', '全部显示');
     resetBtn.type = 'button';
     resetBtn.disabled = !hiddenKeys.length;
     resetBtn.addEventListener('click', () => {
       writeHiddenRosterRoles([]);
-      renderRosterBoard(body, roster);
+      renderRosterBoard(body, roster, true);
     });
     filterHead.appendChild(resetBtn);
     filterMenu.appendChild(filterHead);
 
     const filterList = el('div', 'roster-filter-list');
     roster.duties.forEach(duty => {
-      const itemLabel = el('label', 'roster-filter-item');
-      const checkbox = el('input', '');
-      checkbox.type = 'checkbox';
-      checkbox.checked = !hiddenKeys.includes(duty.key);
-      checkbox.addEventListener('change', () => {
+      const hidden = hiddenKeys.includes(duty.key);
+      const itemBtn = el('button', 'roster-filter-item' + (hidden ? ' is-hidden' : ''));
+      itemBtn.type = 'button';
+      const itemLeft = el('span', 'roster-filter-item-left');
+      append(itemLeft, eyeIcon(hidden), el('span', '', duty.label));
+      const itemState = el('span', 'roster-filter-item-state', hidden ? '已隐藏' : '显示中');
+      append(itemBtn, itemLeft, itemState);
+      itemBtn.addEventListener('click', () => {
         const next = readHiddenRosterRoles().filter(k => k !== duty.key);
-        if (!checkbox.checked) next.push(duty.key);
+        if (!hidden) next.push(duty.key);
         writeHiddenRosterRoles(next);
-        renderRosterBoard(body, roster);
+        renderRosterBoard(body, roster, true);
       });
-      append(itemLabel, checkbox, el('span', '', duty.label));
-      filterList.appendChild(itemLabel);
+      filterList.appendChild(itemBtn);
     });
     filterMenu.appendChild(filterList);
     append(filterDetails, filterSummary, filterMenu);
@@ -364,8 +417,10 @@
       const hiddenBar = el('div', 'roster-hidden-bar');
       hiddenBar.appendChild(el('span', 'roster-hidden-label', '已隐藏岗位（点击恢复）：'));
       hiddenDuties.forEach(duty => {
-        const chip = el('button', 'roster-hidden-chip', '👁 ' + duty.label);
+        const chip = el('button', 'roster-hidden-chip');
         chip.type = 'button';
+        chip.title = `点击重新显示「${duty.label}」`;
+        append(chip, eyeIcon(false), el('span', '', duty.label));
         chip.addEventListener('click', () => {
           writeHiddenRosterRoles(readHiddenRosterRoles().filter(k => k !== duty.key));
           renderRosterBoard(body, roster);
@@ -411,10 +466,11 @@
         row.dataset.roleKey = duty.key;
         const dt = el('dt', '');
         const labelSpan = el('span', 'roster-duty-label', duty.label);
-        const hideBtn = el('button', 'roster-duty-hide', '👁');
+        const hideBtn = el('button', 'roster-duty-hide');
         hideBtn.type = 'button';
         hideBtn.title = `隐藏「${duty.label}」`;
         hideBtn.setAttribute('aria-label', `隐藏${duty.label}`);
+        hideBtn.appendChild(eyeIcon(true));
         hideBtn.addEventListener('click', event => {
           event.stopPropagation();
           const next = readHiddenRosterRoles();
@@ -428,7 +484,9 @@
         const { prefixChip, names } = splitDutyTokens(duty);
         const normalizedPeople = [];
         if (prefixChip) {
-          dd.appendChild(el('span', 'roster-ref-chip', '📖 ' + prefixChip));
+          const refChip = el('span', 'roster-ref-chip');
+          append(refChip, window.PMFeatures.yesicon('book-2', 'roster-ref-icon'), el('span', '', prefixChip));
+          dd.appendChild(refChip);
         }
         names.forEach(name => {
           const cleanName = name.replace(/\s+/g, '');
