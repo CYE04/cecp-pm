@@ -277,6 +277,24 @@
     };
   }
 
+  const NOV_2026_SOUND_DEFAULT = {
+    '2026年11月|第一周|青年团契': { sound: '胡恩典', ppt: '陈煜恩', broadcast: '' },
+    '2026年11月|第二周|青年团契': { sound: '倪翰俊', ppt: '林DANIELE', broadcast: '' },
+    '2026年11月|第三周|青年团契': { sound: '陈煜恩', ppt: '戴DANTE', broadcast: '' },
+    '2026年11月|第四周|青年团契': { sound: '戴DANTE', ppt: '林DANIELE', broadcast: '' },
+    '2026年11月|第五周|青年团契': { sound: '林DANIELE', ppt: '戴DANTE', broadcast: '' },
+    '2026年11月|第一周|主日下午': { sound: '陈煜恩', ppt: '倪翰耀', broadcast: '何正' },
+    '2026年11月|第二周|主日下午': { sound: '林DANIELE', ppt: '倪翰耀', broadcast: '倪翰俊' },
+    '2026年11月|第三周|主日下午': { sound: '倪翰俊', ppt: '叶Romano', broadcast: '吴以勒' },
+    '2026年11月|第四周|主日下午': { sound: '林DANIELE', ppt: '杨Samuele', broadcast: '吴以勒' },
+    '2026年11月|第五周|主日下午': { sound: '吴以勒', ppt: '陈欣豪', broadcast: '黄振宇' },
+    '2026年11月|第一周|主日晚上': { sound: '卓毅豪', ppt: 'Alex', broadcast: '黄振宇' },
+    '2026年11月|第二周|主日晚上': { sound: '何正', ppt: '苏Alessio', broadcast: '卓毅豪' },
+    '2026年11月|第三周|主日晚上': { sound: '黄振宇', ppt: '毛俊龙', broadcast: '卓毅豪' },
+    '2026年11月|第四周|主日晚上': { sound: '黄振宇', ppt: 'Vitto', broadcast: '何正' },
+    '2026年11月|第五周|主日晚上': { sound: '何正', ppt: 'Alex', broadcast: '卓毅豪' }
+  };
+
   async function load(api, date) {
     const normalizedApi = String(api || '').replace(OLD_API_ID, NEW_API_ID);
     const url = new URL(normalizedApi);
@@ -289,7 +307,7 @@
     ]);
 
     let rows = parseGvizMainSchedule(mainRaw);
-    const soundMap = soundRaw ? parseGvizSoundTable(soundRaw) : null;
+    const soundMap = soundRaw ? parseGvizSoundTable(soundRaw) : {};
 
     if (!rows.length) {
       url.searchParams.set('action', 'all');
@@ -309,15 +327,14 @@
       rows = parsed.data;
     }
 
-    if (soundMap) {
-      rows.forEach(r => {
-        const k = `${text(r.month)}|${text(r.week)}|${text(r.type)}`;
-        const sm = soundMap[k];
-        r.sound = text(r.sound) || (sm && sm.sound) || '';
-        r.ppt = text(r.ppt) || (sm && sm.ppt) || '';
-        r.broadcast = text(r.broadcast) || (sm && sm.broadcast) || '';
-      });
-    }
+    const hasNovInSheet = soundMap && Object.keys(soundMap).some(k => k.indexOf('2026年11月|') === 0);
+    rows.forEach(r => {
+      const k = `${text(r.month)}|${text(r.week)}|${text(r.type)}`;
+      const sm = (soundMap && soundMap[k]) || (!hasNovInSheet ? NOV_2026_SOUND_DEFAULT[k] : null);
+      r.sound = text(r.sound) || (sm && sm.sound) || '';
+      r.ppt = text(r.ppt) || (sm && sm.ppt) || '';
+      r.broadcast = text(r.broadcast) || (sm && sm.broadcast) || '';
+    });
 
     return select({ ok: true, data: rows }, date);
   }
