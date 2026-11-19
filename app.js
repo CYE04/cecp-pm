@@ -95,6 +95,42 @@
     }
 
     // 正文直接依照同一份 schedule 数组输出，时间表与内容不会出现不同顺序。
+    const hasReadingSection = (data.schedule || []).some(item => item && item.section === 'reading');
+    const appendReadingAndOffering = (box, onlyWhenFilled = false) => {
+      const raw = data.reading;
+      const refStr = typeof raw === 'string' ? raw.trim() : (raw && typeof raw.ref === 'string' ? raw.ref.trim() : '');
+      const reading = (refStr ? window.PMBible.parseRef(refStr) : null) || (raw && typeof raw === 'object' ? raw : null);
+      const note = raw && typeof raw === 'object' ? raw.note : undefined;
+      const hasReading = Boolean(reading?.reference);
+      const offeringSongs = window.PMFeatures.filledSongs(data.offeringSongs);
+      const hasOffering = Boolean(offeringSongs.length || data.offering);
+
+      if (!onlyWhenFilled || hasReading) {
+        box.appendChild(el('h3', 'stage-subheading', '读经'));
+        if (hasReading) {
+          const card = el('div', 'reading-card');
+          append(card, el('p', 'reading-ref', reading.reference));
+          if (note) card.appendChild(el('p', 'muted', note));
+          box.appendChild(card);
+          window.PMBible.mount(box, reading, root.dataset.bibleApi);
+        } else {
+          box.appendChild(emptyState('本周读经经文尚未公布，同工正在准备中。'));
+        }
+      }
+
+      if (!onlyWhenFilled || hasOffering) {
+        box.appendChild(el('h3', 'stage-subheading stage-subheading-offering', '献诗'));
+        if (offeringSongs.length) {
+          const offeringHost = el('div', 'song-host'); box.appendChild(offeringHost);
+          window.PMSongs.mount(offeringHost, offeringSongs, root.dataset);
+        } else if (data.offering) {
+          box.appendChild(el('p', 'stage-description', data.offering));
+        } else {
+          box.appendChild(emptyState('本周献诗尚未公布，同工正在准备中。'));
+        }
+      }
+    };
+
     (data.schedule || []).forEach(item => {
       const key = item.section;
       if (!/^[a-z][a-z0-9-]*$/.test(key || '')) return;
@@ -114,36 +150,12 @@
         } else {
           box.appendChild(emptyState('本周敬拜诗歌尚未公布，同工正在准备中。'));
         }
+        if (!hasReadingSection) {
+          appendReadingAndOffering(box, true);
+        }
       }
       if (key === 'reading') {
-        box.appendChild(el('h3', 'stage-subheading', '读经'));
-        let hasReading = false;
-        if (data.reading) {
-          // 支持缩写写法：reading: "诗 37" 或 reading: { ref: "林前 3:1-23", note: "..." }
-          const raw = data.reading;
-          const refStr = typeof raw === 'string' ? raw : raw.ref;
-          const reading = (refStr ? window.PMBible.parseRef(refStr) : null) || (typeof raw === 'object' ? raw : null);
-          const note = typeof raw === 'object' ? raw.note : undefined;
-          if (reading?.reference) {
-            hasReading = true;
-            const card = el('div', 'reading-card');
-            append(card, el('p', 'reading-ref', reading.reference));
-            if (note) card.appendChild(el('p', 'muted', note));
-            box.appendChild(card);
-            window.PMBible.mount(box, reading, root.dataset.bibleApi);
-          }
-        }
-        if (!hasReading) box.appendChild(emptyState('本周读经经文尚未公布，同工正在准备中。'));
-        box.appendChild(el('h3', 'stage-subheading stage-subheading-offering', '献诗'));
-        const offeringSongs = window.PMFeatures.filledSongs(data.offeringSongs);
-        if (offeringSongs.length) {
-          const offeringHost = el('div', 'song-host'); box.appendChild(offeringHost);
-          window.PMSongs.mount(offeringHost, offeringSongs, root.dataset);
-        } else if (data.offering) {
-          box.appendChild(el('p', 'stage-description', data.offering));
-        } else {
-          box.appendChild(emptyState('本周献诗尚未公布，同工正在准备中。'));
-        }
+        appendReadingAndOffering(box, false);
       }
       if (key === 'sermon') {
         const raw = data.sermon || {};

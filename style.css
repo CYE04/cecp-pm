@@ -425,6 +425,36 @@ li.schedule-row,
   border-color: var(--row-accent, var(--accent));
   transform: translateX(2px);
 }
+.schedule-row:nth-child(5n + 1) {
+  --row-accent: #4f79b8;
+  --row-soft: rgba(79, 121, 184, 0.14);
+  --row-hover: rgba(79, 121, 184, 0.22);
+  --row-border: rgba(79, 121, 184, 0.30);
+}
+.schedule-row:nth-child(5n + 2) {
+  --row-accent: #d4973b;
+  --row-soft: rgba(212, 151, 59, 0.14);
+  --row-hover: rgba(212, 151, 59, 0.22);
+  --row-border: rgba(212, 151, 59, 0.30);
+}
+.schedule-row:nth-child(5n + 3) {
+  --row-accent: #8e6bc2;
+  --row-soft: rgba(142, 107, 194, 0.14);
+  --row-hover: rgba(142, 107, 194, 0.22);
+  --row-border: rgba(142, 107, 194, 0.30);
+}
+.schedule-row:nth-child(5n + 4) {
+  --row-accent: #4d8a72;
+  --row-soft: rgba(77, 138, 114, 0.14);
+  --row-hover: rgba(77, 138, 114, 0.22);
+  --row-border: rgba(77, 138, 114, 0.30);
+}
+.schedule-row:nth-child(5n + 5) {
+  --row-accent: #b85959;
+  --row-soft: rgba(184, 89, 89, 0.14);
+  --row-hover: rgba(184, 89, 89, 0.22);
+  --row-border: rgba(184, 89, 89, 0.30);
+}
 .schedule-row[data-section="prayer"] {
   --row-accent: #4f79b8;
   --row-soft: rgba(79, 121, 184, 0.14);
