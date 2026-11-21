@@ -15,17 +15,41 @@
   ],
   "reading": "sp 46",
   "songs": [
-    { "title": "" },
-    { "title": "" },
-    { "title": "" },
-    { "title": "" }
+    { "title": "endiandejihao" },
+    { "title": "0739ganendeleishui" },
+    { "title": "0632qiyiendian" }
   ],
   "offeringSongs": ["shenbujiandideai"],
   "sermon": {
-    "ref": "",
-    "title": "",
-    "outline": [""]
+    "ref": "帖撒罗尼迦前书 5:16-18",
+    "title": "凡事谢恩",
+    "outline": [
+      "一 伟大救恩",
+      "二 日常生活",
+      "三 患难痛苦"
+    ]
   },
-  "announcements": [],
+  "announcements": [
+    {
+      "title": "圣诞节福音布道聚会",
+      "detail": "今年教会在 12 月 25 日安排了圣诞节福音布道聚会，讲员：王丽静牧师。请弟兄姐妹们邀请未信主的慕道朋友来参加，也为福音布道会祷告，具体时间表如下：",
+      "schedules": [
+        {
+          "title": "12月25日 · 圣诞节福音布道聚会时间表",
+          "items": []
+        }
+      ]
+    },
+    {
+      "title": "新春培灵会",
+      "detail": "明年 1 月 1 日教会安排了新春培灵会，讲员：陈丰盛牧师。请弟兄姐妹积极参加，也为新春培灵会祷告，具体时间表如下：",
+      "schedules": [
+        {
+          "title": "1月1日 · 新春培灵会时间表",
+          "items": []
+        }
+      ]
+    }
+  ],
   "replayUrl": ""
 }
