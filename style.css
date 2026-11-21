@@ -650,9 +650,11 @@ li.schedule-row,
 :is(#cecp-pm, #app) .roster-filter-menu {
   position: absolute;
   right: 0;
+  left: auto;
   top: calc(100% + 8px);
   z-index: 30;
-  width: 230px;
+  width: min(230px, calc(100vw - 24px));
+  max-width: calc(100vw - 24px);
   padding: 8px;
   border-radius: 14px;
   border: 1px solid var(--line);
@@ -691,7 +693,7 @@ li.schedule-row,
   display: flex;
   flex-direction: column;
   gap: 2px;
-  max-height: 300px;
+  max-height: min(300px, 55vh);
   overflow-y: auto;
 }
 :is(#cecp-pm, #app) .roster-filter-item {
@@ -1212,7 +1214,10 @@ summary.bible-reader-toggle {
   :is(#cecp-pm, #app) .roster-duty { border-right: 0; grid-template-columns: 114px minmax(0, 1fr); padding: 10px 12px; }
   :is(#cecp-pm, #app) .roster-duty:nth-last-child(2):nth-child(odd) { border-bottom: 1px solid var(--line); }
   :is(#cecp-pm, #app) .roster-duty-hide { opacity: 0.55; }
+  :is(#cecp-pm, #app) .roster-filter-menu { left: 0; right: auto; width: min(240px, calc(100vw - 24px)); }
 }
+:is(#cecp-pm, #app) .roster-filter-menu.is-align-left { left: 0; right: auto; }
+:is(#cecp-pm, #app) .roster-filter-menu.is-align-right { left: auto; right: 0; }
 @media (max-width:620px) { .shared-songs .ym-song-tabs { display:flex; flex-wrap:nowrap; overflow-x:auto; overflow-y:hidden; -webkit-overflow-scrolling:touch; scrollbar-width:none; gap:18px; padding:0 0 4px; border-bottom:1px solid var(--line); } .shared-songs .ym-song-tabs::-webkit-scrollbar { display:none; } .shared-songs .ym-song-tab { flex-shrink:0; max-width:none; padding:5px 0 7px; } .shared-songs .ym-song-tab.active::after { bottom:-2px; height:2px; } .shared-songs .pm-compact-player { padding:6px; gap:4px; } .shared-songs .pm-compact-player .ym-pl-stage { grid-template-columns:64px minmax(0,1fr); gap:7px; } .shared-songs .pm-compact-player .ym-pl-cover-wrap,.shared-songs .pm-compact-player .ym-pl-stage.playing .ym-pl-cover-wrap { width:64px; } .shared-songs .pm-compact-player .ym-pl-lrc-panel,.shared-songs .pm-compact-player .ym-pl-stage.playing .ym-pl-lrc-panel { height:82px; } .shared-songs .pm-compact-player .ym-pl-lrc-inner { padding:32px 0 40px; } .shared-songs .pm-compact-player .ym-pl-lrc-line { font-size:12px; } .shared-songs .pm-compact-player .ym-pl-lrc-line.active { font-size:15px; } .shared-songs .pm-compact-player .pm-inline-volume { display:none!important; } .shared-songs .pm-song-actions .sw-tog { min-height:36px; padding:7px 10px; } .shared-songs .pm-video-button { min-width:104px; height:36px; padding:0 11px; font-size:13px; } }
 @media (prefers-reduced-motion:reduce) { html { scroll-behavior:auto; } .bible-reader-panel,.bible-reader-arrow { transition:none!important; } }
 @keyframes pm-sheet-up { from { opacity:0; transform:translateY(38px); } to { opacity:1; transform:translateY(0); } }

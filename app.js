@@ -340,6 +340,62 @@
     return svg;
   }
 
+  function positionRosterFilterMenu(details, topBar) {
+    if (!details || !details.open) return;
+    const menu = details.querySelector('.roster-filter-menu');
+    if (!menu) return;
+    menu.classList.remove('is-align-left', 'is-align-right');
+    menu.style.left = '';
+    menu.style.right = '';
+
+    const vw = document.documentElement?.clientWidth || window.innerWidth || 0;
+    if (!vw) return;
+    const pad = 12;
+    const anchorRect = details.getBoundingClientRect();
+    const barRect = topBar ? topBar.getBoundingClientRect() : null;
+    const menuW = menu.offsetWidth || Math.min(230, Math.max(160, vw - pad * 2));
+
+    const safeLeft = pad;
+    const safeRight = vw - pad;
+    const boundLeft = barRect ? Math.max(safeLeft, barRect.left) : safeLeft;
+    const boundRight = barRect ? Math.min(safeRight, barRect.right) : safeRight;
+
+    const anchorCenter = (anchorRect.left + anchorRect.right) / 2;
+    const barCenter = barRect ? (barRect.left + barRect.right) / 2 : vw / 2;
+    const preferLeft = anchorCenter <= barCenter;
+
+    const fitsLeft = leftEdge => leftEdge >= boundLeft - 0.5 && leftEdge + menuW <= boundRight + 0.5;
+    const fitsViewport = leftEdge => leftEdge >= safeLeft - 0.5 && leftEdge + menuW <= safeRight + 0.5;
+
+    const leftAlignPos = anchorRect.left;
+    const rightAlignPos = anchorRect.right - menuW;
+
+    if (preferLeft) {
+      if (fitsLeft(leftAlignPos) || (!fitsLeft(rightAlignPos) && fitsViewport(leftAlignPos))) {
+        menu.classList.add('is-align-left');
+        return;
+      }
+      if (fitsLeft(rightAlignPos) || fitsViewport(rightAlignPos)) {
+        menu.classList.add('is-align-right');
+        return;
+      }
+    } else {
+      if (fitsLeft(rightAlignPos) || (!fitsLeft(leftAlignPos) && fitsViewport(rightAlignPos))) {
+        menu.classList.add('is-align-right');
+        return;
+      }
+      if (fitsLeft(leftAlignPos) || fitsViewport(leftAlignPos)) {
+        menu.classList.add('is-align-left');
+        return;
+      }
+    }
+
+    const preferredLeft = preferLeft ? leftAlignPos : rightAlignPos;
+    const clampedLeft = Math.max(safeLeft, Math.min(preferredLeft, Math.max(safeLeft, safeRight - menuW)));
+    menu.style.left = `${Math.round(clampedLeft - anchorRect.left)}px`;
+    menu.style.right = 'auto';
+  }
+
   let rosterOutsideBound = false;
   function bindRosterOutsideClose() {
     if (rosterOutsideBound || typeof document === 'undefined') return;
@@ -349,6 +405,13 @@
         if (!details.contains(event.target)) details.open = false;
       });
     });
+    if (typeof window !== 'undefined') {
+      window.addEventListener('resize', () => {
+        document.querySelectorAll('.roster-filter[open]').forEach(details => {
+          positionRosterFilterMenu(details, details.closest('.roster-bar'));
+        });
+      });
+    }
   }
 
   function renderRosterBoard(body, roster, keepMenuOpen = false) {
@@ -398,7 +461,8 @@
     const resetBtn = el('button', 'roster-filter-reset', '全部显示');
     resetBtn.type = 'button';
     resetBtn.disabled = !hiddenKeys.length;
-    resetBtn.addEventListener('click', () => {
+    resetBtn.addEventListener('click', event => {
+      event.stopPropagation();
       writeHiddenRosterRoles([]);
       renderRosterBoard(body, roster, true);
     });
@@ -414,7 +478,8 @@
       append(itemLeft, eyeIcon(hidden), el('span', '', duty.label));
       const itemState = el('span', 'roster-filter-item-state', hidden ? '已隐藏' : '显示中');
       append(itemBtn, itemLeft, itemState);
-      itemBtn.addEventListener('click', () => {
+      itemBtn.addEventListener('click', event => {
+        event.stopPropagation();
         const next = readHiddenRosterRoles().filter(k => k !== duty.key);
         if (!hidden) next.push(duty.key);
         writeHiddenRosterRoles(next);
@@ -424,9 +489,13 @@
     });
     filterMenu.appendChild(filterList);
     append(filterDetails, filterSummary, filterMenu);
+    filterDetails.addEventListener('toggle', () => {
+      if (filterDetails.open) positionRosterFilterMenu(filterDetails, topBar);
+    });
     actionsWrap.appendChild(filterDetails);
     append(topBar, metaWrap, actionsWrap);
     body.appendChild(topBar);
+    if (keepMenuOpen) positionRosterFilterMenu(filterDetails, topBar);
 
     // Hidden roles restore bar
     const hiddenDuties = roster.duties.filter(d => hiddenKeys.includes(d.key));
@@ -584,7 +653,7 @@
     ds.mediaBase = ds.mediaBase || options.mediaBase || 'https://cecp.it/';
     ds.bibleApi = ds.bibleApi || options.bibleApi || 'https://bible.cecp.workers.dev/';
 
-    const baseUrl = options.baseUrl || './';
+    const baseUrl = new URL(options.baseUrl || './', location.href).href;
 
     try {
       let date = options.date || ds.date || new URLSearchParams(location.search).get('date');
