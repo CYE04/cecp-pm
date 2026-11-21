@@ -110,6 +110,11 @@
         if (hasReading) {
           const card = el('div', 'reading-card');
           append(card, el('p', 'reading-ref', reading.reference));
+          const readerName = raw && typeof raw === 'object' ? String(raw.reader || '').trim() : '';
+          const reader = el('p', 'muted', readerName ? '读经 · ' + readerName : '');
+          reader.hidden = !readerName;
+          if (!readerName) reader.dataset.rosterReader = 'true';
+          card.appendChild(reader);
           if (note) card.appendChild(el('p', 'muted', note));
           box.appendChild(card);
           window.PMBible.mount(box, reading, root.dataset.bibleApi);
@@ -547,6 +552,9 @@
       });
       if (duties.note?.value) root.querySelectorAll('[data-roster-speaker]').forEach(slot => {
         slot.textContent = '证道安排 · ' + duties.note.value; slot.hidden = false;
+      });
+      if (duties.reading?.value) root.querySelectorAll('[data-roster-reader]').forEach(slot => {
+        slot.textContent = '读经 · ' + duties.reading.value; slot.hidden = false;
       });
     } catch (_) {
       const retry = el('button', 'roster-retry', '重新加载');
