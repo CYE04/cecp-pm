@@ -8,7 +8,7 @@
 
   const weeks = ['第一周', '第二周', '第三周', '第四周', '第五周'];
   const roles = [
-    ['leader', '主领', 'lead'],
+    ['leader', '司会', 'lead'],
     ['worship', '敬拜带领', 'lead'],
     ['prayerLeader', '祷告会带领', 'lead'],
     ['praisePrayer', '颂赞祷告', 'lead'],
