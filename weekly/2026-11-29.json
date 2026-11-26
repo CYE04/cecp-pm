@@ -1,0 +1,64 @@
+{
+  "date": "2026-11-29",
+  "title": "主日下午聚会",
+  "time": "13:20–17:30",
+  "venue": "帕多瓦教会",
+  "timeZone": "Europe/Rome",
+  "schedule": [
+    { "start": "13:20", "end": "14:00", "title": "祷告会", "section": "prayer", "roles": ["prayerLeader"] },
+    { "start": "14:00", "end": "14:30", "title": "诗歌敬拜、祷告", "section": "worship", "roles": ["worship", "praisePrayer", "memorialPrayer", "reading"] },
+    { "start": "14:30", "end": "15:00", "title": "证道", "section": "sermon", "roles": ["note"] },
+    { "start": "15:00", "end": "15:40", "title": "聚餐" },
+    { "start": "15:40", "end": "16:30", "title": "感恩见证" },
+    { "start": "16:30", "end": "16:40", "title": "奉献" },
+    { "start": "16:40", "end": "17:30", "title": "感恩见证" }
+  ],
+  "reading": "sp 47",
+  "songs": [
+    { "title": "quanranweinishengminghe" },
+    { "title": "womendeshen-zanmei" },
+    { "title": "shengaoyangpeide" }
+  ],
+  "offeringSongs": [""],
+  "sermon": {
+    "ref": "",
+    "title": "",
+    "outline": []
+  },
+  "announcements": [
+    {
+      "title": "圣诞节福音布道聚会",
+      "detail": "今年教会在 12 月 25 日安排了圣诞节福音布道聚会，讲员：王丽静牧师。请弟兄姐妹们邀请未信主的慕道朋友来参加，也为福音布道会祷告，具体时间表如下：",
+      "schedules": [
+        {
+          "title": "12月25日 · 圣诞节福音布道聚会时间表",
+          "items": [
+            { "start": "13:30", "end": "13:45", "title": "诗歌敬拜" },
+            { "start": "13:45", "end": "13:50", "title": "祷告" },
+            { "start": "13:50", "end": "17:10", "title": "节目时间" },
+            { "start": "17:10", "title": "祝福祷告散会" }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "新春培灵会",
+      "detail": "明年 1 月 1 日教会安排了新春培灵会，讲员：陈丰盛牧师。请弟兄姐妹积极参加，也为新春培灵会祷告，具体时间表如下：",
+      "schedules": [
+        {
+          "title": "2027年1月1日 · 新春培灵会时间表",
+          "items": [
+            { "start": "12:00", "end": "13:00", "title": "用餐" },
+            { "start": "13:00", "end": "13:40", "title": "祷告会" },
+            { "start": "13:40", "end": "14:20", "title": "诗歌敬拜、祷告、献诗" },
+            { "start": "14:20", "end": "15:20", "title": "证道一" },
+            { "start": "15:20", "end": "15:30", "title": "回应诗歌（献诗）" },
+            { "start": "15:30", "end": "16:30", "title": "证道二" },
+            { "start": "16:30", "end": "17:30", "title": "自洁祷告会" }
+          ]
+        }
+      ]
+    }
+  ],
+  "replayUrl": ""
+}
